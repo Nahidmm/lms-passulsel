@@ -8,13 +8,14 @@ class Materi extends Model
 {
     protected $fillable = [
         'judul', 'deskripsi', 'jenis', 'file_path', 'url_link',
-        'jabatan_id', 'urutan', 'is_active', 'durasi_baca',
+        'modul_id', 'urutan', 'is_active', 'durasi_baca',
     ];
 
     protected $casts = ['is_active' => 'boolean'];
 
-    public function jabatan() { return $this->belongsTo(Jabatan::class); }
-    public function progresModul() { return $this->hasMany(ProgresModul::class); }
+    public function modul() { return $this->belongsTo(Modul::class); }
+    public function soals() { return $this->hasMany(Soal::class); }
+    public function progresMateris() { return $this->hasMany(ProgresMateri::class); }
 
     public function getFileUrlAttribute(): ?string
     {

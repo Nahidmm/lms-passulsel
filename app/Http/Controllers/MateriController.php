@@ -14,51 +14,40 @@ class MateriController extends Controller
     // =====================================
     // ROLE: ADMIN (CRUD)
     // =====================================
-    public function index()
+    public function create(Modul $modul)
     {
-        $jabatans = Jabatan::with(['materis' => function($q) {
-            $q->orderBy('urutan');
-        }])->get();
-        
-        return view('admin.materi.index', compact('jabatans'));
+        return view('admin.materi.create', compact('modul'));
     }
 
-    public function create()
-    {
-        $jabatans = Jabatan::where('is_active', true)->get();
-        return view('admin.materi.create', compact('jabatans'));
-    }
-
-    public function store(Request $request)
+    public function store(Request $request, Modul $modul)
     {
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'jabatan_id' => 'required|exists:jabatans,id',
+            'jenis' => 'required|in:pdf,ppt,pptx,link,video_embed,quiz',
             'urutan' => 'required|integer|min:1',
-            'jenis' => 'required|in:pdf,ppt,pptx,link,video_embed',
             'durasi_baca' => 'required|integer|min:1',
-            'file_upload' => 'nullable|file|mimes:pdf,ppt,pptx|max:20480', // max 20MB
-            'url_link' => 'nullable|url|max:500',
+            'url_link' => 'nullable|string|max:500',
+            'file_upload' => 'nullable|file|mimes:pdf,ppt,pptx|max:10240',
         ]);
 
         $materi = new Materi($validated);
+        $materi->modul_id = $modul->id;
+        $materi->is_active = $request->has('is_active');
 
-        if ($request->hasFile('file_upload')) {
-            $path = $request->file('file_upload')->store('materi', 'public');
+        if ($request->hasFile('file_upload') && in_array($validated['jenis'], ['pdf', 'ppt', 'pptx'])) {
+            $path = $request->file('file_upload')->store('materis', 'public');
             $materi->file_path = $path;
         }
 
-        $materi->is_active = $request->has('is_active');
         $materi->save();
 
-        return redirect()->route('admin.materi.index')->with('success', 'Modul berhasil ditambahkan.');
+        return redirect()->route('admin.modul.show', $modul->id)->with('success', 'Materi berhasil ditambahkan.');
     }
 
     public function edit(Materi $materi)
     {
-        $jabatans = Jabatan::where('is_active', true)->get();
-        return view('admin.materi.edit', compact('materi', 'jabatans'));
+        return view('admin.materi.edit', compact('materi'));
     }
 
     public function update(Request $request, Materi $materi)
@@ -66,37 +55,38 @@ class MateriController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'jabatan_id' => 'required|exists:jabatans,id',
+            'jenis' => 'required|in:pdf,ppt,pptx,link,video_embed,quiz',
             'urutan' => 'required|integer|min:1',
-            'jenis' => 'required|in:pdf,ppt,pptx,link,video_embed',
             'durasi_baca' => 'required|integer|min:1',
-            'file_upload' => 'nullable|file|mimes:pdf,ppt,pptx|max:20480',
-            'url_link' => 'nullable|url|max:500',
+            'url_link' => 'nullable|string|max:500',
+            'file_upload' => 'nullable|file|mimes:pdf,ppt,pptx|max:10240',
         ]);
 
         $materi->fill($validated);
+        $materi->is_active = $request->has('is_active');
 
-        if ($request->hasFile('file_upload')) {
+        if ($request->hasFile('file_upload') && in_array($validated['jenis'], ['pdf', 'ppt', 'pptx'])) {
             if ($materi->file_path) {
                 Storage::disk('public')->delete($materi->file_path);
             }
-            $path = $request->file('file_upload')->store('materi', 'public');
+            $path = $request->file('file_upload')->store('materis', 'public');
             $materi->file_path = $path;
         }
 
-        $materi->is_active = $request->has('is_active');
         $materi->save();
 
-        return redirect()->route('admin.materi.index')->with('success', 'Modul berhasil diperbarui.');
+        return redirect()->route('admin.modul.show', $materi->modul_id)->with('success', 'Materi berhasil diperbarui.');
     }
 
     public function destroy(Materi $materi)
     {
+        $modulId = $materi->modul_id;
         if ($materi->file_path) {
             Storage::disk('public')->delete($materi->file_path);
         }
         $materi->delete();
-        return redirect()->route('admin.materi.index')->with('success', 'Modul berhasil dihapus.');
+
+        return redirect()->route('admin.modul.show', $modulId)->with('success', 'Materi berhasil dihapus.');
     }
 
     // =====================================
@@ -144,32 +134,57 @@ class MateriController extends Controller
     public function showPeserta(Materi $materi)
     {
         $user = Auth::user();
-        if ($materi->jabatan_id !== $user->jabatan_id) {
-            abort(403);
-        }
 
-        $progres = ProgresModul::firstOrCreate(
-            ['user_id' => $user->id, 'materi_id' => $materi->id]
+        $progres = \App\Models\ProgresMateri::firstOrCreate(
+            ['user_id' => $user->id, 'materi_id' => $materi->id],
+            ['status' => 'belum']
         );
 
         if ($progres->status === 'belum') {
-            $progres->update(['status' => 'sedang', 'persen' => 10]);
+            $progres->update(['status' => 'sedang']);
         }
 
-        return view('peserta.pembelajaran.show', compact('materi', 'progres'));
+        return view('peserta.pembelajaran.show_materi', compact('materi', 'progres'));
     }
 
     public function updateProgress(Request $request, Materi $materi)
     {
         $user = Auth::user();
-        $progres = ProgresModul::where('user_id', $user->id)->where('materi_id', $materi->id)->firstOrFail();
+        $progres = \App\Models\ProgresMateri::where('user_id', $user->id)->where('materi_id', $materi->id)->firstOrFail();
         
         $progres->update([
             'status' => 'selesai',
-            'persen' => 100,
             'tanggal_selesai' => now(),
         ]);
 
-        return redirect()->route('peserta.pembelajaran.index')->with('success', 'Modul berhasil diselesaikan!');
+        // Option: Check if all materis in modul are selesai, then mark modul as selesai
+        $modul = $materi->modul;
+        $allMateris = $modul->materis()->where('is_active', true)->pluck('id');
+        $completedMateris = \App\Models\ProgresMateri::where('user_id', $user->id)
+            ->whereIn('materi_id', $allMateris)
+            ->where('status', 'selesai')
+            ->count();
+
+        if ($completedMateris === count($allMateris)) {
+            $modulProgres = \App\Models\ProgresModul::firstOrCreate(
+                ['user_id' => $user->id, 'modul_id' => $modul->id]
+            );
+            $modulProgres->update([
+                'status' => 'selesai',
+                'persen' => 100,
+                'tanggal_selesai' => now()
+            ]);
+        } else {
+            $modulProgres = \App\Models\ProgresModul::firstOrCreate(
+                ['user_id' => $user->id, 'modul_id' => $modul->id]
+            );
+            $persen = count($allMateris) > 0 ? floor(($completedMateris / count($allMateris)) * 100) : 0;
+            $modulProgres->update([
+                'status' => 'sedang',
+                'persen' => $persen
+            ]);
+        }
+
+        return redirect()->route('peserta.pembelajaran.show', $materi->modul_id)->with('success', 'Materi berhasil diselesaikan!');
     }
 }

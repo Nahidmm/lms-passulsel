@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Jabatan;
+use App\Models\Modul;
 use App\Models\Materi;
 use App\Models\PilihanJawaban;
 use App\Models\Soal;
@@ -48,6 +49,15 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
+        // Demo Modul
+        $modul = Modul::firstOrCreate([
+            'judul' => 'Orientasi Dasar Pemasyarakatan',
+        ], [
+            'deskripsi' => 'Modul wajib untuk seluruh pegawai baru Eselon V',
+            'urutan' => 1,
+            'is_active' => true,
+        ]);
+
         // Demo Materi
         $materis = [
             [
@@ -55,7 +65,7 @@ class DemoDataSeeder extends Seeder
                 'deskripsi' => 'Pengenalan menyeluruh tentang tupoksi, kewenangan, dan tanggung jawab pejabat struktural eselon IV di lingkungan Direktorat Jenderal Pemasyarakatan.',
                 'jenis' => 'link',
                 'url_link' => 'https://www.kemenkumham.go.id/profil/tupoksi',
-                'jabatan_id' => $jabatan->id,
+                'modul_id' => $modul->id,
                 'urutan' => 1,
                 'durasi_baca' => 15,
             ],
@@ -64,7 +74,7 @@ class DemoDataSeeder extends Seeder
                 'deskripsi' => 'Mempelajari dasar hukum jabatan struktural di pemasyarakatan, hierarki organisasi, dan kewenangan masing-masing pejabat.',
                 'jenis' => 'link',
                 'url_link' => 'https://www.kemenkumham.go.id/regulasi',
-                'jabatan_id' => $jabatan->id,
+                'modul_id' => $modul->id,
                 'urutan' => 2,
                 'durasi_baca' => 20,
             ],
@@ -73,14 +83,14 @@ class DemoDataSeeder extends Seeder
                 'deskripsi' => 'Strategi dan teknik pembinaan narapidana yang efektif, meliputi pendekatan individual, kelompok, dan berbasis komunitas.',
                 'jenis' => 'link',
                 'url_link' => 'https://ditjenpas.go.id/pembinaan',
-                'jabatan_id' => $jabatan->id,
+                'modul_id' => $modul->id,
                 'urutan' => 3,
                 'durasi_baca' => 25,
             ],
         ];
 
         foreach ($materis as $m) {
-            Materi::firstOrCreate(['judul' => $m['judul'], 'jabatan_id' => $m['jabatan_id']], $m);
+            Materi::firstOrCreate(['judul' => $m['judul'], 'modul_id' => $m['modul_id']], $m);
         }
 
         // Demo Video
@@ -89,18 +99,28 @@ class DemoDataSeeder extends Seeder
             [
                 'deskripsi' => 'Video orientasi resmi Direktorat Jenderal Pemasyarakatan untuk pejabat eselon IV baru.',
                 'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                'jabatan_id' => $jabatan->id,
                 'urutan' => 1,
                 'durasi_menit' => 30,
             ]
         );
+
+        // Demo Kuis (Materi tipe Kuis)
+        $materiKuis = Materi::firstOrCreate([
+            'judul' => 'Kuis Orientasi',
+            'modul_id' => $modul->id,
+        ], [
+            'deskripsi' => 'Uji pemahaman tentang orientasi',
+            'jenis' => 'quiz',
+            'urutan' => 4,
+            'durasi_baca' => 30,
+        ]);
 
         // Demo Soal
         $soals = [
             [
                 'pertanyaan' => 'Apakah tugas pokok utama Kepala Seksi Bimbingan Narapidana/Anak Didik di Lapas?',
                 'tipe' => 'pilgan',
-                'jabatan_id' => $jabatan->id,
+                'materi_id' => $materiKuis->id,
                 'bobot' => 10,
                 'pembahasan' => 'Tugas pokok utama adalah melakukan bimbingan narapidana/anak didik dan pengawasan pelaksanaan program pembinaan.',
                 'pilihan' => [
@@ -113,7 +133,7 @@ class DemoDataSeeder extends Seeder
             [
                 'pertanyaan' => 'Dalam hierarki organisasi Lapas, Kepala Seksi bertanggung jawab kepada siapa?',
                 'tipe' => 'pilgan',
-                'jabatan_id' => $jabatan->id,
+                'materi_id' => $materiKuis->id,
                 'bobot' => 10,
                 'pembahasan' => 'Kepala Seksi (Eselon IV) bertanggung jawab langsung kepada Kepala Lapas (Eselon III) sesuai dengan struktur organisasi.',
                 'pilihan' => [
@@ -126,7 +146,7 @@ class DemoDataSeeder extends Seeder
             [
                 'pertanyaan' => 'Program Asimilasi bagi narapidana merupakan bagian dari proses pembinaan tahap apa?',
                 'tipe' => 'pilgan',
-                'jabatan_id' => $jabatan->id,
+                'materi_id' => $materiKuis->id,
                 'bobot' => 10,
                 'pembahasan' => 'Asimilasi adalah bagian dari pembinaan tahap akhir (integrasi), di mana narapidana dipersiapkan untuk kembali ke masyarakat.',
                 'pilihan' => [
@@ -141,7 +161,7 @@ class DemoDataSeeder extends Seeder
         foreach ($soals as $s) {
             $pilihan = $s['pilihan'];
             unset($s['pilihan']);
-            $soal = Soal::firstOrCreate(['pertanyaan' => $s['pertanyaan'], 'jabatan_id' => $s['jabatan_id']], $s);
+            $soal = Soal::firstOrCreate(['pertanyaan' => $s['pertanyaan'], 'materi_id' => $s['materi_id']], $s);
             if ($soal->pilihanJawaban()->count() === 0) {
                 foreach ($pilihan as $p) {
                     $soal->pilihanJawaban()->create($p);

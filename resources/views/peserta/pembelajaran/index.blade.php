@@ -6,7 +6,7 @@
 
 <div class="mb-6">
     <h1 class="text-2xl font-display font-bold text-primary">Modul Pembelajaran</h1>
-    <p class="text-text-secondary mt-1">Daftar materi yang harus Anda selesaikan sesuai dengan jabatan Anda.</p>
+    <p class="text-text-secondary mt-1">Daftar modul pembelajaran yang harus Anda selesaikan.</p>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-border p-6 mb-8">
@@ -15,10 +15,10 @@
         <div class="absolute top-0 bottom-0 left-[2.25rem] w-0.5 bg-border z-0 hidden md:block"></div>
 
         <div class="space-y-6 relative z-10">
-            @forelse($materis as $index => $materi)
+            @forelse($moduls as $index => $modul)
                 @php
-                    $status = $modulStatus[$materi->id]['status'];
-                    $isLocked = $modulStatus[$materi->id]['is_locked'];
+                    $status = $modulStatus[$modul->id]['status'];
+                    $isLocked = $modulStatus[$modul->id]['is_locked'];
                 @endphp
 
                 <div class="flex flex-col md:flex-row gap-4 md:gap-6 group">
@@ -48,30 +48,22 @@
                                         @if($isLocked) bg-gray-200 text-gray-500
                                         @elseif($status === 'selesai') bg-success/10 text-success
                                         @else bg-primary/10 text-primary @endif">
-                                        Modul {{ $materi->urutan }}
+                                        Modul {{ $modul->urutan }}
                                     </span>
-                                    
-                                    @if($materi->jenis === 'video_embed')
-                                        <span class="text-xs font-medium text-text-secondary flex items-center gap-1"><i data-lucide="video" class="w-3 h-3"></i> Video</span>
-                                    @elseif($materi->jenis === 'link')
-                                        <span class="text-xs font-medium text-text-secondary flex items-center gap-1"><i data-lucide="link" class="w-3 h-3"></i> Tautan Luar</span>
-                                    @else
-                                        <span class="text-xs font-medium text-text-secondary flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> Dokumen</span>
-                                    @endif
                                 </div>
                                 
                                 <h3 class="text-lg font-display font-bold {{ $isLocked ? 'text-text-secondary' : 'text-text-primary group-hover:text-primary transition-colors' }}">
-                                    {{ $materi->judul }}
+                                    {{ $modul->judul }}
                                 </h3>
                                 
                                 <p class="text-sm {{ $isLocked ? 'text-text-secondary/70' : 'text-text-secondary' }} mt-2 line-clamp-2">
-                                    {{ $materi->deskripsi }}
+                                    {{ $modul->deskripsi }}
                                 </p>
                             </div>
                             
                             <div class="shrink-0 flex flex-col items-start md:items-end gap-3 mt-2 md:mt-0">
                                 <div class="text-xs font-medium text-text-secondary flex items-center gap-1">
-                                    <i data-lucide="clock" class="w-4 h-4"></i> Estimasi: {{ $materi->durasi_baca }} mnt
+                                    <i data-lucide="layers" class="w-4 h-4"></i> {{ $modul->materis()->where('is_active', true)->count() }} Materi
                                 </div>
                                 
                                 @if($isLocked)
@@ -79,8 +71,8 @@
                                         Terkunci
                                     </button>
                                 @else
-                                    <a href="{{ route('peserta.pembelajaran.show', $materi->id) }}" class="w-full md:w-auto px-4 py-2 {{ $status === 'selesai' ? 'bg-white border border-success text-success hover:bg-success/5' : 'bg-primary hover:bg-primary-hover text-white shadow-md' }} font-bold rounded-lg text-center transition-colors">
-                                        {{ $status === 'selesai' ? 'Baca Ulang' : 'Mulai Belajar' }}
+                                    <a href="{{ route('peserta.pembelajaran.show', $modul->id) }}" class="w-full md:w-auto px-4 py-2 {{ $status === 'selesai' ? 'bg-white border border-success text-success hover:bg-success/5' : 'bg-primary hover:bg-primary-hover text-white shadow-md' }} font-bold rounded-lg text-center transition-colors">
+                                        {{ $status === 'selesai' ? 'Lihat Kembali' : 'Mulai Belajar' }}
                                     </a>
                                 @endif
                             </div>
@@ -93,7 +85,7 @@
                         <i data-lucide="book-x" class="w-8 h-8 text-text-secondary"></i>
                     </div>
                     <h3 class="text-lg font-bold text-text-primary">Belum Ada Modul</h3>
-                    <p class="text-text-secondary mt-1">Admin belum menambahkan modul pembelajaran untuk jabatan Anda.</p>
+                    <p class="text-text-secondary mt-1">Admin belum menambahkan modul pembelajaran.</p>
                 </div>
             @endforelse
         </div>

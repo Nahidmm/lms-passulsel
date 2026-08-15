@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Soal')
+@section('title', 'Edit Soal Kuis')
 
 @section('content')
 
 <div class="mb-4 flex items-center gap-2">
-    <a href="{{ route('admin.soal.index') }}" class="text-text-secondary hover:text-primary flex items-center gap-1 font-medium transition-colors">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali
+    <a href="{{ route('admin.modul.show', $soal->materi->modul_id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1 font-medium transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Modul
     </a>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-border p-6 md:p-8">
     <div class="mb-6 pb-4 border-b border-border">
-        <h2 class="text-xl font-display font-bold text-text-primary">Edit Soal #{{ $soal->id }}</h2>
+        <h2 class="text-xl font-display font-bold text-text-primary">Edit Soal Kuis: {{ $soal->materi->judul }}</h2>
     </div>
 
     @if($errors->any())
@@ -29,25 +29,12 @@
         @csrf
         @method('PUT')
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label for="jabatan_id" class="block text-sm font-medium text-text-primary mb-1">Pilih Jabatan <span class="text-danger">*</span></label>
-                <select id="jabatan_id" name="jabatan_id" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white">
-                    @foreach($jabatans as $jabatan)
-                        <option value="{{ $jabatan->id }}" {{ old('jabatan_id', $soal->jabatan_id) == $jabatan->id ? 'selected' : '' }}>
-                            {{ $jabatan->nama_jabatan }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            
-            <div>
-                <label for="is_active" class="block text-sm font-medium text-text-primary mb-1">Status Aktif</label>
-                <select id="is_active" name="is_active" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white">
-                    <option value="1" {{ old('is_active', $soal->is_active) == '1' ? 'selected' : '' }}>Aktif (Ditampilkan)</option>
-                    <option value="0" {{ old('is_active', $soal->is_active) == '0' ? 'selected' : '' }}>Draft (Sembunyikan)</option>
-                </select>
-            </div>
+        <div>
+            <label for="is_active" class="block text-sm font-medium text-text-primary mb-1">Status Aktif</label>
+            <select id="is_active" name="is_active" class="w-full md:w-1/3 px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white">
+                <option value="1" {{ old('is_active', $soal->is_active) == '1' ? 'selected' : '' }}>Aktif (Ditampilkan)</option>
+                <option value="0" {{ old('is_active', $soal->is_active) == '0' ? 'selected' : '' }}>Draft (Sembunyikan)</option>
+            </select>
         </div>
 
         <div>
@@ -104,7 +91,7 @@
         </div>
 
         <div class="flex justify-end pt-6 border-t border-border gap-3 mt-8">
-            <a href="{{ route('admin.soal.index') }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
+            <a href="{{ route('admin.modul.show', $soal->materi->modul_id) }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
             <button type="submit" class="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
                 Perbarui Soal
             </button>

@@ -12,13 +12,13 @@ return new class extends Migration
             $table->id();
             $table->text('pertanyaan');
             $table->enum('tipe', ['pilgan', 'esai'])->default('pilgan');
-            $table->unsignedBigInteger('jabatan_id');
+            $table->unsignedBigInteger('materi_id');
             $table->text('pembahasan')->nullable(); // penjelasan jawaban
             $table->unsignedInteger('bobot')->default(10); // poin per soal
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            $table->foreign('jabatan_id')->references('id')->on('jabatans')->onDelete('cascade');
+            $table->foreign('materi_id')->references('id')->on('materis')->onDelete('cascade');
         });
     }
 

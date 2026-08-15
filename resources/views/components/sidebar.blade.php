@@ -44,21 +44,11 @@
             <!-- Menu Admin / Superadmin -->
             <div class="text-xs font-semibold text-white/40 uppercase tracking-wider mt-4 mb-2 px-3">Manajemen Konten</div>
             
-            <a href="{{ route('admin.materi.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.materi.*') ? 'bg-white/10 text-accent font-semibold relative after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:h-6 after:w-1 after:bg-accent after:rounded-r-md' : 'text-white/80 hover:bg-white/5 hover:text-white' }}">
-                <i data-lucide="library" class="w-5 h-5"></i>
+            <a href="{{ route('admin.modul.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.modul.*', 'admin.materi.*') ? 'bg-white/10 text-accent font-semibold relative after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:h-6 after:w-1 after:bg-accent after:rounded-r-md' : 'text-white/80 hover:bg-white/5 hover:text-white' }}">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
                 <span>Kelola Modul</span>
             </a>
             
-            <a href="{{ route('admin.video.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.video.*') ? 'bg-white/10 text-accent font-semibold relative after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:h-6 after:w-1 after:bg-accent after:rounded-r-md' : 'text-white/80 hover:bg-white/5 hover:text-white' }}">
-                <i data-lucide="video" class="w-5 h-5"></i>
-                <span>Kelola Video</span>
-            </a>
-            
-            <a href="{{ route('admin.soal.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.soal.*') ? 'bg-white/10 text-accent font-semibold relative after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:h-6 after:w-1 after:bg-accent after:rounded-r-md' : 'text-white/80 hover:bg-white/5 hover:text-white' }}">
-                <i data-lucide="help-circle" class="w-5 h-5"></i>
-                <span>Kelola Soal</span>
-            </a>
-
             <div class="text-xs font-semibold text-white/40 uppercase tracking-wider mt-4 mb-2 px-3">Laporan & Pengguna</div>
             
             <a href="{{ route('admin.statistik.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.statistik.*') ? 'bg-white/10 text-accent font-semibold relative after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:h-6 after:w-1 after:bg-accent after:rounded-r-md' : 'text-white/80 hover:bg-white/5 hover:text-white' }}">

@@ -59,9 +59,10 @@ Route::middleware(['auth'])->group(function () {
         Route::middleware(['role:peserta'])->prefix('peserta')->name('peserta.')->group(function () {
             
             // Pembelajaran (Modul)
-            Route::get('/pembelajaran', [MateriController::class, 'indexPeserta'])->name('pembelajaran.index');
-            Route::get('/pembelajaran/{materi}', [MateriController::class, 'showPeserta'])->name('pembelajaran.show');
-            Route::post('/pembelajaran/{materi}/progress', [MateriController::class, 'updateProgress'])->name('pembelajaran.progress');
+            Route::get('/pembelajaran', [\App\Http\Controllers\ModulController::class, 'indexPeserta'])->name('pembelajaran.index');
+            Route::get('/pembelajaran/modul/{modul}', [\App\Http\Controllers\ModulController::class, 'showPeserta'])->name('pembelajaran.show');
+            Route::get('/pembelajaran/materi/{materi}', [\App\Http\Controllers\MateriController::class, 'showPeserta'])->name('pembelajaran.materi.show');
+            Route::post('/pembelajaran/materi/{materi}/progress', [\App\Http\Controllers\MateriController::class, 'updateProgress'])->name('pembelajaran.materi.progress');
 
             // Evaluasi (Kuis)
             Route::get('/evaluasi', [EvaluasiController::class, 'index'])->name('evaluasi.index');
@@ -79,14 +80,12 @@ Route::middleware(['auth'])->group(function () {
         // ==========================================
         Route::middleware(['role:admin,superadmin'])->prefix('admin')->name('admin.')->group(function () {
             
-            // Kelola Modul (Materi)
-            Route::resource('materi', MateriController::class);
+            // Kelola Modul, Materi, dan Soal (Nested)
+            Route::resource('modul', \App\Http\Controllers\ModulController::class);
+            Route::resource('modul.materi', \App\Http\Controllers\MateriController::class)->shallow();
+            Route::resource('materi.soal', \App\Http\Controllers\SoalController::class)->shallow();
             
-            // Kelola Video
-            Route::resource('video', VideoController::class);
-
-            // Kelola Soal
-            Route::resource('soal', SoalController::class);
+            // Note: VideoController is deprecated since video is now a type of Materi
 
             // Statistik / Rekap Peserta
             Route::get('/statistik', [StatistikController::class, 'indexAdmin'])->name('statistik.index');

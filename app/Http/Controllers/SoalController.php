@@ -9,118 +9,96 @@ use Illuminate\Http\Request;
 
 class SoalController extends Controller
 {
-    public function index()
+    public function create(Materi $materi)
     {
-        $jabatans = Jabatan::with(['soals'])->get();
-        return view('admin.soal.index', compact('jabatans'));
+        if ($materi->jenis !== 'quiz') {
+            return redirect()->back()->with('error', 'Hanya materi berjenis kuis yang dapat memiliki soal.');
+        }
+        return view('admin.soal.create', compact('materi'));
     }
 
-    public function create()
-    {
-        $jabatans = Jabatan::where('is_active', true)->get();
-        return view('admin.soal.create', compact('jabatans'));
-    }
-
-    public function store(Request $request)
+    public function store(Request $request, Materi $materi)
     {
         $validated = $request->validate([
-            'jabatan_id' => 'required|exists:jabatans,id',
             'pertanyaan' => 'required|string',
-            'tipe' => 'required|in:pilgan,esai',
-            'bobot' => 'required|integer|min:1',
             'pembahasan' => 'nullable|string',
-            
-            // Pilihan ganda validation
-            'pilihan.*.huruf' => 'required_if:tipe,pilgan|string|max:1',
-            'pilihan.*.teks' => 'required_if:tipe,pilgan|string',
-            'kunci_jawaban' => 'required_if:tipe,pilgan|string|max:1',
+            'jawaban_benar' => 'required|in:0,1,2,3',
+            'pilihan' => 'required|array|size:4',
+            'pilihan.*' => 'required|string',
         ]);
 
         $soal = new Soal([
-            'jabatan_id' => $validated['jabatan_id'],
+            'materi_id' => $materi->id,
             'pertanyaan' => $validated['pertanyaan'],
-            'tipe' => $validated['tipe'],
-            'bobot' => $validated['bobot'],
+            'tipe' => 'pilgan',
+            'bobot' => 10,
             'pembahasan' => $validated['pembahasan'] ?? null,
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->has('is_active') && $request->input('is_active') != '0',
         ]);
         $soal->save();
 
-        if ($validated['tipe'] === 'pilgan') {
-            foreach ($request->input('pilihan') as $p) {
-                $soal->pilihanJawaban()->create([
-                    'huruf' => strtoupper($p['huruf']),
-                    'teks' => $p['teks'],
-                    'is_correct' => strtoupper($p['huruf']) === strtoupper($validated['kunci_jawaban']),
-                ]);
-            }
+        $hurufs = ['A', 'B', 'C', 'D'];
+        foreach ($request->input('pilihan') as $index => $teks) {
+            $soal->pilihanJawaban()->create([
+                'huruf' => $hurufs[$index],
+                'teks' => $teks,
+                'is_correct' => $index == $validated['jawaban_benar'],
+            ]);
         }
 
-        return redirect()->route('admin.soal.index')->with('success', 'Soal berhasil ditambahkan.');
+        return redirect()->route('admin.modul.show', $materi->modul_id)->with('success', 'Soal berhasil ditambahkan ke Kuis.');
     }
 
     public function edit(Soal $soal)
     {
-        $jabatans = Jabatan::where('is_active', true)->get();
-        return view('admin.soal.edit', compact('soal', 'jabatans'));
+        return view('admin.soal.edit', compact('soal'));
     }
 
     public function update(Request $request, Soal $soal)
     {
         $validated = $request->validate([
-            'jabatan_id' => 'required|exists:jabatans,id',
             'pertanyaan' => 'required|string',
-            'tipe' => 'required|in:pilgan,esai',
-            'bobot' => 'required|integer|min:1',
             'pembahasan' => 'nullable|string',
-            
-            'pilihan.*.id' => 'nullable|exists:pilihan_jawabans,id',
-            'pilihan.*.huruf' => 'required_if:tipe,pilgan|string|max:1',
-            'pilihan.*.teks' => 'required_if:tipe,pilgan|string',
-            'kunci_jawaban' => 'required_if:tipe,pilgan|string|max:1',
+            'jawaban_benar' => 'required|in:0,1,2,3',
+            'pilihan' => 'required|array|size:4',
+            'pilihan.*' => 'required|string',
         ]);
 
         $soal->update([
-            'jabatan_id' => $validated['jabatan_id'],
             'pertanyaan' => $validated['pertanyaan'],
-            'tipe' => $validated['tipe'],
-            'bobot' => $validated['bobot'],
             'pembahasan' => $validated['pembahasan'] ?? null,
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->has('is_active') && $request->input('is_active') != '0',
         ]);
 
-        if ($validated['tipe'] === 'pilgan') {
-            // Delete old options not in the current request
-            $requestIds = collect($request->input('pilihan'))->pluck('id')->filter()->toArray();
-            $soal->pilihanJawaban()->whereNotIn('id', $requestIds)->delete();
-
-            foreach ($request->input('pilihan') as $p) {
-                $isCorrect = strtoupper($p['huruf']) === strtoupper($validated['kunci_jawaban']);
-                if (isset($p['id']) && $p['id']) {
-                    $soal->pilihanJawaban()->where('id', $p['id'])->update([
-                        'huruf' => strtoupper($p['huruf']),
-                        'teks' => $p['teks'],
-                        'is_correct' => $isCorrect,
-                    ]);
-                } else {
-                    $soal->pilihanJawaban()->create([
-                        'huruf' => strtoupper($p['huruf']),
-                        'teks' => $p['teks'],
-                        'is_correct' => $isCorrect,
-                    ]);
-                }
+        $hurufs = ['A', 'B', 'C', 'D'];
+        $existingPilihans = $soal->pilihanJawaban;
+        
+        foreach ($request->input('pilihan') as $index => $teks) {
+            $huruf = $hurufs[$index];
+            $isCorrect = $index == $validated['jawaban_benar'];
+            
+            $pilihan = $existingPilihans->where('huruf', $huruf)->first();
+            if ($pilihan) {
+                $pilihan->update([
+                    'teks' => $teks,
+                    'is_correct' => $isCorrect,
+                ]);
+            } else {
+                $soal->pilihanJawaban()->create([
+                    'huruf' => $huruf,
+                    'teks' => $teks,
+                    'is_correct' => $isCorrect,
+                ]);
             }
-        } else {
-            // If changed to essay, delete all options
-            $soal->pilihanJawaban()->delete();
         }
 
-        return redirect()->route('admin.soal.index')->with('success', 'Soal berhasil diperbarui.');
+        return redirect()->route('admin.modul.show', $soal->materi->modul_id)->with('success', 'Soal berhasil diperbarui.');
     }
 
     public function destroy(Soal $soal)
     {
+        $modulId = $soal->materi->modul_id;
         $soal->delete();
-        return redirect()->route('admin.soal.index')->with('success', 'Soal berhasil dihapus.');
+        return redirect()->route('admin.modul.show', $modulId)->with('success', 'Soal berhasil dihapus.');
     }
 }

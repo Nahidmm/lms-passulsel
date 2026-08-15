@@ -6,23 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('videos', function (Blueprint $table) {
+        Schema::create('moduls', function (Blueprint $table) {
             $table->id();
-            $table->string('judul', 255);
+            $table->string('judul');
             $table->text('deskripsi')->nullable();
-            $table->string('url', 500); // YouTube or direct video URL
-            $table->unsignedInteger('urutan')->default(1);
-            $table->unsignedInteger('durasi_menit')->nullable();
-            $table->string('thumbnail', 500)->nullable();
+            $table->integer('urutan')->default(1);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('videos');
+        Schema::dropIfExists('moduls');
     }
 };

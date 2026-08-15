@@ -86,9 +86,11 @@
                 </div>
                 <i data-lucide="chevron-right" class="w-4 h-4 text-text-secondary"></i>
             </a>
-            <a href="{{ route('admin.materi.index') }}" class="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary transition-colors">
+            <a href="{{ route('admin.modul.index') }}" class="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary transition-colors">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-green-100 text-green-600 rounded flex items-center justify-center"><i data-lucide="book-plus" class="w-4 h-4"></i></div>
+                    <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                    </div>
                     <span class="font-medium text-text-primary">Tambah Modul Baru</span>
                 </div>
                 <i data-lucide="chevron-right" class="w-4 h-4 text-text-secondary"></i>

@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Soal extends Model
 {
-    protected $fillable = ['pertanyaan', 'tipe', 'jabatan_id', 'pembahasan', 'bobot', 'is_active'];
+    protected $fillable = ['pertanyaan', 'tipe', 'materi_id', 'pembahasan', 'bobot', 'is_active'];
     protected $casts = ['is_active' => 'boolean'];
 
-    public function jabatan() { return $this->belongsTo(Jabatan::class); }
+    public function materi() { return $this->belongsTo(Materi::class); }
     public function pilihanJawaban() { return $this->hasMany(PilihanJawaban::class); }
     public function hasilLatihan() { return $this->hasMany(HasilLatihan::class); }
 
