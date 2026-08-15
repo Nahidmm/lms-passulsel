@@ -29,9 +29,9 @@ class User extends Authenticatable
         return $this->belongsTo(Jabatan::class);
     }
 
-    public function progresModul()
+    public function progresMateri()
     {
-        return $this->hasMany(ProgresModul::class);
+        return $this->hasMany(ProgresMateri::class);
     }
 
     public function sesiEvaluasi()
@@ -65,9 +65,9 @@ class User extends Authenticatable
         return $this->sesiEvaluasi()->where('status', 'berlangsung')->first();
     }
 
-    public function getModulSelesaiCount(): int
+    public function getMateriSelesaiCount(): int
     {
-        return $this->progresModul()->where('status', 'selesai')->count();
+        return $this->progresMateri()->where('status', 'selesai')->count();
     }
 
     public function getRataRataSkor(): float
@@ -78,13 +78,9 @@ class User extends Authenticatable
 
     public function getProgresKeseluruhan(): int
     {
-        $jabatan = $this->jabatan;
-        if (!$jabatan) return 0;
-        $total = $jabatan->materis()->where('is_active', true)->count();
+        $total = \App\Models\Materi::where('is_active', true)->count();
         if ($total === 0) return 0;
-        $selesai = $this->progresModul()
-            ->whereHas('materi', fn($q) => $q->where('jabatan_id', $jabatan->id)->where('is_active', true))
-            ->where('status', 'selesai')->count();
+        $selesai = $this->getMateriSelesaiCount();
         return (int) round(($selesai / $total) * 100);
     }
 

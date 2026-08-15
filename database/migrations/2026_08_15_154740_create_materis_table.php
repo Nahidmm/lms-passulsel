@@ -19,9 +19,23 @@ return new class extends Migration
             $table->unsignedInteger('urutan')->default(1);
             $table->boolean('is_active')->default(true);
             $table->unsignedInteger('durasi_baca')->default(10); // menit estimasi
+
+            // Gating / Prerequisites
+            $table->unsignedBigInteger('prasyarat_materi_id')->nullable();
+
+            // Quiz Settings (Only relevant if jenis = 'quiz')
+            $table->unsignedInteger('passing_grade')->default(70);
+            $table->unsignedInteger('durasi_menit')->nullable(); // null = unlimited
+            $table->unsignedInteger('max_attempts')->default(0); // 0 = unlimited
+            $table->boolean('acak_soal')->default(false);
+            $table->boolean('acak_jawaban')->default(false);
+            $table->boolean('tampilkan_feedback')->default(true);
+            $table->boolean('strict_anti_cheat')->default(false);
+
             $table->timestamps();
 
             $table->foreign('modul_id')->references('id')->on('moduls')->onDelete('cascade');
+            $table->foreign('prasyarat_materi_id')->references('id')->on('materis')->onDelete('set null');
         });
     }
 

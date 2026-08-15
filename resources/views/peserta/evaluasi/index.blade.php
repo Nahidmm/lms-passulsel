@@ -19,18 +19,9 @@
                     <i data-lucide="clipboard-check" class="w-8 h-8"></i>
                 </div>
                 <div>
-                    <h2 class="text-xl font-display font-bold text-text-primary">Kuis Evaluasi Jabatan</h2>
-                    <p class="text-text-secondary">Eselon V - {{ Auth::user()->jabatan->nama_jabatan ?? 'Belum ada jabatan' }}</p>
+                    <h2 class="text-xl font-display font-bold text-text-primary">Evaluasi & Kuis</h2>
+                    <p class="text-text-secondary">Riwayat evaluasi dan kuis yang pernah Anda kerjakan.</p>
                 </div>
-            </div>
-
-            <div class="bg-secondary p-5 rounded-lg border border-border mb-8">
-                <h3 class="font-bold text-text-primary mb-3">Informasi Kuis:</h3>
-                <ul class="space-y-2 text-sm text-text-secondary">
-                    <li class="flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4 text-primary"></i> Total Soal: {{ $totalSoalTersedia }} Pilihan Ganda</li>
-                    <li class="flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-primary"></i> Durasi: 30 Menit</li>
-                    <li class="flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning"></i> Sesi bersifat <strong>Locked Mode</strong> (Tidak bisa copy-paste).</li>
-                </ul>
             </div>
 
             @if($activeSesi)
@@ -38,19 +29,18 @@
                     <i data-lucide="alert-circle" class="text-warning w-5 h-5 mt-0.5"></i>
                     <div>
                         <p class="font-bold text-warning">Sesi Evaluasi Sedang Berlangsung!</p>
-                        <p class="text-sm text-warning/80 mt-1">Anda memiliki kuis yang belum diselesaikan.</p>
+                        <p class="text-sm text-warning/80 mt-1">Anda memiliki kuis ({{ $activeSesi->materi->judul ?? 'Kuis' }}) yang belum diselesaikan.</p>
                     </div>
                 </div>
                 <a href="{{ route('peserta.evaluasi.soal', $activeSesi->id) }}" class="block w-full bg-warning hover:bg-warning/90 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors shadow-md">
                     Lanjutkan Kuis
                 </a>
             @else
-                <form action="{{ route('peserta.evaluasi.start') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-md text-lg" {{ $totalSoalTersedia == 0 ? 'disabled' : '' }}>
-                        {{ $totalSoalTersedia == 0 ? 'Soal Belum Tersedia' : 'Mulai Evaluasi' }}
-                    </button>
-                </form>
+                <div class="bg-secondary p-6 rounded-lg border border-border text-center">
+                    <i data-lucide="info" class="w-8 h-8 text-text-secondary mx-auto mb-2"></i>
+                    <p class="text-text-secondary font-medium">Tidak ada kuis yang sedang berlangsung.</p>
+                    <p class="text-sm text-text-secondary mt-1">Anda dapat memulai kuis atau evaluasi langsung dari halaman materi pelatihan.</p>
+                </div>
             @endif
         </div>
     </div>

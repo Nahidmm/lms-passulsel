@@ -3,12 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\Jabatan;
+use App\Models\Pelatihan;
 use App\Models\Modul;
 use App\Models\Materi;
 use App\Models\PilihanJawaban;
 use App\Models\Soal;
 use App\Models\User;
-use App\Models\Video;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -49,108 +49,86 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
-        // Demo Modul
-        $modul = Modul::firstOrCreate([
+        // Demo Pelatihan
+        $pelatihan = Pelatihan::firstOrCreate([
             'judul' => 'Orientasi Dasar Pemasyarakatan',
         ], [
-            'deskripsi' => 'Modul wajib untuk seluruh pegawai baru Eselon V',
-            'urutan' => 1,
+            'deskripsi' => 'Pelatihan wajib untuk seluruh pegawai di lingkungan Kementerian Hukum dan HAM wilayah Sulawesi Selatan.',
             'is_active' => true,
         ]);
 
         // Demo Materi
         $materis = [
             [
-                'judul' => 'Pengantar Tugas Pokok dan Fungsi Pejabat Eselon IV',
-                'deskripsi' => 'Pengenalan menyeluruh tentang tupoksi, kewenangan, dan tanggung jawab pejabat struktural eselon IV di lingkungan Direktorat Jenderal Pemasyarakatan.',
+                'judul' => 'Pengantar Tugas Pokok',
+                'deskripsi' => 'Pengenalan menyeluruh tentang tupoksi dan kewenangan.',
                 'jenis' => 'link',
                 'url_link' => 'https://www.kemenkumham.go.id/profil/tupoksi',
-                'modul_id' => $modul->id,
+                'pelatihan_id' => $pelatihan->id,
                 'urutan' => 1,
                 'durasi_baca' => 15,
             ],
             [
-                'judul' => 'Peraturan Menteri Hukum dan HAM tentang Jabatan Struktural',
-                'deskripsi' => 'Mempelajari dasar hukum jabatan struktural di pemasyarakatan, hierarki organisasi, dan kewenangan masing-masing pejabat.',
+                'judul' => 'Peraturan Menteri Hukum dan HAM',
+                'deskripsi' => 'Mempelajari dasar hukum jabatan struktural di pemasyarakatan.',
                 'jenis' => 'link',
                 'url_link' => 'https://www.kemenkumham.go.id/regulasi',
-                'modul_id' => $modul->id,
+                'pelatihan_id' => $pelatihan->id,
                 'urutan' => 2,
                 'durasi_baca' => 20,
             ],
             [
-                'judul' => 'Manajemen Pembinaan Narapidana',
-                'deskripsi' => 'Strategi dan teknik pembinaan narapidana yang efektif, meliputi pendekatan individual, kelompok, dan berbasis komunitas.',
-                'jenis' => 'link',
-                'url_link' => 'https://ditjenpas.go.id/pembinaan',
-                'modul_id' => $modul->id,
+                'judul' => 'Overview Arsitektur (Video)',
+                'deskripsi' => 'Video orientasi resmi Direktorat Jenderal Pemasyarakatan.',
+                'jenis' => 'video_embed',
+                'url_link' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'pelatihan_id' => $pelatihan->id,
                 'urutan' => 3,
-                'durasi_baca' => 25,
+                'durasi_baca' => 30,
             ],
         ];
 
         foreach ($materis as $m) {
-            Materi::firstOrCreate(['judul' => $m['judul'], 'modul_id' => $m['modul_id']], $m);
+            Materi::firstOrCreate(['judul' => $m['judul'], 'pelatihan_id' => $m['pelatihan_id']], $m);
         }
-
-        // Demo Video
-        Video::firstOrCreate(
-            ['judul' => 'Orientasi Pegawai Pemasyarakatan Eselon IV'],
-            [
-                'deskripsi' => 'Video orientasi resmi Direktorat Jenderal Pemasyarakatan untuk pejabat eselon IV baru.',
-                'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                'urutan' => 1,
-                'durasi_menit' => 30,
-            ]
-        );
 
         // Demo Kuis (Materi tipe Kuis)
         $materiKuis = Materi::firstOrCreate([
-            'judul' => 'Kuis Orientasi',
-            'modul_id' => $modul->id,
+            'judul' => 'Kuis Evaluasi Pemahaman',
+            'pelatihan_id' => $pelatihan->id,
         ], [
-            'deskripsi' => 'Uji pemahaman tentang orientasi',
+            'deskripsi' => 'Uji pemahaman tentang orientasi Bab 1.',
             'jenis' => 'quiz',
             'urutan' => 4,
             'durasi_baca' => 30,
+            'passing_grade' => 70,
+            'durasi_menit' => 15,
+            'max_attempts' => 3,
+            'acak_soal' => true,
+            'acak_jawaban' => true,
         ]);
 
         // Demo Soal
         $soals = [
             [
-                'pertanyaan' => 'Apakah tugas pokok utama Kepala Seksi Bimbingan Narapidana/Anak Didik di Lapas?',
-                'tipe' => 'pilgan',
-                'materi_id' => $materiKuis->id,
+                'pertanyaan' => 'Apakah tugas pokok utama Pemasyarakatan?',
+                'tipe' => 'pilihan_ganda',
                 'bobot' => 10,
-                'pembahasan' => 'Tugas pokok utama adalah melakukan bimbingan narapidana/anak didik dan pengawasan pelaksanaan program pembinaan.',
+                'pembahasan' => 'Tugas pokok utama adalah melakukan bimbingan narapidana.',
                 'pilihan' => [
-                    ['huruf' => 'A', 'teks' => 'Mengurus administrasi keuangan dan penganggaran Lapas', 'is_correct' => false],
-                    ['huruf' => 'B', 'teks' => 'Melakukan bimbingan narapidana/anak didik dan pengawasan program pembinaan', 'is_correct' => true],
-                    ['huruf' => 'C', 'teks' => 'Mengelola kegiatan keamanan dan ketertiban Lapas', 'is_correct' => false],
-                    ['huruf' => 'D', 'teks' => 'Menyusun laporan tahunan kepada Kepala Lapas', 'is_correct' => false],
-                ],
-            ],
-            [
-                'pertanyaan' => 'Dalam hierarki organisasi Lapas, Kepala Seksi bertanggung jawab kepada siapa?',
-                'tipe' => 'pilgan',
-                'materi_id' => $materiKuis->id,
-                'bobot' => 10,
-                'pembahasan' => 'Kepala Seksi (Eselon IV) bertanggung jawab langsung kepada Kepala Lapas (Eselon III) sesuai dengan struktur organisasi.',
-                'pilihan' => [
-                    ['huruf' => 'A', 'teks' => 'Direktur Jenderal Pemasyarakatan', 'is_correct' => false],
-                    ['huruf' => 'B', 'teks' => 'Kepala Divisi Pemasyarakatan', 'is_correct' => false],
-                    ['huruf' => 'C', 'teks' => 'Kepala Lapas / Kepala Rutan', 'is_correct' => true],
-                    ['huruf' => 'D', 'teks' => 'Kepala Kantor Wilayah Kemenkumham', 'is_correct' => false],
+                    ['huruf' => 'A', 'teks' => 'Mengurus administrasi', 'is_correct' => false],
+                    ['huruf' => 'B', 'teks' => 'Melakukan bimbingan narapidana', 'is_correct' => true],
+                    ['huruf' => 'C', 'teks' => 'Mengelola keamanan', 'is_correct' => false],
+                    ['huruf' => 'D', 'teks' => 'Menyusun laporan', 'is_correct' => false],
                 ],
             ],
             [
                 'pertanyaan' => 'Program Asimilasi bagi narapidana merupakan bagian dari proses pembinaan tahap apa?',
-                'tipe' => 'pilgan',
-                'materi_id' => $materiKuis->id,
+                'tipe' => 'pilihan_ganda',
                 'bobot' => 10,
-                'pembahasan' => 'Asimilasi adalah bagian dari pembinaan tahap akhir (integrasi), di mana narapidana dipersiapkan untuk kembali ke masyarakat.',
+                'pembahasan' => 'Asimilasi adalah bagian dari pembinaan tahap akhir (integrasi).',
                 'pilihan' => [
-                    ['huruf' => 'A', 'teks' => 'Pembinaan Tahap Awal (Orientasi)', 'is_correct' => false],
+                    ['huruf' => 'A', 'teks' => 'Pembinaan Tahap Awal', 'is_correct' => false],
                     ['huruf' => 'B', 'teks' => 'Pembinaan Tahap Lanjutan I', 'is_correct' => false],
                     ['huruf' => 'C', 'teks' => 'Pembinaan Tahap Lanjutan II', 'is_correct' => false],
                     ['huruf' => 'D', 'teks' => 'Pembinaan Tahap Akhir (Integrasi)', 'is_correct' => true],
@@ -161,7 +139,13 @@ class DemoDataSeeder extends Seeder
         foreach ($soals as $s) {
             $pilihan = $s['pilihan'];
             unset($s['pilihan']);
-            $soal = Soal::firstOrCreate(['pertanyaan' => $s['pertanyaan'], 'materi_id' => $s['materi_id']], $s);
+            $soal = Soal::firstOrCreate(['pertanyaan' => $s['pertanyaan']], $s);
+            
+            // Attach to Quiz
+            if (!$materiKuis->soals()->where('soal_id', $soal->id)->exists()) {
+                $materiKuis->soals()->attach($soal->id);
+            }
+
             if ($soal->pilihanJawaban()->count() === 0) {
                 foreach ($pilihan as $p) {
                     $soal->pilihanJawaban()->create($p);

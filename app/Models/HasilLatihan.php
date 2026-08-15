@@ -8,7 +8,7 @@ class HasilLatihan extends Model
 {
     protected $fillable = [
         'sesi_evaluasi_id', 'user_id', 'soal_id',
-        'pilihan_id', 'jawaban_esai', 'is_correct', 'skor',
+        'pilihan_id', 'jawaban_esai', 'catatan_admin', 'is_correct', 'skor',
     ];
 
     protected $casts = ['is_correct' => 'boolean'];

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\SesiEvaluasi;
-use App\Models\ProgresModul;
+use App\Models\ProgresMateri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,22 +14,22 @@ class StatistikController extends Controller
     {
         $user = Auth::user();
         
-        $progresModuls = ProgresModul::with('materi')
+        $progresMateris = ProgresMateri::with('materi.pelatihan')
             ->where('user_id', $user->id)
             ->get();
             
-        $riwayatEvaluasi = SesiEvaluasi::with('jabatan')
+        $riwayatEvaluasi = SesiEvaluasi::with('materi')
             ->where('user_id', $user->id)
             ->where('status', 'selesai')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('peserta.statistik.index', compact('progresModuls', 'riwayatEvaluasi'));
+        return view('peserta.statistik.index', compact('progresMateris', 'riwayatEvaluasi'));
     }
 
     public function indexAdmin(Request $request)
     {
-        $query = User::with(['jabatan', 'progresModul', 'sesiEvaluasi' => function($q) {
+        $query = User::with(['jabatan', 'progresMateri', 'sesiEvaluasi' => function($q) {
                 $q->where('status', 'selesai');
             }])
             ->where('role', 'peserta')
@@ -39,7 +39,7 @@ class StatistikController extends Controller
         $direction = $request->get('direction', 'asc');
 
         $users = $query->get()->map(function ($user) {
-            $user->modul_selesai = $user->getModulSelesaiCount();
+            $user->materi_selesai = $user->getMateriSelesaiCount();
             $user->rata_nilai = $user->getRataRataSkor();
             return $user;
         });
@@ -48,7 +48,7 @@ class StatistikController extends Controller
         if ($sort === 'nilai') {
             $users = $direction === 'asc' ? $users->sortBy('rata_nilai') : $users->sortByDesc('rata_nilai');
         } elseif ($sort === 'modul') {
-            $users = $direction === 'asc' ? $users->sortBy('modul_selesai') : $users->sortByDesc('modul_selesai');
+            $users = $direction === 'asc' ? $users->sortBy('materi_selesai') : $users->sortByDesc('materi_selesai');
         } else {
             $users = $direction === 'asc' ? $users->sortBy('nama') : $users->sortByDesc('nama');
         }

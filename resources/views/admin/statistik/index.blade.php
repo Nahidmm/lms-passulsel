@@ -44,7 +44,7 @@
                     <th class="px-4 py-3 w-10">No</th>
                     <th class="px-4 py-3">Nama Peserta / NIP</th>
                     <th class="px-4 py-3">Jabatan</th>
-                    <th class="px-4 py-3 text-center">Modul Selesai</th>
+                    <th class="px-4 py-3 text-center">Materi Selesai</th>
                     <th class="px-4 py-3 text-center">Rata-rata Nilai</th>
                     <th class="px-4 py-3 text-center">Status</th>
                 </tr>
@@ -62,10 +62,10 @@
                         </td>
                         <td class="px-4 py-3 text-center">
                             @php
-                                $totalModul = $user->jabatan ? $user->jabatan->materis()->where('is_active', true)->count() : 0;
+                                $totalMateri = \App\Models\Materi::where('is_active', true)->count();
                             @endphp
-                            <span class="inline-block px-2 py-1 rounded {{ $user->modul_selesai === $totalModul && $totalModul > 0 ? 'bg-success/10 text-success font-bold' : 'bg-gray-100 text-gray-700 font-medium' }}">
-                                {{ $user->modul_selesai }} / {{ $totalModul }}
+                            <span class="inline-block px-2 py-1 rounded {{ $user->materi_selesai === $totalMateri && $totalMateri > 0 ? 'bg-success/10 text-success font-bold' : 'bg-gray-100 text-gray-700 font-medium' }}">
+                                {{ $user->materi_selesai }} / {{ $totalMateri }}
                             </span>
                         </td>
                         <td class="px-4 py-3 text-center">
@@ -74,9 +74,9 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            @if($user->modul_selesai === $totalModul && $totalModul > 0 && $user->rata_nilai >= 70)
+                            @if($user->materi_selesai === $totalMateri && $totalMateri > 0 && $user->rata_nilai >= 70)
                                 <span class="bg-success text-white text-xs font-bold px-2 py-1 rounded-full">Kompeten</span>
-                            @elseif($user->modul_selesai > 0 || $user->rata_nilai > 0)
+                            @elseif($user->materi_selesai > 0 || $user->rata_nilai > 0)
                                 <span class="bg-warning text-white text-xs font-bold px-2 py-1 rounded-full">In Progress</span>
                             @else
                                 <span class="bg-gray-200 text-gray-500 text-xs font-bold px-2 py-1 rounded-full">Belum Mulai</span>

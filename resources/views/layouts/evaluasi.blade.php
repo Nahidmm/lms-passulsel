@@ -16,9 +16,7 @@
     <!-- Header Only (No Sidebar) -->
     <header class="bg-white border-b border-border h-16 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-display font-bold text-xs shadow-sm">
-                PAS
-            </div>
+            <img src="{{ asset('logo/logo.png') }}" alt="Logo LMS" class="h-8 w-auto object-contain">
             <div class="font-display font-bold text-primary text-lg hidden sm:block">LMS Pas Sulsel</div>
         </div>
 
@@ -33,7 +31,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="p-4 md:p-6 lg:p-8 flex-1 max-w-4xl mx-auto w-full">
+    <main class="p-4 md:p-6 lg:p-8 flex-1 max-w-7xl mx-auto w-full">
         @if(session('error'))
             <div class="bg-danger text-white px-4 py-3 rounded-lg mb-6 shadow-sm flex items-start gap-3">
                 <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>

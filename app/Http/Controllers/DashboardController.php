@@ -39,14 +39,14 @@ class DashboardController extends Controller
 
     private function dashboardPeserta(User $user)
     {
-        $modulDibaca = $user->getModulSelesaiCount();
-        $totalModul = $user->jabatan ? $user->jabatan->materis()->where('is_active', true)->count() : 0;
+        $materiSelesai = $user->getMateriSelesaiCount();
+        $totalMateri = \App\Models\Materi::where('is_active', true)->count();
         
         $rataNilai = $user->getRataRataSkor();
         $progres = $user->getProgresKeseluruhan();
 
         return view('peserta.dashboard', compact(
-            'modulDibaca', 'totalModul', 'rataNilai', 'progres'
+            'materiSelesai', 'totalMateri', 'rataNilai', 'progres'
         ));
     }
 }

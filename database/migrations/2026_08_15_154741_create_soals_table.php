@@ -11,14 +11,11 @@ return new class extends Migration
         Schema::create('soals', function (Blueprint $table) {
             $table->id();
             $table->text('pertanyaan');
-            $table->enum('tipe', ['pilgan', 'esai'])->default('pilgan');
-            $table->unsignedBigInteger('materi_id');
+            $table->enum('tipe', ['pilihan_ganda', 'multi_select', 'isian_singkat', 'essay'])->default('pilihan_ganda');
             $table->text('pembahasan')->nullable(); // penjelasan jawaban
             $table->unsignedInteger('bobot')->default(10); // poin per soal
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-
-            $table->foreign('materi_id')->references('id')->on('materis')->onDelete('cascade');
         });
     }
 

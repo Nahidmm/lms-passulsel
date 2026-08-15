@@ -5,14 +5,14 @@
 @section('content')
 
 <div class="mb-4 flex items-center gap-2">
-    <a href="{{ route('admin.modul.show', $modul->id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1 font-medium transition-colors">
+    <a href="{{ route('admin.pelatihan.show', $pelatihan->id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1 font-medium transition-colors">
         <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Modul
     </a>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-border p-6 md:p-8 max-w-3xl">
     <div class="mb-6 pb-4 border-b border-border">
-        <h2 class="text-xl font-display font-bold text-text-primary">Tambah Materi ke: {{ $modul->judul }}</h2>
+        <h2 class="text-xl font-display font-bold text-text-primary">Tambah Materi ke: {{ $pelatihan->judul }}</h2>
         <p class="text-text-secondary mt-1">Pilih jenis materi (Dokumen, Video, Link, atau Kuis) dan lengkapi informasinya.</p>
     </div>
 
@@ -26,7 +26,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.modul.materi.store', $modul->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form action="{{ route('admin.pelatihan.materi.store', $pelatihan->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -44,7 +44,6 @@
                     <option value="pptx" {{ old('jenis') == 'pptx' ? 'selected' : '' }}>PowerPoint (PPTX)</option>
                     <option value="video_embed" {{ old('jenis') == 'video_embed' ? 'selected' : '' }}>Embed Video (YouTube)</option>
                     <option value="link" {{ old('jenis') == 'link' ? 'selected' : '' }}>Tautan Eksternal</option>
-                    <option value="quiz" {{ old('jenis') == 'quiz' ? 'selected' : '' }}>Kuis / Evaluasi</option>
                 </select>
             </div>
 
@@ -68,7 +67,7 @@
                 class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">{{ old('deskripsi') }}</textarea>
         </div>
 
-        <div id="file_input_container" class="{{ in_array(old('jenis'), ['link', 'video_embed', 'quiz']) ? 'hidden' : '' }}">
+        <div id="file_input_container" class="{{ in_array(old('jenis'), ['link', 'video_embed']) ? 'hidden' : '' }}">
             <label for="file_upload" class="block text-sm font-medium text-text-primary mb-1">Unggah Dokumen (PDF/PPT/PPTX)</label>
             <input type="file" id="file_upload" name="file_upload" accept=".pdf,.ppt,.pptx"
                 class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white">
@@ -81,20 +80,13 @@
                 class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
         </div>
 
-        <div id="quiz_info_container" class="{{ old('jenis') == 'quiz' ? '' : 'hidden' }}">
-            <div class="bg-accent/10 border border-accent/20 rounded-lg p-4 flex items-start gap-3 text-accent-hover text-sm">
-                <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                <p>Setelah materi Kuis berhasil disimpan, Anda akan diarahkan kembali ke halaman Modul di mana Anda dapat mulai menambahkan soal-soal untuk kuis ini.</p>
-            </div>
-        </div>
-
         <div class="flex items-center gap-2 pt-2 border-t border-border mt-4">
             <input type="checkbox" id="is_active" name="is_active" checked class="w-4 h-4 text-primary rounded border-border focus:ring-primary">
             <label for="is_active" class="text-sm font-medium text-text-primary cursor-pointer">Materi Aktif</label>
         </div>
 
         <div class="flex justify-end pt-4 gap-3">
-            <a href="{{ route('admin.modul.show', $modul->id) }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
+            <a href="{{ route('admin.pelatihan.show', $pelatihan->id) }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
             <button type="submit" class="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
                 Simpan Materi
             </button>
@@ -109,17 +101,13 @@
 function toggleContentInput(jenis) {
     const fileContainer = document.getElementById('file_input_container');
     const urlContainer = document.getElementById('url_input_container');
-    const quizContainer = document.getElementById('quiz_info_container');
     
     // Hide all
     fileContainer.classList.add('hidden');
     urlContainer.classList.add('hidden');
-    quizContainer.classList.add('hidden');
 
     if (jenis === 'link' || jenis === 'video_embed') {
         urlContainer.classList.remove('hidden');
-    } else if (jenis === 'quiz') {
-        quizContainer.classList.remove('hidden');
     } else {
         fileContainer.classList.remove('hidden');
     }

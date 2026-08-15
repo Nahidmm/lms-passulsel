@@ -5,8 +5,8 @@
 @section('content')
 
 <div class="mb-4 flex items-center gap-2">
-    <a href="{{ route('peserta.pembelajaran.show', $materi->modul_id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1 font-medium transition-colors">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Modul
+    <a href="{{ route('peserta.pelatihan.show', $materi->pelatihan_id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1 font-medium transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Pelatihan
     </a>
 </div>
 
@@ -50,11 +50,14 @@
             <div class="text-center py-16 bg-secondary/50 rounded-xl border border-dashed border-border">
                 <i data-lucide="help-circle" class="w-12 h-12 text-accent mx-auto mb-4"></i>
                 <h3 class="text-lg font-bold text-text-primary mb-2">Evaluasi / Kuis</h3>
-                <p class="text-text-secondary mb-6">Kerjakan kuis ini untuk menguji pemahaman Anda.</p>
-                <!-- For now, we don't have a direct link to the quiz execution for a specific materi since evaluasi might be global. But let's assume there is a route for it. -->
-                <a href="#" class="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white font-bold py-2.5 px-6 rounded-lg transition-colors">
-                    Mulai Kuis <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </a>
+                <p class="text-text-secondary mb-6">Kerjakan kuis ini untuk menguji pemahaman Anda. Kuis ini mensyaratkan nilai minimal <strong>{{ $materi->passing_grade ?? 70 }}</strong> untuk dianggap selesai.</p>
+                <form action="{{ route('peserta.evaluasi.start') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="materi_id" value="{{ $materi->id }}">
+                    <button type="submit" class="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer">
+                        Mulai Kuis <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
             </div>
         @else
             <!-- PDF / PPTX Viewer -->

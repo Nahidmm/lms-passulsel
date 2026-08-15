@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Jabatan;
+use App\Models\Materi;
 use App\Models\Soal;
 use App\Models\PilihanJawaban;
 use Illuminate\Http\Request;
@@ -19,86 +19,165 @@ class SoalController extends Controller
 
     public function store(Request $request, Materi $materi)
     {
-        $validated = $request->validate([
+        $tipe = $request->input('tipe', 'pilihan_ganda');
+
+        $rules = [
             'pertanyaan' => 'required|string',
             'pembahasan' => 'nullable|string',
-            'jawaban_benar' => 'required|in:0,1,2,3',
-            'pilihan' => 'required|array|size:4',
-            'pilihan.*' => 'required|string',
-        ]);
+            'tipe'       => 'required|in:pilihan_ganda,multi_select,essay,isian_singkat,menjodohkan',
+            'bobot'      => 'nullable|integer|min:1',
+        ];
 
-        $soal = new Soal([
-            'materi_id' => $materi->id,
-            'pertanyaan' => $validated['pertanyaan'],
-            'tipe' => 'pilgan',
-            'bobot' => 10,
-            'pembahasan' => $validated['pembahasan'] ?? null,
-            'is_active' => $request->has('is_active') && $request->input('is_active') != '0',
-        ]);
-        $soal->save();
-
-        $hurufs = ['A', 'B', 'C', 'D'];
-        foreach ($request->input('pilihan') as $index => $teks) {
-            $soal->pilihanJawaban()->create([
-                'huruf' => $hurufs[$index],
-                'teks' => $teks,
-                'is_correct' => $index == $validated['jawaban_benar'],
-            ]);
+        // Tipe-specific validation
+        if ($tipe === 'pilihan_ganda') {
+            $rules['pilihan']       = 'required|array|min:2';
+            $rules['pilihan.*']     = 'required|string';
+            $rules['jawaban_benar'] = 'required|integer|min:0';
+        } elseif ($tipe === 'multi_select') {
+            $rules['pilihan']         = 'required|array|min:2';
+            $rules['pilihan.*']       = 'required|string';
+            $rules['jawaban_benar']   = 'required|array|min:1';
+            $rules['jawaban_benar.*'] = 'integer';
+        } elseif ($tipe === 'isian_singkat') {
+            $rules['jawaban_teks'] = 'required|string';
+        } elseif ($tipe === 'menjodohkan') {
+            $rules['pasangan_kiri']    = 'required|array|min:2';
+            $rules['pasangan_kiri.*']  = 'required|string';
+            $rules['pasangan_kanan']   = 'required|array|min:2';
+            $rules['pasangan_kanan.*'] = 'required|string';
         }
+        // essay: no answer choices needed
 
-        return redirect()->route('admin.modul.show', $materi->modul_id)->with('success', 'Soal berhasil ditambahkan ke Kuis.');
+        $validated = $request->validate($rules);
+
+        $soal = Soal::create([
+            'pertanyaan' => $validated['pertanyaan'],
+            'tipe'       => $tipe,
+            'bobot'      => $validated['bobot'] ?? 10,
+            'pembahasan' => $validated['pembahasan'] ?? null,
+            'is_active'  => $request->input('is_active', '1') !== '0',
+        ]);
+
+        // Attach to Materi Quiz via pivot
+        $materi->soals()->attach($soal->id);
+
+        // Store answer choices based on type
+        $this->storeAnswers($soal, $tipe, $request);
+
+        return redirect()->route('admin.materi.edit', $materi->id)
+            ->with('success', 'Soal berhasil ditambahkan.');
     }
 
     public function edit(Soal $soal)
     {
-        return view('admin.soal.edit', compact('soal'));
+        $materi = $soal->materis()->first();
+        $soal->load('pilihanJawaban');
+        return view('admin.soal.edit', compact('soal', 'materi'));
     }
 
     public function update(Request $request, Soal $soal)
     {
-        $validated = $request->validate([
+        $tipe = $request->input('tipe', $soal->tipe);
+
+        $rules = [
             'pertanyaan' => 'required|string',
             'pembahasan' => 'nullable|string',
-            'jawaban_benar' => 'required|in:0,1,2,3',
-            'pilihan' => 'required|array|size:4',
-            'pilihan.*' => 'required|string',
-        ]);
+            'tipe'       => 'required|string',
+            'bobot'      => 'nullable|integer|min:1',
+        ];
 
-        $soal->update([
-            'pertanyaan' => $validated['pertanyaan'],
-            'pembahasan' => $validated['pembahasan'] ?? null,
-            'is_active' => $request->has('is_active') && $request->input('is_active') != '0',
-        ]);
-
-        $hurufs = ['A', 'B', 'C', 'D'];
-        $existingPilihans = $soal->pilihanJawaban;
-        
-        foreach ($request->input('pilihan') as $index => $teks) {
-            $huruf = $hurufs[$index];
-            $isCorrect = $index == $validated['jawaban_benar'];
-            
-            $pilihan = $existingPilihans->where('huruf', $huruf)->first();
-            if ($pilihan) {
-                $pilihan->update([
-                    'teks' => $teks,
-                    'is_correct' => $isCorrect,
-                ]);
-            } else {
-                $soal->pilihanJawaban()->create([
-                    'huruf' => $huruf,
-                    'teks' => $teks,
-                    'is_correct' => $isCorrect,
-                ]);
-            }
+        if ($tipe === 'pilihan_ganda') {
+            $rules['pilihan']       = 'required|array|min:2';
+            $rules['pilihan.*']     = 'required|string';
+            $rules['jawaban_benar'] = 'required|integer|min:0';
+        } elseif ($tipe === 'multi_select') {
+            $rules['pilihan']         = 'required|array|min:2';
+            $rules['pilihan.*']       = 'required|string';
+            $rules['jawaban_benar']   = 'required|array|min:1';
+            $rules['jawaban_benar.*'] = 'integer';
+        } elseif ($tipe === 'isian_singkat') {
+            $rules['jawaban_teks'] = 'required|string';
+        } elseif ($tipe === 'menjodohkan') {
+            $rules['pasangan_kiri']    = 'required|array|min:2';
+            $rules['pasangan_kiri.*']  = 'required|string';
+            $rules['pasangan_kanan']   = 'required|array|min:2';
+            $rules['pasangan_kanan.*'] = 'required|string';
         }
 
-        return redirect()->route('admin.modul.show', $soal->materi->modul_id)->with('success', 'Soal berhasil diperbarui.');
+        $request->validate($rules);
+
+        $soal->update([
+            'pertanyaan' => $request->input('pertanyaan'),
+            'tipe'       => $tipe,
+            'bobot'      => $request->input('bobot', 10),
+            'pembahasan' => $request->input('pembahasan'),
+            'is_active'  => $request->input('is_active', '1') !== '0',
+        ]);
+
+        // Clear old choices and re-create
+        $soal->pilihanJawaban()->delete();
+        $this->storeAnswers($soal, $tipe, $request);
+
+        $materi = $soal->materis()->first();
+        return redirect()->route('admin.materi.edit', $materi->id)
+            ->with('success', 'Soal berhasil diperbarui.');
     }
 
     public function destroy(Soal $soal)
     {
-        $modulId = $soal->materi->modul_id;
+        $materi = $soal->materis()->first();
         $soal->delete();
-        return redirect()->route('admin.modul.show', $modulId)->with('success', 'Soal berhasil dihapus.');
+
+        if ($materi) {
+            return redirect()->route('admin.materi.edit', $materi->id)
+                ->with('success', 'Soal berhasil dihapus.');
+        }
+        return redirect()->route('admin.pelatihan.index')->with('success', 'Soal berhasil dihapus.');
+    }
+
+    // ==========================================
+    // PRIVATE HELPERS
+    // ==========================================
+
+    private function storeAnswers(Soal $soal, string $tipe, Request $request): void
+    {
+        $hurufs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+        if ($tipe === 'pilihan_ganda') {
+            $jawabanBenar = (int) $request->input('jawaban_benar', 0);
+            foreach ($request->input('pilihan', []) as $index => $teks) {
+                $soal->pilihanJawaban()->create([
+                    'huruf'      => $hurufs[$index] ?? ($index + 1),
+                    'teks'       => $teks,
+                    'is_correct' => $index === $jawabanBenar,
+                ]);
+            }
+        } elseif ($tipe === 'multi_select') {
+            $jawabanBenar = array_map('intval', $request->input('jawaban_benar', []));
+            foreach ($request->input('pilihan', []) as $index => $teks) {
+                $soal->pilihanJawaban()->create([
+                    'huruf'      => $hurufs[$index] ?? ($index + 1),
+                    'teks'       => $teks,
+                    'is_correct' => in_array($index, $jawabanBenar),
+                ]);
+            }
+        } elseif ($tipe === 'isian_singkat') {
+            $soal->pilihanJawaban()->create([
+                'huruf'      => 'A',
+                'teks'       => $request->input('jawaban_teks'),
+                'is_correct' => true,
+            ]);
+        } elseif ($tipe === 'menjodohkan') {
+            $kiri   = $request->input('pasangan_kiri', []);
+            $kanan  = $request->input('pasangan_kanan', []);
+            foreach ($kiri as $index => $teksKiri) {
+                $soal->pilihanJawaban()->create([
+                    'huruf'      => 'L' . ($index + 1),
+                    'teks'       => $teksKiri . '|||' . ($kanan[$index] ?? ''),
+                    'is_correct' => true,
+                ]);
+            }
+        }
+        // essay: no choices needed
     }
 }

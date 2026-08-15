@@ -18,10 +18,10 @@
             <i data-lucide="book-open-check" class="w-6 h-6"></i>
         </div>
         <div>
-            <p class="text-sm font-medium text-text-secondary mb-1">Modul Dipelajari</p>
+            <p class="text-sm font-medium text-text-secondary mb-1">Materi Dipelajari</p>
             <div class="flex items-baseline gap-2">
-                <h3 class="text-3xl font-display font-bold text-text-primary">{{ $modulDibaca }}</h3>
-                <span class="text-sm font-medium text-text-secondary">/ {{ $totalModul }}</span>
+                <h3 class="text-3xl font-display font-bold text-text-primary">{{ $materiSelesai }}</h3>
+                <span class="text-sm font-medium text-text-secondary">/ {{ $totalMateri }}</span>
             </div>
         </div>
     </div>
@@ -88,9 +88,9 @@
     <!-- Lanjutkan Pembelajaran -->
     <div class="bg-white rounded-xl shadow-sm border border-border p-6">
         <h3 class="text-lg font-display font-bold text-text-primary mb-4">Lanjutkan Belajar</h3>
-        <p class="text-sm text-text-secondary mb-6">Akses modul pembelajaran sesuai dengan urutan yang telah ditetapkan.</p>
-        <a href="{{ route('peserta.pembelajaran.index') }}" class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-medium py-2 px-4 rounded-lg transition-colors">
-            Buka Modul
+        <p class="text-sm text-text-secondary mb-6">Akses materi pembelajaran sesuai dengan urutan yang telah ditetapkan.</p>
+        <a href="{{ route('peserta.pelatihan.index') }}" class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-medium py-2 px-4 rounded-lg transition-colors">
+            Buka Pelatihan
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
     </div>

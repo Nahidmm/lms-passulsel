@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SesiEvaluasi extends Model
 {
     protected $fillable = [
-        'user_id', 'jabatan_id', 'status', 'mulai_at',
+        'user_id', 'materi_id', 'status', 'mulai_at',
         'selesai_at', 'durasi_menit', 'total_soal', 'benar', 'skor',
     ];
 
@@ -18,7 +18,7 @@ class SesiEvaluasi extends Model
     ];
 
     public function user() { return $this->belongsTo(User::class); }
-    public function jabatan() { return $this->belongsTo(Jabatan::class); }
+    public function materi() { return $this->belongsTo(Materi::class); }
     public function hasilLatihan() { return $this->hasMany(HasilLatihan::class); }
 
     public function isBerlangsung(): bool { return $this->status === 'berlangsung'; }
@@ -28,6 +28,6 @@ class SesiEvaluasi extends Model
     {
         if (!$this->mulai_at || !$this->isBerlangsung()) return 0;
         $batas = $this->mulai_at->addMinutes($this->durasi_menit);
-        return max(0, now()->diffInSeconds($batas, false) * -1);
+        return max(0, now()->diffInSeconds($batas, false));
     }
 }

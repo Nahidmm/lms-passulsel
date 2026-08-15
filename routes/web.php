@@ -58,9 +58,9 @@ Route::middleware(['auth'])->group(function () {
         // ==========================================
         Route::middleware(['role:peserta'])->prefix('peserta')->name('peserta.')->group(function () {
             
-            // Pembelajaran (Modul)
-            Route::get('/pembelajaran', [\App\Http\Controllers\ModulController::class, 'indexPeserta'])->name('pembelajaran.index');
-            Route::get('/pembelajaran/modul/{modul}', [\App\Http\Controllers\ModulController::class, 'showPeserta'])->name('pembelajaran.show');
+            // Pembelajaran (Pelatihan)
+            Route::get('/pelatihan', [\App\Http\Controllers\PelatihanController::class, 'indexPeserta'])->name('pelatihan.index');
+            Route::get('/pelatihan/{pelatihan}', [\App\Http\Controllers\PelatihanController::class, 'showPeserta'])->name('pelatihan.show');
             Route::get('/pembelajaran/materi/{materi}', [\App\Http\Controllers\MateriController::class, 'showPeserta'])->name('pembelajaran.materi.show');
             Route::post('/pembelajaran/materi/{materi}/progress', [\App\Http\Controllers\MateriController::class, 'updateProgress'])->name('pembelajaran.materi.progress');
 
@@ -80,10 +80,24 @@ Route::middleware(['auth'])->group(function () {
         // ==========================================
         Route::middleware(['role:admin,superadmin'])->prefix('admin')->name('admin.')->group(function () {
             
-            // Kelola Modul, Materi, dan Soal (Nested)
-            Route::resource('modul', \App\Http\Controllers\ModulController::class);
-            Route::resource('modul.materi', \App\Http\Controllers\MateriController::class)->shallow();
+            // Kelola Pelatihan, Materi, dan Soal (Nested)
+            Route::resource('pelatihan', \App\Http\Controllers\PelatihanController::class);
+            Route::resource('pelatihan.materi', \App\Http\Controllers\MateriController::class)->shallow();
             Route::resource('materi.soal', \App\Http\Controllers\SoalController::class)->shallow();
+
+            // Kuis: Nilai & Review Peserta
+            Route::get('kuis/{materi}/peserta', [\App\Http\Controllers\Admin\KuisReviewController::class, 'indexPeserta'])->name('kuis.peserta');
+            Route::get('kuis/{materi}/peserta/{sesi}', [\App\Http\Controllers\Admin\KuisReviewController::class, 'showJawaban'])->name('kuis.jawaban');
+            Route::post('kuis/{materi}/peserta/{sesi}/nilai', [\App\Http\Controllers\Admin\KuisReviewController::class, 'nilaiManual'])->name('kuis.nilai-manual');
+            Route::get('kuis/{materi}/export', [\App\Http\Controllers\Admin\KuisReviewController::class, 'exportNilai'])->name('kuis.export');
+
+            // Import Soal dari CSV
+            Route::get('materi/{materi}/import-soal', [\App\Http\Controllers\Admin\ImportSoalController::class, 'create'])->name('soal.import');
+            Route::post('materi/{materi}/import-soal', [\App\Http\Controllers\Admin\ImportSoalController::class, 'store'])->name('soal.import.store');
+            Route::get('materi/{materi}/template-soal', [\App\Http\Controllers\Admin\ImportSoalController::class, 'template'])->name('soal.template');
+
+            // API endpoints for Drag-and-Drop builder
+            Route::post('pelatihan/{pelatihan}/reorder', [\App\Http\Controllers\PelatihanController::class, 'reorder'])->name('pelatihan.reorder');
             
             // Note: VideoController is deprecated since video is now a type of Materi
 
