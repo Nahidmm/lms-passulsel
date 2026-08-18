@@ -64,9 +64,9 @@
             <i data-lucide="star" class="w-6 h-6 text-accent"></i>
         </div>
         <div>
-            <p class="text-xs text-text-secondary font-semibold uppercase tracking-wider">Poin dari Kuis (Skor)</p>
-            <p class="text-3xl font-bold text-accent mt-0.5">{{ number_format($sesis->sum('skor')) }}</p>
-            <p class="text-xs text-text-secondary mt-0.5">dari {{ $sesis->count() }} kuis dikerjakan</p>
+            <p class="text-xs text-text-secondary font-semibold uppercase tracking-wider">Poin dari Kuis (Skor Tertinggi)</p>
+            <p class="text-3xl font-bold text-accent mt-0.5">{{ number_format($totalPoinEvaluasi) }}</p>
+            <p class="text-xs text-text-secondary mt-0.5">dari {{ $sesis->unique('materi_id')->count() }} kuis</p>
         </div>
     </div>
 </div>

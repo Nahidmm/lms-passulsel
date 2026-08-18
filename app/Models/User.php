@@ -161,13 +161,20 @@ class User extends Authenticatable
             return (int) $this->attributes['total_poin'];
         }
 
-        // Sum 'poin' from materi that have been completed
+        // Sum 'poin' from materi that have been completed (ensure unique materi_id)
         $poinMateri = \App\Models\ProgresMateri::where('user_id', $this->id)
             ->where('status', 'selesai')
             ->join('materis', 'progres_materis.materi_id', '=', 'materis.id')
+            ->distinct('progres_materis.materi_id')
             ->sum('materis.poin');
 
-        $poinEvaluasi = $this->sesiEvaluasi()->where('status', 'selesai')->sum('skor');
+        // Sum max 'skor' for each unique quiz (materi_id)
+        $poinEvaluasi = \App\Models\SesiEvaluasi::where('user_id', $this->id)
+            ->where('status', 'selesai')
+            ->groupBy('materi_id')
+            ->selectRaw('MAX(skor) as max_skor')
+            ->get()
+            ->sum('max_skor');
         
         return (int) $poinMateri + (int) $poinEvaluasi;
     }

@@ -62,11 +62,12 @@ class PenilaianController extends Controller
             ->orderByDesc('tanggal_selesai')
             ->get();
 
-        $totalPoinMateri = $progresMateri->sum(fn($p) => $p->materi->poin ?? 0);
+        $totalPoinMateri = $progresMateri->unique('materi_id')->sum(fn($p) => $p->materi->poin ?? 0);
+        $totalPoinEvaluasi = $sesis->groupBy('materi_id')->map(fn($group) => $group->max('skor'))->sum();
 
         $rataRata   = $sesis->avg('skor') ?? 0;
         $totalLulus = $sesis->filter(fn($s) => $s->skor >= $s->passing_grade)->count();
 
-        return view('admin.penilaian.show', compact('user', 'sesis', 'rataRata', 'totalLulus', 'progresMateri', 'totalPoinMateri'));
+        return view('admin.penilaian.show', compact('user', 'sesis', 'rataRata', 'totalLulus', 'progresMateri', 'totalPoinMateri', 'totalPoinEvaluasi'));
     }
 }
