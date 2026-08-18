@@ -54,8 +54,13 @@
                         class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
                 </div>
                 <div class="flex-1">
-                    <label for="durasi_baca" class="block text-sm font-medium text-text-primary mb-1">Durasi (Mnt) <span class="text-danger">*</span></label>
+                    <label for="durasi_baca" class="block text-sm font-medium text-text-primary mb-1">Estimasi Waktu Baca (Mnt) <span class="text-danger">*</span></label>
                     <input type="number" id="durasi_baca" name="durasi_baca" value="{{ old('durasi_baca', 15) }}" required min="1"
+                        class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                </div>
+                <div class="flex-1">
+                    <label for="poin" class="block text-sm font-medium text-text-primary mb-1">Poin Penyelesaian <span class="text-danger">*</span></label>
+                    <input type="number" id="poin" name="poin" value="{{ old('poin', 50) }}" required min="0"
                         class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
                 </div>
             </div>

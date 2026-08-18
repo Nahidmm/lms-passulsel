@@ -23,10 +23,68 @@
     <div class="flex items-center gap-4 lg:gap-6 ml-auto">
         
         <!-- Notification Bell -->
-        <button class="relative p-2 text-text-secondary hover:text-primary hover:bg-primary/5 rounded-full transition-colors">
-            <i data-lucide="bell" class="w-5 h-5"></i>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full border border-white"></span>
-        </button>
+        @php
+            $unreadNotifs = \App\Models\Notification::where('user_id', Auth::id())
+                ->whereNull('read_at')
+                ->orderBy('created_at', 'desc')
+                ->get();
+            $recentNotifs = \App\Models\Notification::where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+        @endphp
+        
+        <div class="relative group" id="notification-dropdown">
+            <button class="relative p-2 text-text-secondary hover:text-primary hover:bg-primary/5 rounded-full transition-colors focus:outline-none">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                @if($unreadNotifs->count() > 0)
+                    <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-danger rounded-full border-2 border-white animate-pulse"></span>
+                @endif
+            </button>
+            
+            <!-- Notification Dropdown Menu -->
+            <div class="absolute top-full mt-2 right-0 w-80 bg-white rounded-xl shadow-lg border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right">
+                <div class="p-3 border-b border-border flex items-center justify-between">
+                    <h3 class="font-bold text-text-primary text-sm">Notifikasi</h3>
+                    @if($unreadNotifs->count() > 0)
+                        <form action="{{ route('notifikasi.read-all') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="text-xs text-primary hover:underline font-medium">Tandai Semua Dibaca</button>
+                        </form>
+                    @endif
+                </div>
+                
+                <div class="max-h-[300px] overflow-y-auto">
+                    @forelse($recentNotifs as $notif)
+                        <a href="{{ route('notifikasi.read', $notif->id) }}" class="block p-3 border-b border-border/50 hover:bg-secondary/50 transition-colors {{ !$notif->isRead() ? 'bg-primary/5' : '' }}">
+                            <div class="flex items-start gap-3">
+                                <div class="mt-0.5 shrink-0 w-8 h-8 rounded-full flex items-center justify-center 
+                                    {{ $notif->type === 'success' ? 'bg-success/10 text-success' : 
+                                       ($notif->type === 'warning' ? 'bg-warning/10 text-warning' : 
+                                       ($notif->type === 'danger' ? 'bg-danger/10 text-danger' : 'bg-primary/10 text-primary')) }}">
+                                    <i data-lucide="{{ $notif->icon }}" class="w-4 h-4"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-text-primary mb-0.5 {{ !$notif->isRead() ? 'text-primary' : '' }}">{{ $notif->title }}</p>
+                                    @if($notif->body)
+                                        <p class="text-xs text-text-secondary line-clamp-2 mb-1">{{ $notif->body }}</p>
+                                    @endif
+                                    <p class="text-[10px] text-text-secondary">{{ $notif->created_at->diffForHumans() }}</p>
+                                </div>
+                                @if(!$notif->isRead())
+                                    <span class="w-2 h-2 rounded-full bg-primary shrink-0 mt-1"></span>
+                                @endif
+                            </div>
+                        </a>
+                    @empty
+                        <div class="p-4 text-center">
+                            <i data-lucide="bell-off" class="w-8 h-8 text-text-secondary mx-auto mb-2 opacity-50"></i>
+                            <p class="text-sm text-text-secondary">Belum ada notifikasi.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
 
         <!-- User Dropdown -->
         <div class="relative group flex items-center gap-3">

@@ -12,9 +12,14 @@
 <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
     <!-- Header/Filter Area -->
     <div class="p-4 border-b border-border bg-secondary/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
-            <i data-lucide="trending-up" class="w-5 h-5 text-primary"></i> Rekap Nilai Peserta
-        </h3>
+        <div class="flex items-center gap-3">
+            <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-5 h-5 text-primary"></i> Rekap Nilai Peserta
+            </h3>
+            <a href="{{ route('admin.statistik.export') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success hover:bg-success/90 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
+                <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+            </a>
+        </div>
 
         <!-- Simple Sorting (Query Params) -->
         <div class="flex items-center gap-2">

@@ -12,12 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
+            'role'             => \App\Http\Middleware\CheckRole::class,
+            'permission'       => \App\Http\Middleware\CheckPermission::class,
             'account.approved' => \App\Http\Middleware\CheckAccountApproved::class,
-            'evaluasi.mode' => \App\Http\Middleware\CheckEvaluasiMode::class,
-            'force.password' => \App\Http\Middleware\ForceChangePassword::class,
+            'evaluasi.mode'    => \App\Http\Middleware\CheckEvaluasiMode::class,
+            'force.password'   => \App\Http\Middleware\ForceChangePassword::class,
         ]);
     })
+
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

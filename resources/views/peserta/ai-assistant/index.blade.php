@@ -55,6 +55,20 @@
                 
                 <div class="flex-1 {{ $msg->role === 'user' ? 'bg-primary text-white rounded-tr-none' : 'bg-secondary text-text-primary rounded-tl-none border border-border' }} rounded-2xl p-4 shadow-sm max-w-[85%] md:max-w-[75%]">
                     <div class="text-sm leading-relaxed whitespace-pre-wrap">{!! nl2br(e($msg->content)) !!}</div>
+                    
+                    @if($msg->role === 'assistant' && !empty($msg->references))
+                        <div class="mt-4 pt-4 border-t border-border/50">
+                            <p class="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">Sumber Referensi:</p>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($msg->references as $ref)
+                                    <a href="{{ Storage::url($ref['file_path']) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-border rounded-lg text-xs text-primary hover:bg-primary/5 hover:border-primary/30 transition-colors">
+                                        <i data-lucide="file-text" class="w-3.5 h-3.5 shrink-0"></i>
+                                        <span class="truncate max-w-[200px]">{{ $ref['judul'] }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         @endforeach
@@ -163,7 +177,7 @@
                 typingIndicator.classList.add('hidden');
                 
                 if (data.success) {
-                    appendBotMessage(data.message);
+                    appendBotMessage(data.message, data.data.references);
                 } else {
                     appendBotMessage("Error: " + (data.message || "Terjadi kesalahan."));
                 }
@@ -197,11 +211,30 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function appendBotMessage(text) {
+        function appendBotMessage(text, references = null) {
             // Very basic markdown parsing for bold and line breaks
             let formattedText = escapeHtml(text)
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\n/g, '<br>');
+
+            let referencesHtml = '';
+            if (references && references.length > 0) {
+                let refLinks = references.map(ref => {
+                    return `<a href="/storage/${ref.file_path}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-border rounded-lg text-xs text-primary hover:bg-primary/5 hover:border-primary/30 transition-colors">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5 shrink-0"></i>
+                                <span class="truncate max-w-[200px]">${escapeHtml(ref.judul)}</span>
+                            </a>`;
+                }).join('');
+                
+                referencesHtml = `
+                    <div class="mt-4 pt-4 border-t border-border/50">
+                        <p class="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">Sumber Referensi:</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${refLinks}
+                        </div>
+                    </div>
+                `;
+            }
 
             const html = `
                 <div class="flex gap-4">
@@ -210,6 +243,7 @@
                     </div>
                     <div class="flex-1 bg-secondary text-text-primary rounded-2xl rounded-tl-none border border-border p-4 shadow-sm max-w-[85%] md:max-w-[75%]">
                         <div class="text-sm leading-relaxed">${formattedText}</div>
+                        ${referencesHtml}
                     </div>
                 </div>
             `;

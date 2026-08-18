@@ -10,15 +10,17 @@ class GeminiService
     private string $apiKey;
     private string $model;
     private string $baseUrl;
+    private string $embeddingModel;
 
     public function __construct()
     {
         $this->apiKey = env('GEMINI_API_KEY');
         $this->model = env('GEMINI_MODEL', 'gemini-1.5-flash');
         $this->baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
+        $this->embeddingModel = 'text-embedding-004';
     }
 
-    public function chat(string $prompt, array $history = []): ?string
+    public function chat(string $prompt, array $history = [], string $ragContext = ''): ?string
     {
         if (empty($this->apiKey) || $this->apiKey === 'your-gemini-api-key-here') {
             Log::error('Gemini API key is not configured.');
@@ -29,6 +31,10 @@ class GeminiService
         
         // System instructions (prepended to history context if any)
         $systemContext = "Anda adalah AI Assistant resmi untuk LMS Pemasyarakatan Sulawesi Selatan. Tugas Anda adalah membantu para pejabat eselon V (seperti Kepala Seksi di Lapas/Rutan) memahami tugas pokok dan fungsi (tupoksi), regulasi Kemenkumham, serta memberikan panduan dan contoh laporan. Jawab dengan bahasa Indonesia yang formal, sopan, namun mudah dipahami. Jangan menjawab pertanyaan yang tidak relevan dengan pemasyarakatan atau tugas pegawai pemerintah.";
+
+        if (!empty($ragContext)) {
+            $systemContext .= "\n\nBerikut adalah konteks dokumen referensi yang relevan dengan pertanyaan (Gunakan informasi ini jika relevan untuk menjawab, jika tidak relevan, abaikan saja):\n" . $ragContext;
+        }
 
         if (empty($history)) {
             $contents[] = [
@@ -85,6 +91,46 @@ class GeminiService
         } catch (\Exception $e) {
             Log::error('Gemini Service Exception: ' . $e->getMessage());
             return "Maaf, layanan AI sedang mengalami gangguan koneksi.";
+        }
+    }
+
+    /**
+     * Get vector embedding for a given text
+     */
+    public function getEmbedding(string $text): ?array
+    {
+        if (empty($this->apiKey) || $this->apiKey === 'your-gemini-api-key-here') {
+            Log::error('Gemini API key is not configured for embeddings.');
+            return null;
+        }
+
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->embeddingModel}:embedContent";
+        
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post($url . '?key=' . $this->apiKey, [
+                'model' => "models/{$this->embeddingModel}",
+                'content' => [
+                    'parts' => [
+                        ['text' => $text]
+                    ]
+                ]
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (isset($data['embedding']['values'])) {
+                    return $data['embedding']['values'];
+                }
+            }
+
+            Log::error('Gemini Embedding API Error: ' . $response->body());
+            return null;
+            
+        } catch (\Exception $e) {
+            Log::error('Gemini Embedding Exception: ' . $e->getMessage());
+            return null;
         }
     }
 }

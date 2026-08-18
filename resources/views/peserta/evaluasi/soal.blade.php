@@ -395,5 +395,34 @@
         loadAnswers();
         updateMapStyling();
     });
+
+    @if($materi->strict_anti_cheat)
+    // Anti-Cheat Logic
+    let warningCount = 0;
+    const maxWarnings = 2; // Auto submit on 3rd violation
+
+    document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === 'hidden' && !document.getElementById('quiz-form').submitted) {
+            handleCheatViolation();
+        }
+    });
+
+    window.addEventListener("blur", function() {
+        if (!document.getElementById('quiz-form').submitted) {
+            handleCheatViolation();
+        }
+    });
+
+    function handleCheatViolation() {
+        warningCount++;
+        if (warningCount > maxWarnings) {
+            alert("PERINGATAN FINAL!\n\nAnda telah terdeteksi meninggalkan halaman kuis lebih dari batas maksimal. Kuis Anda akan dikumpulkan otomatis sekarang.");
+            document.getElementById('quiz-form').submitted = true;
+            document.getElementById('quiz-form').submit();
+        } else {
+            alert(`PERINGATAN ANTI-CHEAT (${warningCount}/${maxWarnings})\n\nSistem mendeteksi Anda meninggalkan halaman kuis atau membuka tab/aplikasi lain. Mohon kerjakan kuis dengan jujur.\n\nJika pelanggaran terjadi lebih dari ${maxWarnings} kali, kuis akan otomatis dikumpulkan dengan nilai seadanya.`);
+        }
+    }
+    @endif
 </script>
 @endpush

@@ -184,6 +184,8 @@ class MateriController extends Controller
             'tanggal_selesai' => now(),
         ]);
 
+        \App\Models\ProgresPelatihan::checkCompletion($user->id, $materi->pelatihan_id);
+
         return redirect()->route('peserta.pelatihan.show', $materi->pelatihan_id)->with('success', 'Materi berhasil diselesaikan!');
     }
 }

@@ -11,21 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class EvaluasiController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
-        
-        $activeSesi = SesiEvaluasi::where('user_id', $user->id)
-            ->where('status', 'berlangsung')
-            ->first();
-            
-        $riwayatSesi = SesiEvaluasi::where('user_id', $user->id)
-            ->where('status', 'selesai')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('peserta.evaluasi.index', compact('activeSesi', 'riwayatSesi'));
-    }
+    // Removed global index method
 
     public function start(Request $request)
     {
@@ -79,7 +65,7 @@ class EvaluasiController extends Controller
     {
         $user = Auth::user();
         if ($sesi->user_id !== $user->id || $sesi->status !== 'berlangsung') {
-            return redirect()->route('peserta.evaluasi.index');
+            return redirect()->route('peserta.pelatihan.index');
         }
 
         $materi = $sesi->materi;
@@ -104,7 +90,7 @@ class EvaluasiController extends Controller
     {
         $user = Auth::user();
         if ($sesi->user_id !== $user->id || $sesi->status !== 'berlangsung') {
-            return redirect()->route('peserta.evaluasi.index');
+            return redirect()->route('peserta.pelatihan.index');
         }
 
         return $this->processSubmit($sesi, $request->input('jawaban', []));
@@ -166,7 +152,7 @@ class EvaluasiController extends Controller
                 'tanggal_selesai' => now(),
             ]);
             
-            // Pelatihan completion is calculated dynamically, no table update needed
+            \App\Models\ProgresPelatihan::checkCompletion($sesi->user_id, $materi->pelatihan_id);
         }
 
         return redirect()->route('peserta.evaluasi.hasil', ['sesi' => $sesi->id]);

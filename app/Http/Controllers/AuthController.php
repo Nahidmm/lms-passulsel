@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Jabatan;
 use App\Models\AccountRequest;
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -71,6 +72,15 @@ class AuthController extends Controller
             'jabatan_id' => $validated['jabatan_id'],
             'pesan' => $validated['pesan'] ?? null,
         ]);
+
+        // Notify all admins about new pending account
+        Notification::kirimKeAdmin(
+            'Permintaan Akun Baru',
+            "Peserta baru {$validated['nama']} (NIP: {$validated['nip']}) mendaftar dan menunggu persetujuan.",
+            'warning',
+            'user-plus',
+            route('admin.akun.index')
+        );
 
         // Auto login so they see the waiting approval page
         Auth::login($user);

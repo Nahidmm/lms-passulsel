@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\AccountRequest;
+use App\Models\Notification;
+use App\Mail\AccountApprovedMail;
+use App\Mail\AccountRejectedMail;
+use App\Mail\PasswordResetMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Str;
+use Illuminate\Support\Facades\Mail;
 
 class ManajemenAkunController extends Controller
 {
@@ -41,6 +46,23 @@ class ManajemenAkunController extends Controller
         $user = User::where('nip', $accountRequest->nip)->first();
         if ($user) {
             $user->update(['status_akun' => 'approved']);
+
+            // Notify the peserta
+            Notification::kirim(
+                $user->id,
+                'Akun Anda Telah Disetujui',
+                'Selamat! Akun Anda sudah aktif. Silakan login dan mulai belajar.',
+                'success',
+                'check-circle',
+                route('dashboard')
+            );
+            
+            // Send Email (silently fail if mail config is broken)
+            try {
+                Mail::to($user->email)->send(new AccountApprovedMail($user));
+            } catch (\Exception $e) {
+                // Log or ignore
+            }
         }
 
         return back()->with('success', "Akun dengan NIP {$accountRequest->nip} berhasil disetujui.");
@@ -68,6 +90,23 @@ class ManajemenAkunController extends Controller
         $user = User::where('nip', $accountRequest->nip)->first();
         if ($user) {
             $user->update(['status_akun' => 'rejected']);
+
+            // Notify the peserta
+            Notification::kirim(
+                $user->id,
+                'Pendaftaran Akun Ditolak',
+                'Maaf, pendaftaran akun Anda ditolak. Silakan hubungi administrator untuk informasi lebih lanjut.',
+                'danger',
+                'x-circle',
+                ''
+            );
+            
+            // Send Email
+            try {
+                Mail::to($user->email)->send(new AccountRejectedMail($user, $request->alasan_tolak));
+            } catch (\Exception $e) {
+                // Log or ignore
+            }
         }
 
         return back()->with('success', "Akun dengan NIP {$accountRequest->nip} telah ditolak.");
@@ -89,7 +128,13 @@ class ManajemenAkunController extends Controller
             'force_change_password' => true,
         ]);
 
-        // TODO: In a real app, send this via Email.
+        // Send Email
+        try {
+            Mail::to($user->email)->send(new PasswordResetMail($user, $tempPassword));
+        } catch (\Exception $e) {
+            // Log or ignore
+        }
+
         // For this project, we'll flash it to the session to show the admin so they can tell the user.
         return back()->with('success_reset', [
             'nama' => $user->nama,

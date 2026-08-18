@@ -21,11 +21,6 @@
                 <span class="text-sm">Katalog Pelatihan</span>
             </a>
             
-            <a href="{{ route('peserta.evaluasi.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('peserta.evaluasi.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-                <span class="text-sm">Evaluasi / Kuis</span>
-            </a>
-            
             <a href="{{ route('peserta.statistik.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('peserta.statistik.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
                 <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
                 <span class="text-sm">Statistik Belajar</span>
@@ -53,6 +48,11 @@
                 <i data-lucide="trending-up" class="w-5 h-5"></i>
                 <span class="text-sm">Statistik Peserta</span>
             </a>
+
+            <a href="{{ route('admin.penilaian.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.penilaian.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
+                <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+                <span class="text-sm">Penilaian Peserta</span>
+            </a>
             
             <a href="{{ route('admin.akun.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.akun.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
                 <i data-lucide="users" class="w-5 h-5"></i>
@@ -65,11 +65,36 @@
                 @endif
             </a>
             
+            <a href="{{ route('admin.jabatan.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.jabatan.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+                <span class="text-sm">Kelola Jabatan</span>
+            </a>
+            
             <a href="{{ route('admin.kalender.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.kalender.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
                 <i data-lucide="calendar" class="w-5 h-5"></i>
                 <span class="text-sm">Kalender Akademik</span>
             </a>
+
+            @if(Auth::user()->isSuperadmin())
+                <div class="text-xs font-semibold text-text-secondary/60 uppercase tracking-wider mt-5 mb-2 px-4">Akses & Keamanan</div>
+                
+                <a href="{{ route('admin.kelola-akses.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.kelola-akses.index', 'admin.kelola-akses.roles.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    <span class="text-sm">Kelola Akses Fitur</span>
+                </a>
+
+                <a href="{{ route('admin.kelola-akses.users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.kelola-akses.users') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
+                    <i data-lucide="user-cog" class="w-5 h-5"></i>
+                    <span class="text-sm">Assign Role User</span>
+                </a>
+
+                <a href="{{ route('admin.kelola-akses.dokumen-ai.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.kelola-akses.dokumen-ai.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                    <span class="text-sm">Knowledge Base AI</span>
+                </a>
+            @endif
         @endif
+
         
         <div class="mt-auto pt-6">
             <form action="{{ route('logout') }}" method="POST">

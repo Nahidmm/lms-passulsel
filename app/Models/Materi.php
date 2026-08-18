@@ -8,7 +8,7 @@ class Materi extends Model
 {
     protected $fillable = [
         'judul', 'deskripsi', 'jenis', 'file_path', 'url_link',
-        'modul_id', 'urutan', 'is_active', 'durasi_baca',
+        'modul_id', 'urutan', 'is_active', 'durasi_baca', 'poin',
         'prasyarat_materi_id', 'passing_grade', 'durasi_menit',
         'max_attempts', 'acak_soal', 'acak_jawaban',
         'tampilkan_feedback', 'strict_anti_cheat'

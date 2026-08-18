@@ -65,38 +65,118 @@
 
 </div>
 
-<!-- Quick Links Admin -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="bg-white rounded-xl shadow-sm border border-border p-6">
+<!-- Charts & Activities -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Chart -->
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-border p-6">
+        <h3 class="font-display font-bold text-lg mb-4 text-text-primary">Tren Pendaftaran Peserta (7 Hari Terakhir)</h3>
+        <div class="h-[300px] w-full">
+            <canvas id="registrationChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="bg-white rounded-xl shadow-sm border border-border p-6 flex flex-col">
         <h3 class="font-display font-bold text-lg mb-4 flex items-center gap-2">
-            <i data-lucide="settings" class="w-5 h-5 text-primary"></i> Manajemen Cepat
+            <i data-lucide="clock" class="w-5 h-5 text-primary"></i> Evaluasi Terbaru
         </h3>
-        <div class="flex flex-col gap-3">
-            <a href="{{ route('admin.akun.index') }}" class="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary transition-colors">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded flex items-center justify-center"><i data-lucide="users-check" class="w-4 h-4"></i></div>
-                    <span class="font-medium text-text-primary">Kelola Persetujuan Akun</span>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 text-text-secondary"></i>
-            </a>
-            <a href="{{ route('admin.statistik.index') }}" class="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary transition-colors">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded flex items-center justify-center"><i data-lucide="clipboard-data" class="w-4 h-4"></i></div>
-                    <span class="font-medium text-text-primary">Lihat Rekap Nilai Peserta</span>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 text-text-secondary"></i>
-            </a>
-            <a href="{{ route('admin.pelatihan.index') }}" class="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary transition-colors">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary">
-                        <i data-lucide="book-open" class="w-4 h-4"></i>
+        
+        <div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-2">
+            @forelse($recentActivities as $activity)
+                <div class="flex items-start gap-3 p-3 rounded-lg border border-border/50 bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-primary"></i>
                     </div>
-                    <span class="font-medium text-text-primary">Kelola Pelatihan & Modul</span>
+                    <div>
+                        <p class="text-sm font-bold text-text-primary">{{ $activity->user->nama ?? 'Unknown' }}</p>
+                        <p class="text-xs text-text-secondary mt-0.5">
+                            Menyelesaikan kuis <span class="font-medium text-text-primary">{{ $activity->materi->judul ?? 'Unknown' }}</span>
+                        </p>
+                        <div class="flex items-center gap-2 mt-1.5">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $activity->skor >= 70 ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning' }}">
+                                Skor: {{ $activity->skor }}
+                            </span>
+                            <span class="text-[10px] text-text-secondary">{{ $activity->updated_at->diffForHumans() }}</span>
+                        </div>
+                    </div>
                 </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 text-text-secondary"></i>
+            @empty
+                <div class="flex flex-col items-center justify-center h-full opacity-50 py-8">
+                    <i data-lucide="inbox" class="w-10 h-10 mb-2"></i>
+                    <p class="text-sm">Belum ada evaluasi diselesaikan.</p>
+                </div>
+            @endforelse
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-border">
+            <a href="{{ route('admin.statistik.index') }}" class="text-sm font-bold text-primary hover:underline flex items-center justify-center gap-1">
+                Lihat Semua Statistik <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('registrationChart').getContext('2d');
+        
+        // Reverse arrays because we built them from newest to oldest (6 days ago -> today)
+        const labels = {!! json_encode(array_reverse($chartDates)) !!};
+        const data = {!! json_encode(array_reverse($chartData)) !!};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Pendaftaran Baru',
+                    data: data,
+                    borderColor: '#2563eb', // primary color
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#2563eb',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 12,
+                        titleFont: { size: 13, family: "'Inter', sans-serif" },
+                        bodyFont: { size: 14, family: "'Inter', sans-serif", weight: 'bold' },
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, precision: 0 },
+                        grid: { borderDash: [4, 4], color: '#e2e8f0' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+            }
+        });
+    });
+</script>
+@endpush
 
 @endsection

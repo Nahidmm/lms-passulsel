@@ -9,6 +9,16 @@
     <p class="text-text-secondary mt-1">Pantau riwayat pembelajaran dan nilai evaluasi Anda.</p>
 </div>
 
+<!-- Chart Nilai -->
+@if(count($chartData) > 0)
+<div class="bg-white rounded-xl shadow-sm border border-border p-6 mb-6">
+    <h3 class="font-display font-bold text-lg mb-4 text-text-primary">Perkembangan Nilai Kuis</h3>
+    <div class="h-[300px] w-full">
+        <canvas id="skorChart"></canvas>
+    </div>
+</div>
+@endif
+
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     
     <!-- Progres Materi -->
@@ -69,5 +79,79 @@
     </div>
 
 </div>
+
+@push('scripts')
+@if(count($chartData) > 0)
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('skorChart').getContext('2d');
+        
+        const labels = {!! json_encode($chartLabels) !!};
+        const data = {!! json_encode($chartData) !!};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Skor Kuis',
+                    data: data,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: function(context) {
+                        const index = context.dataIndex;
+                        const value = context.dataset.data[index];
+                        return value >= 70 ? '#10b981' : '#ef4444'; // Green if pass, red if fail
+                    },
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 12,
+                        titleFont: { size: 13, family: "'Inter', sans-serif" },
+                        bodyFont: { size: 14, family: "'Inter', sans-serif", weight: 'bold' },
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Skor: ' + context.parsed.y;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { stepSize: 20 },
+                        grid: { borderDash: [4, 4], color: '#e2e8f0' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endif
+@endpush
 
 @endsection

@@ -12,6 +12,9 @@ use App\Http\Controllers\KalenderController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ManajemenAkunController;
 use App\Http\Controllers\SoalController;
+use App\Http\Controllers\Admin\KelolAksesController;
+use App\Http\Controllers\Admin\JabatanController;
+use App\Http\Controllers\NotificationController;
 
 // Public / Guest Routes
 Route::middleware('guest')->group(function () {
@@ -47,6 +50,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/profil/update', [AccountController::class, 'update'])->name('profil.update');
         Route::post('/profil/password', [AccountController::class, 'updatePassword'])->name('profil.password');
 
+        // Notifikasi
+        Route::get('/notifikasi/{notification}/read', [NotificationController::class, 'markRead'])->name('notifikasi.read');
+        Route::post('/notifikasi/read-all', [NotificationController::class, 'markAllRead'])->name('notifikasi.read-all');
+
         // AI Assistant (Blocked during active evaluasi)
         Route::middleware(['evaluasi.mode'])->group(function () {
             Route::get('/ai-assistant', [AiAssistantController::class, 'index'])->name('ai.index');
@@ -61,11 +68,11 @@ Route::middleware(['auth'])->group(function () {
             // Pembelajaran (Pelatihan)
             Route::get('/pelatihan', [\App\Http\Controllers\PelatihanController::class, 'indexPeserta'])->name('pelatihan.index');
             Route::get('/pelatihan/{pelatihan}', [\App\Http\Controllers\PelatihanController::class, 'showPeserta'])->name('pelatihan.show');
+            Route::post('/pelatihan/{pelatihan}/enroll', [\App\Http\Controllers\PelatihanController::class, 'enrollPeserta'])->name('pelatihan.enroll');
             Route::get('/pembelajaran/materi/{materi}', [\App\Http\Controllers\MateriController::class, 'showPeserta'])->name('pembelajaran.materi.show');
             Route::post('/pembelajaran/materi/{materi}/progress', [\App\Http\Controllers\MateriController::class, 'updateProgress'])->name('pembelajaran.materi.progress');
 
             // Evaluasi (Kuis)
-            Route::get('/evaluasi', [EvaluasiController::class, 'index'])->name('evaluasi.index');
             Route::post('/evaluasi/start', [EvaluasiController::class, 'start'])->name('evaluasi.start');
             Route::get('/evaluasi/soal/{sesi}', [EvaluasiController::class, 'soal'])->name('evaluasi.soal');
             Route::post('/evaluasi/submit/{sesi}', [EvaluasiController::class, 'submit'])->name('evaluasi.submit');
@@ -103,6 +110,18 @@ Route::middleware(['auth'])->group(function () {
 
             // Statistik / Rekap Peserta
             Route::get('/statistik', [StatistikController::class, 'indexAdmin'])->name('statistik.index');
+            Route::get('/statistik/export', [StatistikController::class, 'exportCsv'])->name('statistik.export');
+
+            // Penilaian Per Peserta
+            Route::get('/penilaian', [\App\Http\Controllers\Admin\PenilaianController::class, 'index'])->name('penilaian.index');
+            Route::get('/penilaian/{user}', [\App\Http\Controllers\Admin\PenilaianController::class, 'show'])->name('penilaian.show');
+
+            // Kelola Jabatan
+            Route::get('/jabatan', [JabatanController::class, 'index'])->name('jabatan.index');
+            Route::post('/jabatan', [JabatanController::class, 'store'])->name('jabatan.store');
+            Route::put('/jabatan/{jabatan}', [JabatanController::class, 'update'])->name('jabatan.update');
+            Route::delete('/jabatan/{jabatan}', [JabatanController::class, 'destroy'])->name('jabatan.destroy');
+            Route::post('/jabatan/{jabatan}/toggle', [JabatanController::class, 'toggleActive'])->name('jabatan.toggle');
 
             // Manajemen Akun
             Route::get('/akun', [ManajemenAkunController::class, 'index'])->name('akun.index');
@@ -113,6 +132,30 @@ Route::middleware(['auth'])->group(function () {
 
             // Kalender Akademik
             Route::resource('kalender', KalenderController::class);
+
+            // ==========================================
+            // KELOLA AKSES FITUR (Superadmin Only)
+            // ==========================================
+            Route::middleware(['role:superadmin'])->prefix('kelola-akses')->name('kelola-akses.')->group(function () {
+                // Dashboard
+                Route::get('/', [KelolAksesController::class, 'index'])->name('index');
+
+                // CRUD Role
+                Route::get('/roles/create', [KelolAksesController::class, 'createRole'])->name('roles.create');
+                Route::post('/roles', [KelolAksesController::class, 'storeRole'])->name('roles.store');
+                Route::get('/roles/{id}/edit', [KelolAksesController::class, 'editRole'])->name('roles.edit');
+                Route::put('/roles/{id}', [KelolAksesController::class, 'updateRole'])->name('roles.update');
+                Route::delete('/roles/{id}', [KelolAksesController::class, 'destroyRole'])->name('roles.destroy');
+
+                // Assign Role ke User
+                Route::get('/users', [KelolAksesController::class, 'users'])->name('users');
+                Route::post('/users/{id}/assign', [KelolAksesController::class, 'assignRole'])->name('users.assign');
+                
+                // Knowledge Base AI (RAG)
+                Route::get('/dokumen-ai', [\App\Http\Controllers\Admin\DokumenAiController::class, 'index'])->name('dokumen-ai.index');
+                Route::post('/dokumen-ai', [\App\Http\Controllers\Admin\DokumenAiController::class, 'store'])->name('dokumen-ai.store');
+                Route::delete('/dokumen-ai/{dokumen_ai}', [\App\Http\Controllers\Admin\DokumenAiController::class, 'destroy'])->name('dokumen-ai.destroy');
+            });
         });
     });
 });

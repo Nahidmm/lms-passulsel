@@ -5,8 +5,8 @@
 @section('content')
 
 <div class="mb-4 flex items-center gap-2">
-    <a href="{{ route('peserta.evaluasi.index') }}" class="text-text-secondary hover:text-primary flex items-center gap-1 font-medium transition-colors">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Menu Evaluasi
+    <a href="{{ route('peserta.pelatihan.show', $materi->pelatihan_id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1 font-medium transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Pelatihan
     </a>
 </div>
 
