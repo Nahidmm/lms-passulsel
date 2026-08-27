@@ -1,66 +1,103 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LMS Pemasyarakatan Sulawesi Selatan (SPEKTRA)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+LMS SPEKTRA adalah sistem manajemen pembelajaran khusus untuk pegawai di lingkungan Kanwil Kemenkumham Sulawesi Selatan. Sistem ini dilengkapi dengan Kuis Interaktif (Cinematic Game Mode) dan Asisten AI berbasis Google Gemini.
 
-## About Laravel
+## 🚀 Panduan Instalasi (Untuk Tim Pengembang / Kolaborasi)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Ikuti langkah-langkah di bawah ini untuk menjalankan proyek ini di perangkat lokal Anda.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Persyaratan Sistem
+Pastikan perangkat Anda sudah terinstal:
+- **PHP** (minimal versi 8.2)
+- **Composer** (versi terbaru)
+- **Node.js** dan **NPM** (minimal versi 18.x)
+- **Git**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. Kloning Repositori
+Lakukan kloning dari repositori utama:
+```bash
+git clone https://github.com/Nahidmm/lms-passulsel.git
+cd lms-passulsel
+```
 
-## Learning Laravel
+### 3. Instalasi Dependensi
+Instal pustaka PHP menggunakan Composer dan dependensi Node.js menggunakan NPM:
+```bash
+# Instal dependensi backend (PHP)
+composer install
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# Instal dependensi frontend (JavaScript/CSS)
+npm install
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 4. Konfigurasi Environment (`.env`)
+Salin berkas konfigurasi *environment* dan sesuaikan:
+```bash
+cp .env.example .env
+```
+Setelah itu, buat _application key_ rahasia:
+```bash
+php artisan key:generate
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Buka *file* `.env` dan pastikan konfigurasi *database* menggunakan `sqlite` (bawaan Laravel 11) agar lebih praktis untuk pengembangan lokal:
+```env
+DB_CONNECTION=sqlite
+# Hapus baris DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD jika ada.
+```
+*Catatan: Pastikan Anda telah membuat *file* kosong bernama `database.sqlite` di dalam *folder* `database/` jika terjadi error saat migrasi.*
 
-## Laravel Sponsors
+Selain itu, isi konfigurasi API Key untuk Gemini agar AI Assistant dapat berfungsi:
+```env
+GEMINI_API_KEY=masukkan_api_key_google_gemini_anda_di_sini
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 5. Migrasi dan Seeding Database
+Jalankan migrasi untuk membuat tabel *database* beserta data awal (*dummy/seeder*):
+```bash
+php artisan migrate:fresh --seed
+```
+*Catatan: `SamplePretestSeeder` dan `SertifikatPermissionSeeder` sudah dipanggil otomatis melalui `DatabaseSeeder`.*
 
-### Premium Partners
+### 6. Tautkan Storage Folder
+Agar file (seperti materi PDF atau gambar) yang diunggah ke folder `storage/app/public` bisa diakses dari *browser*, jalankan perintah ini:
+```bash
+php artisan storage:link
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 7. Jalankan Server Pengembangan (Development Server)
+Anda perlu menjalankan **dua server** secara bersamaan. Silakan buka **dua tab terminal** yang berbeda di dalam folder proyek.
 
-## Contributing
+**Terminal 1 (Backend - PHP):**
+```bash
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Terminal 2 (Frontend - Vite Asset Bundler):**
+```bash
+npm run dev
+```
 
-## Code of Conduct
+### 8. Akses Aplikasi
+Buka *browser* Anda dan kunjungi URL berikut:
+**[http://localhost:8000](http://localhost:8000)**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 👥 Informasi Kredensial Uji Coba
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Untuk keperluan *testing*, Anda dapat masuk menggunakan akun berikut:
 
-## License
+- **Superadmin:**
+  - Email: `superadmin@lms.test`
+  - Password: `password`
+- **Peserta Budi (Sudah Reset Pretest):**
+  - NIP/Username: `198001012005011002`
+  - Password: `password`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🧩 Fitur Utama
+1. **Manajemen Pembelajaran (Materi, Video, Modul)**
+2. **Mesin Pretest & Kuis Interaktif (Cinematic Game Mode)**
+3. **Penerbitan E-Sertifikat Otomatis**
+4. **Asisten AI (RAG - *Retrieval-Augmented Generation*) berbasis Gemini 1.5/3.6**
+5. **Dashboard Analitik**
