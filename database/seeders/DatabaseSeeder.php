@@ -12,7 +12,10 @@ class DatabaseSeeder extends Seeder
             JabatanSeeder::class,
             HariLiburSeeder::class,
             SuperadminSeeder::class,
+            PermissionAndRoleSeeder::class,
+            SertifikatPermissionSeeder::class,
             DemoDataSeeder::class,
         ]);
     }
 }
+

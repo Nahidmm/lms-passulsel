@@ -24,7 +24,7 @@
 
         {{-- Left: Role Info --}}
         <div class="lg:col-span-1 space-y-4">
-            <div class="bg-white rounded-xl shadow-sm border border-border p-5">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-5">
                 <h3 class="font-bold text-text-primary mb-4 flex items-center gap-2">
                     <i data-lucide="info" class="w-4 h-4 text-primary"></i> Informasi Role
                 </h3>
@@ -63,7 +63,7 @@
             {{-- Action Buttons --}}
             <div class="flex flex-col gap-2">
                 <button type="submit"
-                        class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors shadow-sm">
+                        class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-[var(--text-primary)] text-sm font-bold px-5 py-2.5 rounded-lg transition-colors shadow-sm">
                     <i data-lucide="save" class="w-4 h-4"></i> Simpan Role
                 </button>
                 <a href="{{ route('admin.kelola-akses.index') }}"
@@ -77,7 +77,7 @@
         <div class="lg:col-span-2 space-y-4">
 
             {{-- Select All --}}
-            <div class="bg-white rounded-xl shadow-sm border border-border p-4 flex items-center justify-between">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-4 flex items-center justify-between">
                 <p class="text-sm font-semibold text-text-primary">Pilih Permission</p>
                 <div class="flex gap-2">
                     <button type="button" onclick="selectAll()" class="text-xs font-semibold text-primary hover:underline px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors">Pilih Semua</button>
@@ -86,7 +86,7 @@
             </div>
 
             @foreach($permissions as $grup => $perms)
-            <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
                 {{-- Group Header --}}
                 <div class="px-5 py-3 bg-secondary/50 border-b border-border flex items-center justify-between">
                     <h4 class="font-bold text-sm text-text-primary flex items-center gap-2">
@@ -181,3 +181,4 @@
     updateCount();
 </script>
 @endpush
+

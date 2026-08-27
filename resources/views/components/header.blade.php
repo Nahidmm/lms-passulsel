@@ -1,114 +1,131 @@
-<header class="bg-white border-b border-border h-16 flex items-center justify-between px-4 lg:px-8 shrink-0 sticky top-0 z-30">
-    
-    <!-- Mobile menu button -->
-    <div class="md:hidden flex items-center gap-3">
-        <button class="text-text-secondary hover:text-primary p-1">
-            <i data-lucide="menu" class="w-6 h-6"></i>
-        </button>
-        <img src="{{ asset('logo/logo.png') }}" alt="Logo LMS" class="h-6 w-auto object-contain">
-        <div class="font-display font-bold text-primary text-lg">LMS Pas Sulsel</div>
-    </div>
+<header class="app-header">
 
-    <!-- Left Side: Search Bar (Desktop) -->
-    <div class="hidden md:flex flex-1 max-w-md">
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-4 h-4 text-text-secondary"></i>
+    {{-- Left: Hamburger + brand --}}
+    <div class="flex items-center gap-3 flex-1 min-w-0">
+        {{-- Sidebar toggle (desktop: collapse/expand | mobile: drawer) --}}
+        <button onclick="toggleSidebar()"
+            id="sidebar-toggle-btn"
+            class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all"
+            style="color:var(--text-secondary);border:1px solid rgba(255,255,255,0.07);"
+            aria-label="Toggle sidebar"
+            onmouseenter="this.style.color='var(--paper)';this.style.background='rgba(255,255,255,0.07)'"
+            onmouseleave="this.style.color='var(--text-secondary)';this.style.background='transparent'">
+            <i data-lucide="panel-left" class="w-4 h-4"></i>
+        </button>
+
+        {{-- Page title / brand on mobile --}}
+        <div class="md:hidden flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600 to-blue-500 flex items-center justify-center">
+                <i data-lucide="zap" class="w-3 h-3 text-white"></i>
             </div>
-            <input type="text" placeholder="Search..." class="w-full pl-10 pr-4 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-text-primary placeholder-text-secondary">
+            <span class="font-black text-[var(--text-primary)] text-sm">SPEKTRA</span>
         </div>
     </div>
 
-    <!-- Right Side Actions -->
-    <div class="flex items-center gap-4 lg:gap-6 ml-auto">
-        
-        <!-- Notification Bell -->
+    {{-- Right: XP chips (desktop) + notif + user --}}
+    <div class="flex items-center gap-2 ml-auto">
+
+        {{-- Peserta XP chips â€” desktop only --}}
+        @if(Auth::user()->isPeserta())
+        <div class="hidden lg:flex items-center gap-2">
+            <span class="badge badge-violet text-xs">
+                <i data-lucide="zap" class="w-3 h-3"></i> Lvl 12
+            </span>
+            <span class="badge badge-amber text-xs">
+                <i data-lucide="flame" class="w-3 h-3"></i> 5 Hari
+            </span>
+            <span class="badge badge-emerald text-xs">
+                <i data-lucide="star" class="w-3 h-3"></i>
+                {{ number_format(Auth::user()->getTotalPoin()) }} XP
+            </span>
+        </div>
+        @endif
+
+        {{-- Theme Toggle --}}
+        <button id="theme-toggle" class="relative w-9 h-9 flex items-center justify-center rounded-xl text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--card)] border border-transparent transition-all mr-1">
+            <i id="theme-toggle-dark-icon" data-lucide="moon" class="w-4 h-4 hidden"></i>
+            <i id="theme-toggle-light-icon" data-lucide="sun" class="w-4 h-4 hidden"></i>
+        </button>
+
+        {{-- Notification bell --}}
         @php
-            $unreadNotifs = \App\Models\Notification::where('user_id', Auth::id())
-                ->whereNull('read_at')
-                ->orderBy('created_at', 'desc')
-                ->get();
-            $recentNotifs = \App\Models\Notification::where('user_id', Auth::id())
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get();
+            $unreadNotifs = \App\Models\Notification::where('user_id', Auth::id())->whereNull('read_at')->orderByDesc('created_at')->get();
+            $recentNotifs = \App\Models\Notification::where('user_id', Auth::id())->orderByDesc('created_at')->take(6)->get();
         @endphp
-        
-        <div class="relative group" id="notification-dropdown">
-            <button class="relative p-2 text-text-secondary hover:text-primary hover:bg-primary/5 rounded-full transition-colors focus:outline-none">
-                <i data-lucide="bell" class="w-5 h-5"></i>
+
+        <div class="relative group">
+            <button class="relative w-9 h-9 flex items-center justify-center rounded-xl text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--card)] border border-[var(--border)] shadow-sm border border-transparent transition-all">
+                <i data-lucide="bell" class="w-4 h-4"></i>
                 @if($unreadNotifs->count() > 0)
-                    <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-danger rounded-full border-2 border-white animate-pulse"></span>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#0d1117] animate-pulse"></span>
                 @endif
             </button>
-            
-            <!-- Notification Dropdown Menu -->
-            <div class="absolute top-full mt-2 right-0 w-80 bg-white rounded-xl shadow-lg border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right">
-                <div class="p-3 border-b border-border flex items-center justify-between">
-                    <h3 class="font-bold text-text-primary text-sm">Notifikasi</h3>
+
+            {{-- Dropdown --}}
+            <div class="notif-dropdown">
+                <div class="flex items-center justify-between p-4 border-b border-[var(--border)]">
+                    <h3 class="text-sm font-bold text-[var(--text-primary)]">Notifikasi</h3>
                     @if($unreadNotifs->count() > 0)
                         <form action="{{ route('notifikasi.read-all') }}" method="POST">
                             @csrf
-                            <button type="submit" class="text-xs text-primary hover:underline font-medium">Tandai Semua Dibaca</button>
+                            <button class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold">Tandai semua</button>
                         </form>
                     @endif
                 </div>
-                
-                <div class="max-h-[300px] overflow-y-auto">
+                <div class="max-h-64 overflow-y-auto">
                     @forelse($recentNotifs as $notif)
-                        <a href="{{ route('notifikasi.read', $notif->id) }}" class="block p-3 border-b border-border/50 hover:bg-secondary/50 transition-colors {{ !$notif->isRead() ? 'bg-primary/5' : '' }}">
-                            <div class="flex items-start gap-3">
-                                <div class="mt-0.5 shrink-0 w-8 h-8 rounded-full flex items-center justify-center 
-                                    {{ $notif->type === 'success' ? 'bg-success/10 text-success' : 
-                                       ($notif->type === 'warning' ? 'bg-warning/10 text-warning' : 
-                                       ($notif->type === 'danger' ? 'bg-danger/10 text-danger' : 'bg-primary/10 text-primary')) }}">
-                                    <i data-lucide="{{ $notif->icon }}" class="w-4 h-4"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-semibold text-text-primary mb-0.5 {{ !$notif->isRead() ? 'text-primary' : '' }}">{{ $notif->title }}</p>
-                                    @if($notif->body)
-                                        <p class="text-xs text-text-secondary line-clamp-2 mb-1">{{ $notif->body }}</p>
-                                    @endif
-                                    <p class="text-[10px] text-text-secondary">{{ $notif->created_at->diffForHumans() }}</p>
-                                </div>
-                                @if(!$notif->isRead())
-                                    <span class="w-2 h-2 rounded-full bg-primary shrink-0 mt-1"></span>
-                                @endif
+                        <a href="{{ route('notifikasi.read', $notif->id) }}"
+                           class="flex items-start gap-3 px-4 py-3 hover:bg-[var(--card)] border border-[var(--border)] shadow-sm transition-colors border-b last:border-0 {{ !$notif->isRead() ? 'bg-[var(--card-hover)]' : '' }}">
+                            <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5
+                                {{ $notif->type==='success' ? 'bg-emerald-500/15 text-emerald-400' :
+                                   ($notif->type==='warning' ? 'bg-amber-500/15 text-amber-400'  :
+                                   ($notif->type==='danger'  ? 'bg-rose-500/15 text-rose-400'    :
+                                                               'bg-violet-500/15 text-violet-400')) }}">
+                                <i data-lucide="{{ $notif->icon ?? 'bell' }}" class="w-4 h-4"></i>
                             </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-[var(--text-primary)] truncate">{{ $notif->title }}</p>
+                                @if($notif->body)
+                                    <p class="text-xs text-[var(--text-secondary)] line-clamp-2 mt-0.5">{{ $notif->body }}</p>
+                                @endif
+                                <p class="text-[10px] text-[var(--text-muted)] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                            </div>
+                            @if(!$notif->isRead())
+                                <span class="w-2 h-2 rounded-full bg-violet-400 shrink-0 mt-2"></span>
+                            @endif
                         </a>
                     @empty
-                        <div class="p-4 text-center">
-                            <i data-lucide="bell-off" class="w-8 h-8 text-text-secondary mx-auto mb-2 opacity-50"></i>
-                            <p class="text-sm text-text-secondary">Belum ada notifikasi.</p>
+                        <div class="py-10 text-center">
+                            <i data-lucide="bell-off" class="w-8 h-8 text-[var(--text-muted)] mx-auto mb-2"></i>
+                            <p class="text-sm text-[var(--text-secondary)]">Belum ada notifikasi</p>
                         </div>
                     @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- User Dropdown -->
-        <div class="relative group flex items-center gap-3">
-            <div class="text-right hidden sm:block">
-                <p class="text-xs text-text-secondary">Hello</p>
-                <p class="text-sm font-bold text-text-primary leading-tight">{{ explode(' ', Auth::user()->nama)[0] }}</p>
-            </div>
-            <button class="flex items-center gap-2 hover:bg-secondary rounded-full transition-colors focus:outline-none">
-                <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="w-9 h-9 rounded-full border-2 border-white shadow-sm object-cover">
+        {{-- User avatar + dropdown --}}
+        <div class="relative group">
+            <button class="flex items-center gap-2 p-1 rounded-xl hover:bg-[var(--card)] border border-[var(--border)] shadow-sm border border-transparent transition-all">
+                <img src="{{ Auth::user()->avatar_url }}"
+                     class="w-8 h-8 rounded-xl object-cover" alt="Avatar"
+                     style="border:2px solid rgba(200,137,26,0.35);">
+                <i data-lucide="chevron-down" class="w-3 h-3 hidden sm:block" style="color:var(--text-muted);"></i>
             </button>
-            
-            <!-- Dropdown Menu -->
-            <div class="absolute top-full mt-2 right-0 w-48 bg-white rounded-xl shadow-lg border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right">
-                <div class="p-3 border-b border-border">
-                    <p class="text-sm font-semibold text-text-primary truncate">{{ Auth::user()->nama }}</p>
-                    <p class="text-xs text-text-secondary truncate">{{ Auth::user()->nip }}</p>
+
+            <div class="user-dropdown">
+                <div class="p-4 border-b border-[var(--border)]">
+                    <p class="text-sm font-bold text-[var(--text-primary)] truncate">{{ Auth::user()->nama }}</p>
+                    <p class="text-xs text-[var(--text-secondary)] mt-0.5 truncate">{{ Auth::user()->nip }}</p>
                 </div>
-                <div class="p-1.5">
-                    <a href="{{ route('profil.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
+                <div class="p-2">
+                    <a href="{{ route('profil.index') }}"
+                       class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--card)] border border-[var(--border)] shadow-sm font-semibold transition-all">
                         <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
                     </a>
-                    <form action="{{ route('logout') }}" method="POST" class="w-full mt-1">
+                    <form action="{{ route('logout') }}" method="POST" class="mt-1">
                         @csrf
-                        <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-danger/10 rounded-lg transition-colors">
+                        <button type="submit" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-rose-400 hover:bg-rose-500/8 font-semibold transition-all">
                             <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
                         </button>
                     </form>
@@ -118,3 +135,4 @@
 
     </div>
 </header>
+

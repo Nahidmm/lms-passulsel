@@ -15,9 +15,9 @@ class GeminiService
     public function __construct()
     {
         $this->apiKey = env('GEMINI_API_KEY');
-        $this->model = env('GEMINI_MODEL', 'gemini-1.5-flash');
+        $this->model = 'gemini-3.6-flash';
         $this->baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
-        $this->embeddingModel = 'text-embedding-004';
+        $this->embeddingModel = 'gemini-embedding-2';
     }
 
     public function chat(string $prompt, array $history = [], string $ragContext = ''): ?string
@@ -30,10 +30,12 @@ class GeminiService
         $contents = [];
         
         // System instructions (prepended to history context if any)
-        $systemContext = "Anda adalah AI Assistant resmi untuk LMS Pemasyarakatan Sulawesi Selatan. Tugas Anda adalah membantu para pejabat eselon V (seperti Kepala Seksi di Lapas/Rutan) memahami tugas pokok dan fungsi (tupoksi), regulasi Kemenkumham, serta memberikan panduan dan contoh laporan. Jawab dengan bahasa Indonesia yang formal, sopan, namun mudah dipahami. Jangan menjawab pertanyaan yang tidak relevan dengan pemasyarakatan atau tugas pegawai pemerintah.";
+        $systemContext = "Anda adalah AI Assistant resmi untuk LMS Pemasyarakatan Sulawesi Selatan. Tugas Anda adalah membantu pegawai pemasyarakatan. Anda memiliki akses ke Dokumen Referensi internal (Knowledge Base).";
 
         if (!empty($ragContext)) {
-            $systemContext .= "\n\nBerikut adalah konteks dokumen referensi yang relevan dengan pertanyaan (Gunakan informasi ini jika relevan untuk menjawab, jika tidak relevan, abaikan saja):\n" . $ragContext;
+            $systemContext .= "\n\nPENTING! Anda WAJIB menjawab pertanyaan HANYA berdasarkan informasi yang ada di dalam Dokumen Referensi berikut. Jangan pernah mengarang jawaban atau menggunakan pengetahuan dari luar dokumen ini. Jika jawabannya tidak ada di dalam dokumen referensi ini, katakan: 'Maaf, informasi tersebut tidak ditemukan dalam dokumen referensi saya.'\n\n--- DOKUMEN REFERENSI ---\n" . $ragContext . "\n--- AKHIR REFERENSI ---\n";
+        } else {
+             $systemContext .= "\n\nSaat ini belum ada dokumen referensi yang cocok dengan pertanyaan pengguna. Berikan jawaban umum yang sesuai jika memungkinkan, namun ingatkan pengguna bahwa ini bukan dari referensi resmi.";
         }
 
         if (empty($history)) {
@@ -74,23 +76,24 @@ class GeminiService
                     'temperature' => 0.4,
                     'topK' => 40,
                     'topP' => 0.95,
-                    'maxOutputTokens' => 1024,
+                    'maxOutputTokens' => 8192,
                 ]
             ]);
 
             if ($response->successful()) {
                 $data = $response->json();
+                Log::info('Gemini Success Response: ' . json_encode($data));
                 if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                     return $data['candidates'][0]['content']['parts'][0]['text'];
                 }
             }
 
             Log::error('Gemini API Error: ' . $response->body());
-            return "Maaf, terjadi kesalahan saat menghubungi server AI. Coba lagi nanti.";
+            throw new \Exception("Maaf, terjadi kesalahan saat menghubungi server AI. Coba lagi nanti.");
             
         } catch (\Exception $e) {
             Log::error('Gemini Service Exception: ' . $e->getMessage());
-            return "Maaf, layanan AI sedang mengalami gangguan koneksi.";
+            throw new \Exception("Maaf, layanan AI sedang mengalami gangguan koneksi.");
         }
     }
 

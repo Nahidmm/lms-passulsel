@@ -19,8 +19,8 @@ use App\Http\Controllers\NotificationController;
 // Public / Guest Routes
 Route::middleware('guest')->group(function () {
     Route::get('/', function () {
-        return redirect()->route('login');
-    });
+        return view('welcome');
+    })->name('landing');
 
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -28,6 +28,9 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
+
+// Public Route untuk Verifikasi Sertifikat
+Route::get('/verify-certificate/{credential_id}', [\App\Http\Controllers\SertifikatController::class, 'verify'])->name('sertifikat.verify');
 
 // Authenticated Routes (Any Role)
 Route::middleware(['auth'])->group(function () {
@@ -40,8 +43,8 @@ Route::middleware(['auth'])->group(function () {
     // Waiting approval page
     Route::get('/auth/waiting-approval', [AuthController::class, 'showWaitingApproval'])->name('auth.waiting');
 
-    // Normal access (Account approved & password changed)
-    Route::middleware(['account.approved', 'force.password'])->group(function () {
+    // Normal access (Account approved, password changed, and pretest completed)
+    Route::middleware(['account.approved', 'force.password', 'pretest.completed'])->group(function () {
         
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -64,6 +67,8 @@ Route::middleware(['auth'])->group(function () {
         // ROLE: PESERTA
         // ==========================================
         Route::middleware(['role:peserta'])->prefix('peserta')->name('peserta.')->group(function () {
+            // Sertifikat
+            Route::get('/sertifikat/{credential_id}/download', [\App\Http\Controllers\SertifikatController::class, 'download'])->name('sertifikat.download');
             
             // Pembelajaran (Pelatihan)
             Route::get('/pelatihan', [\App\Http\Controllers\PelatihanController::class, 'indexPeserta'])->name('pelatihan.index');
@@ -78,6 +83,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/evaluasi/submit/{sesi}', [EvaluasiController::class, 'submit'])->name('evaluasi.submit');
             Route::get('/evaluasi/hasil/{sesi}', [EvaluasiController::class, 'hasil'])->name('evaluasi.hasil');
 
+            // Pretest
+            Route::get('/pretest/take', [\App\Http\Controllers\Peserta\PretestPesertaController::class, 'take'])->name('pretest.take');
+
             // Statistik / Riwayat
             Route::get('/statistik', [StatistikController::class, 'indexPeserta'])->name('statistik.index');
         });
@@ -86,11 +94,11 @@ Route::middleware(['auth'])->group(function () {
         // ROLE: ADMIN & SUPERADMIN
         // ==========================================
         Route::middleware(['role:admin,superadmin'])->prefix('admin')->name('admin.')->group(function () {
-            
             // Kelola Pelatihan, Materi, dan Soal (Nested)
             Route::resource('pelatihan', \App\Http\Controllers\PelatihanController::class);
             Route::resource('pelatihan.materi', \App\Http\Controllers\MateriController::class)->shallow();
             Route::resource('materi.soal', \App\Http\Controllers\SoalController::class)->shallow();
+            Route::get('materi/{materi}/preview-quiz', [\App\Http\Controllers\MateriController::class, 'previewQuiz'])->name('materi.preview-quiz');
 
             // Kuis: Nilai & Review Peserta
             Route::get('kuis/{materi}/peserta', [\App\Http\Controllers\Admin\KuisReviewController::class, 'indexPeserta'])->name('kuis.peserta');
@@ -112,7 +120,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/statistik', [StatistikController::class, 'indexAdmin'])->name('statistik.index');
             Route::get('/statistik/export', [StatistikController::class, 'exportCsv'])->name('statistik.export');
 
-            // Penilaian Per Peserta
+            // Pretest Management
+            Route::get('/pretest', [App\Http\Controllers\Admin\PretestController::class, 'index'])->name('pretest.index');
+            Route::post('/pretest/setting', [App\Http\Controllers\Admin\PretestController::class, 'updateSetting'])->name('pretest.setting');
+            Route::post('/pretest/topik', [App\Http\Controllers\Admin\PretestController::class, 'storeTopik'])->name('pretest.topik.store');
+            Route::put('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'updateTopik'])->name('pretest.topik.update');
+            Route::delete('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'destroyTopik'])->name('pretest.topik.destroy');
+
+            // Evaluasi Penilaian List
             Route::get('/penilaian', [\App\Http\Controllers\Admin\PenilaianController::class, 'index'])->name('penilaian.index');
             Route::get('/penilaian/{user}', [\App\Http\Controllers\Admin\PenilaianController::class, 'show'])->name('penilaian.show');
 
@@ -130,8 +145,25 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/akun/reset-password/{id}', [ManajemenAkunController::class, 'resetPassword'])->name('akun.reset-password');
             Route::delete('/akun/delete/{id}', [ManajemenAkunController::class, 'destroy'])->name('akun.destroy');
 
+            // Import Users
+            Route::get('/users/import', [\App\Http\Controllers\Admin\UserImportController::class, 'index'])->name('users.import');
+            Route::post('/users/import', [\App\Http\Controllers\Admin\UserImportController::class, 'store'])->name('users.import.store');
+            Route::get('/users/import/template', [\App\Http\Controllers\Admin\UserImportController::class, 'downloadTemplate'])->name('users.import.template');
+
+            // Unit Kerja
+            Route::resource('unit-kerja', \App\Http\Controllers\Admin\UnitKerjaController::class)->except(['create', 'show', 'edit']);
+
             // Kalender Akademik
             Route::resource('kalender', KalenderController::class);
+
+            // ==========================================
+            // SERTIFIKAT (Superadmin Only)
+            // ==========================================
+            Route::middleware(['role:superadmin'])->group(function () {
+                                Route::get('/sertifikat-setting/preview', [\App\Http\Controllers\SertifikatSettingController::class, 'preview'])->name('sertifikat-setting.preview');
+Route::get('/sertifikat-setting', [\App\Http\Controllers\SertifikatSettingController::class, 'edit'])->name('sertifikat-setting.edit');
+                Route::put('/sertifikat-setting', [\App\Http\Controllers\SertifikatSettingController::class, 'update'])->name('sertifikat-setting.update');
+            });
 
             // ==========================================
             // KELOLA AKSES FITUR (Superadmin Only)
@@ -159,3 +191,13 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 });
+
+
+
+
+
+
+
+
+
+

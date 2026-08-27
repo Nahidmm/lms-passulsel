@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Buat Kuis Baru — ' . $pelatihan->judul)
+@section('title', 'Buat Kuis Baru Ã¢â‚¬â€ ' . $pelatihan->judul)
 
 @section('content')
 
@@ -14,9 +14,9 @@
 <div class="max-w-2xl mx-auto space-y-5">
 
     {{-- HEADER --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border overflow-hidden">
         <div class="px-6 py-5 flex items-start gap-4" style="background:linear-gradient(to right,#FEF9EC,transparent)">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-accent shrink-0" style="background:#FEF9EC;border:1px solid #F0E4B0">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-accent shrink-0" class="rounded-xl p-4 text-center bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border">
                 <i data-lucide="help-circle" class="w-6 h-6"></i>
             </div>
             <div>
@@ -30,17 +30,17 @@
         {{-- Step Indicator --}}
         <div class="px-6 py-3 bg-secondary border-t border-border flex items-center gap-2 text-xs overflow-x-auto whitespace-nowrap">
             <div class="flex items-center gap-2 font-bold text-accent">
-                <span class="w-5 h-5 rounded-full bg-accent text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
+                <span class="w-5 h-5 rounded-full bg-accent text-[var(--text-primary)] flex items-center justify-center text-xs font-bold shrink-0">1</span>
                 Konfigurasi
             </div>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-border shrink-0"></i>
             <div class="flex items-center gap-2 text-text-secondary opacity-50">
-                <span class="w-5 h-5 rounded-full bg-border text-white flex items-center justify-center text-xs font-bold shrink-0">2</span>
+                <span class="w-5 h-5 rounded-full bg-border text-[var(--text-primary)] flex items-center justify-center text-xs font-bold shrink-0">2</span>
                 Tambah Soal
             </div>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-border shrink-0"></i>
             <div class="flex items-center gap-2 text-text-secondary opacity-50">
-                <span class="w-5 h-5 rounded-full bg-border text-white flex items-center justify-center text-xs font-bold shrink-0">3</span>
+                <span class="w-5 h-5 rounded-full bg-border text-[var(--text-primary)] flex items-center justify-center text-xs font-bold shrink-0">3</span>
                 Publish
             </div>
         </div>
@@ -61,7 +61,7 @@
         <div class="space-y-5">
 
             {{-- CARD 1: Informasi Dasar --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border">
                 <div class="px-5 py-4 border-b border-border flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#EFF6FF">
                         <i data-lucide="file-text" class="w-4 h-4 text-primary"></i>
@@ -83,7 +83,7 @@
                     <div>
                         <label for="deskripsi" class="block text-sm font-semibold text-text-primary mb-1.5">
                             Instruksi untuk Peserta
-                            <span class="text-xs font-normal text-text-secondary">(opsional — tampil sebelum kuis dimulai)</span>
+                            <span class="text-xs font-normal text-text-secondary">(opsional Ã¢â‚¬â€ tampil sebelum kuis dimulai)</span>
                         </label>
                         <textarea id="deskripsi" name="deskripsi" rows="3"
                             placeholder="Contoh: Kerjakan soal-soal berikut dengan jujur dan mandiri..."
@@ -108,7 +108,7 @@
             </div>
 
             {{-- CARD 2: Penilaian & Waktu --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border">
                 <div class="px-5 py-4 border-b border-border flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#FEF9EC">
                         <i data-lucide="sliders-horizontal" class="w-4 h-4 text-accent"></i>
@@ -120,18 +120,18 @@
                 </div>
                 <div class="p-5">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="rounded-xl p-4 text-center" style="background:#FEF9EC;border:1px solid #F0E4B0">
-                            <div class="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-3" style="background:#C5A02E22">
+                        <div class="rounded-xl p-4 text-center bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border">
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-3" class="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-3 bg-[var(--card)] border border-[var(--border)] shadow-sm">
                                 <i data-lucide="target" class="w-4 h-4 text-accent"></i>
                             </div>
                             <label for="passing_grade" class="block text-xs font-bold text-accent uppercase tracking-widest mb-2">Nilai Lulus</label>
                             <div class="relative">
                                 <input type="number" id="passing_grade" name="passing_grade"
                                     value="{{ old('passing_grade', 70) }}" min="0" max="100" required
-                                    class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-white text-xl font-bold text-center text-accent focus:ring-2 focus:ring-accent">
+                                    class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-xl font-bold text-center text-accent focus:ring-2 focus:ring-accent">
                                 <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-accent font-bold text-sm">%</span>
                             </div>
-                            <p class="text-xs text-text-secondary mt-2">Rentang 0 – 100</p>
+                            <p class="text-xs text-text-secondary mt-2">Rentang 0 Ã¢â‚¬â€œ 100</p>
                         </div>
 
                         <div class="rounded-xl p-4 text-center bg-secondary border border-border">
@@ -141,8 +141,8 @@
                             <label for="durasi_menit" class="block text-xs font-bold text-text-secondary uppercase tracking-widest mb-2">Durasi</label>
                             <input type="number" id="durasi_menit" name="durasi_menit"
                                 value="{{ old('durasi_menit', 30) }}" min="0" required
-                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-white text-xl font-bold text-center focus:ring-2 focus:ring-primary">
-                            <p class="text-xs text-text-secondary mt-2">Menit &bull; 0 = ∞</p>
+                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-xl font-bold text-center focus:ring-2 focus:ring-primary">
+                            <p class="text-xs text-text-secondary mt-2">Menit &bull; 0 = Ã¢Ë†Å¾</p>
                         </div>
 
                         <div class="rounded-xl p-4 text-center bg-secondary border border-border">
@@ -152,26 +152,26 @@
                             <label for="max_attempts" class="block text-xs font-bold text-text-secondary uppercase tracking-widest mb-2">Maks. Coba</label>
                             <input type="number" id="max_attempts" name="max_attempts"
                                 value="{{ old('max_attempts', 3) }}" min="0" required
-                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-white text-xl font-bold text-center">
-                            <p class="text-xs text-text-secondary mt-2">0 = ∞</p>
+                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-xl font-bold text-center">
+                            <p class="text-xs text-text-secondary mt-2">0 = Ã¢Ë†Å¾</p>
                         </div>
 
                         <div class="rounded-xl p-4 text-center bg-secondary border border-border">
                             <div class="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-3" style="background:#F3E8FF">
                                 <i data-lucide="award" class="w-4 h-4 text-purple-600"></i>
                             </div>
-                            <label for="poin" class="block text-xs font-bold text-text-secondary uppercase tracking-widest mb-2">Poin</label>
+                            <label for="poin" class="block text-xs font-bold text-text-secondary uppercase tracking-widest mb-2">Poin Maks</label>
                             <input type="number" id="poin" name="poin"
-                                value="{{ old('poin', 50) }}" min="0" required
-                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-white text-xl font-bold text-center focus:ring-2 focus:ring-purple-500">
-                            <p class="text-xs text-text-secondary mt-2">Reward Poin</p>
+                                value="{{ old('poin', 100) }}" min="0" required
+                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-xl font-bold text-center focus:ring-2 focus:ring-purple-500">
+                            <p class="text-[10px] text-text-secondary mt-2 leading-tight">Maks poin (jika skor 100). Mode Interaktif dapat bonus +20%.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {{-- CARD 3: Perilaku Soal --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border">
                 <div class="px-5 py-4 border-b border-border flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#F5F3FF">
                         <i data-lucide="shuffle" class="w-4 h-4" style="color:#7C3AED"></i>
@@ -227,8 +227,93 @@
                 </div>
             </div>
 
-            {{-- CARD 4: Anti-Cheat --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
+            {{-- CARD 4: Mode Interaktif --}}
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border">
+                <div class="px-5 py-4 border-b border-border flex items-center gap-3" style="background:linear-gradient(to right,#F5F3FF,transparent)">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                        <i data-lucide="gamepad-2" class="w-4 h-4 text-violet-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-text-primary text-sm">Mode Interaktif</p>
+                        <p class="text-xs text-text-secondary">Atur pengalaman kuis agar lebih game-like</p>
+                    </div>
+                </div>
+                <div class="p-5 space-y-5">
+                    
+                    {{-- Mode Tampilan (Radio Cards) --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-text-primary mb-2">Mode Tampilan</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="relative flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all {{ old('mode_tampilan', 'standard') === 'standard' ? 'border-primary bg-primary/5' : 'border-border hover:bg-secondary' }}" id="label-mode-standard" onclick="toggleInteraktifSettings('standard')">
+                                <input type="radio" name="mode_tampilan" value="standard" class="hidden" {{ old('mode_tampilan', 'standard') === 'standard' ? 'checked' : '' }}>
+                                <div class="w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center {{ old('mode_tampilan', 'standard') === 'standard' ? 'border-primary' : 'border-text-secondary' }}" id="radio-indicator-standard">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-primary {{ old('mode_tampilan', 'standard') === 'standard' ? '' : 'hidden' }}" id="radio-dot-standard"></div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-text-primary">Standard</p>
+                                    <p class="text-xs text-text-secondary mt-0.5">Tampilan ujian akademik bersih</p>
+                                </div>
+                            </label>
+                            <label class="relative flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all {{ old('mode_tampilan', 'standard') === 'interaktif' ? 'border-violet-600 bg-violet-600/5' : 'border-border hover:bg-secondary' }}" id="label-mode-interaktif" onclick="toggleInteraktifSettings('interaktif')">
+                                <input type="radio" name="mode_tampilan" value="interaktif" class="hidden" {{ old('mode_tampilan', 'standard') === 'interaktif' ? 'checked' : '' }}>
+                                <div class="w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center {{ old('mode_tampilan', 'standard') === 'interaktif' ? 'border-violet-600' : 'border-text-secondary' }}" id="radio-indicator-interaktif">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-violet-600 {{ old('mode_tampilan', 'standard') === 'interaktif' ? '' : 'hidden' }}" id="radio-dot-interaktif"></div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-text-primary">Interaktif (Game)</p>
+                                    <p class="text-xs text-text-secondary mt-0.5">Gamifikasi dan efek tantangan</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- Sub Mode & Advanced Settings --}}
+                    <div id="advanced-settings-container" class="{{ old('mode_tampilan', 'standard') === 'standard' ? 'hidden' : '' }} space-y-4 pt-4 border-t border-border">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="sub_mode" class="block text-sm font-semibold text-text-primary mb-1.5">Sub Mode</label>
+                                <select id="sub_mode" name="sub_mode" class="w-full px-3 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-violet-600 outline-none text-sm bg-secondary">
+                                    <option value="standard" {{ old('sub_mode', 'standard') === 'standard' ? 'selected' : '' }}>Standard</option>
+                                    <option value="time_attack" {{ old('sub_mode', 'standard') === 'time_attack' ? 'selected' : '' }}>Time Attack</option>
+                                    <option value="practice" {{ old('sub_mode', 'standard') === 'practice' ? 'selected' : '' }}>Practice</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="timer_per_soal" class="block text-sm font-semibold text-text-primary mb-1.5">Waktu per Soal (Detik)</label>
+                                <input type="number" id="timer_per_soal" name="timer_per_soal" min="0" value="{{ old('timer_per_soal', 0) }}"
+                                    class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-violet-600 outline-none text-sm bg-secondary">
+                                <p class="text-xs text-text-secondary mt-1">0 = tidak pakai timer per soal</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Efek Suara</p></div>
+                                <input type="checkbox" name="sound_enabled" value="1" {{ old('sound_enabled', true) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Leaderboard</p></div>
+                                <input type="checkbox" name="leaderboard_enabled" value="1" {{ old('leaderboard_enabled', false) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Bonus Kecepatan</p></div>
+                                <input type="checkbox" name="bonus_kecepatan_enabled" value="1" {{ old('bonus_kecepatan_enabled', false) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Animasi Feedback</p></div>
+                                <input type="checkbox" name="animasi_enabled" value="1" {{ old('animasi_enabled', true) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Badge / Achievement</p></div>
+                                <input type="checkbox" name="badge_enabled" value="1" {{ old('badge_enabled', false) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- CARD 5: Anti-Cheat --}}
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border overflow-hidden">
                 <div class="px-5 py-4 border-b border-border flex items-center gap-3" style="background:#FEF2F2">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#FEE2E2">
                         <i data-lucide="shield-alert" class="w-4 h-4 text-danger"></i>
@@ -260,7 +345,7 @@
                         </p>
                         <p class="text-xs text-text-secondary flex items-center gap-1.5">
                             <i data-lucide="triangle-alert" class="w-3 h-3 shrink-0" style="color:#F97316"></i>
-                            Auto-submit setelah 3× pelanggaran
+                            Auto-submit setelah 3Ãƒâ€” pelanggaran
                         </p>
                     </div>
                     <button type="button" onclick="openAntiCheatModal()"
@@ -270,8 +355,8 @@
                 </div>
             </div>
 
-            {{-- CARD 5: Publish --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border p-5">
+            {{-- CARD 6: Publish --}}
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border p-5">
                 <label class="flex items-center justify-between gap-3 cursor-pointer">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#ECFDF5">
@@ -289,8 +374,8 @@
             </div>
 
             {{-- Info Box --}}
-            <div class="rounded-xl p-4 flex items-start gap-3" style="background:#FEF9EC;border:1px solid #F0E4B0">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background:#C5A02E22">
+            <div class="rounded-xl p-4 flex items-start gap-3" class="rounded-xl p-4 text-center bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" class="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-3 bg-[var(--card)] border border-[var(--border)] shadow-sm">
                     <i data-lucide="lightbulb" class="w-4 h-4 text-accent"></i>
                 </div>
                 <div>
@@ -310,7 +395,7 @@
                     Batal
                 </a>
                 <button type="submit"
-                    class="bg-accent hover:bg-accent-hover text-white font-bold py-2.5 px-8 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-all">
+                    class="bg-accent hover:bg-accent-hover text-[var(--text-primary)] font-bold py-2.5 px-8 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-all">
                     Lanjut Buat Soal <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -384,19 +469,19 @@
                     </div>
                     <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.875rem;border-bottom:1px solid #E2E6EC;background:#FFF7ED;">
                         <div style="width:1.75rem;height:1.75rem;background:#FFEDD5;border:2px solid #F97316;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#EA580C;flex-shrink:0;">2</div>
-                        <div><p style="font-size:0.875rem;font-weight:700;color:#1A1A1A;">Pelanggaran ke-2</p><p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">Peringatan terakhir — satu lagi = kuis dikumpulkan otomatis.</p></div>
+                        <div><p style="font-size:0.875rem;font-weight:700;color:#1A1A1A;">Pelanggaran ke-2</p><p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">Peringatan terakhir Ã¢â‚¬â€ satu lagi = kuis dikumpulkan otomatis.</p></div>
                     </div>
                     <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.875rem;background:#FEF2F2;">
                         <div style="width:1.75rem;height:1.75rem;background:#C0392B;border:2px solid #C0392B;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;">3</div>
-                        <div><p style="font-size:0.875rem;font-weight:700;color:#C0392B;">Pelanggaran ke-3 → Auto Submit</p><p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">Kuis dikumpulkan otomatis dengan jawaban yang sudah terisi.</p></div>
+                        <div><p style="font-size:0.875rem;font-weight:700;color:#C0392B;">Pelanggaran ke-3 Ã¢â€ â€™ Auto Submit</p><p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">Kuis dikumpulkan otomatis dengan jawaban yang sudah terisi.</p></div>
                     </div>
                 </div>
             </div>
             <div style="background:#F5F7FA;border:1px solid #E2E6EC;border-radius:0.75rem;padding:1rem;">
                 <p style="font-size:0.6875rem;font-weight:700;color:#5C6470;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.625rem;">Yang Tidak Terdeteksi</p>
-                <p style="font-size:0.75rem;color:#5C6470;">— Membaca buku / modul cetak</p>
-                <p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">— HP / tablet yang digunakan bersamaan</p>
-                <p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">— Diskusi dengan orang di sekitar</p>
+                <p style="font-size:0.75rem;color:#5C6470;">Ã¢â‚¬â€ Membaca buku / modul cetak</p>
+                <p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">Ã¢â‚¬â€ HP / tablet yang digunakan bersamaan</p>
+                <p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">Ã¢â‚¬â€ Diskusi dengan orang di sekitar</p>
                 <p style="font-size:0.6875rem;color:#5C6470;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #E2E6EC;line-height:1.5;">Untuk ujian bernilai tinggi, pertimbangkan pengawas manual tambahan.</p>
             </div>
         </div>
@@ -428,4 +513,49 @@ function closeAntiCheatModal() {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAntiCheatModal(); });
 </script>
+<script>
+function toggleInteraktifSettings(mode) {
+    const isInteraktif = mode === 'interaktif';
+    const container = document.getElementById('advanced-settings-container');
+    if(container) {
+        if(isInteraktif) container.classList.remove('hidden');
+        else container.classList.add('hidden');
+    }
+    
+    const labelStd = document.getElementById('label-mode-standard');
+    const labelInt = document.getElementById('label-mode-interaktif');
+    const dotStd = document.getElementById('radio-dot-standard');
+    const dotInt = document.getElementById('radio-dot-interaktif');
+    const indStd = document.getElementById('radio-indicator-standard');
+    const indInt = document.getElementById('radio-indicator-interaktif');
+    
+    if (isInteraktif) {
+        labelInt.classList.add('border-violet-600', 'bg-violet-600/5');
+        labelInt.classList.remove('border-border', 'hover:bg-secondary');
+        indInt.classList.add('border-violet-600');
+        indInt.classList.remove('border-text-secondary');
+        dotInt.classList.remove('hidden');
+        
+        labelStd.classList.remove('border-primary', 'bg-primary/5');
+        labelStd.classList.add('border-border', 'hover:bg-secondary');
+        indStd.classList.remove('border-primary');
+        indStd.classList.add('border-text-secondary');
+        dotStd.classList.add('hidden');
+    } else {
+        labelStd.classList.add('border-primary', 'bg-primary/5');
+        labelStd.classList.remove('border-border', 'hover:bg-secondary');
+        indStd.classList.add('border-primary');
+        indStd.classList.remove('border-text-secondary');
+        dotStd.classList.remove('hidden');
+        
+        labelInt.classList.remove('border-violet-600', 'bg-violet-600/5');
+        labelInt.classList.add('border-border', 'hover:bg-secondary');
+        indInt.classList.remove('border-violet-600');
+        indInt.classList.add('border-text-secondary');
+        dotInt.classList.add('hidden');
+    }
+}
+</script>
 @endpush
+
+

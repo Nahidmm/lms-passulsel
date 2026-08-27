@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Jawaban – ' . $sesi->user->nama)
+@section('title', 'Detail Jawaban â€“ ' . $sesi->user->nama)
 
 @section('content')
 
@@ -19,7 +19,7 @@
     $essaySoals = $hasilLatihans->filter(fn($h) => $h->soal && in_array($h->soal->tipe, ['essay', 'isian_singkat', 'free_text']));
 @endphp
 
-<div class="bg-white rounded-xl border border-border shadow-sm p-6 mb-6">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm p-6 mb-6">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div class="flex items-start gap-4">
             <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
@@ -43,7 +43,7 @@
             <div class="text-center px-5 py-3 rounded-xl {{ $lulus ? 'bg-success/10' : 'bg-danger/10' }}">
                 <p class="text-xs font-medium {{ $lulus ? 'text-success' : 'text-danger' }}">Nilai Akhir</p>
                 <p class="text-3xl font-bold mt-1 {{ $lulus ? 'text-success' : 'text-danger' }}">{{ number_format($sesi->skor, 1) }}</p>
-                <p class="text-xs font-bold {{ $lulus ? 'text-success' : 'text-danger' }}">{{ $lulus ? '✓ LULUS' : '✗ TIDAK LULUS' }}</p>
+                <p class="text-xs font-bold {{ $lulus ? 'text-success' : 'text-danger' }}">{{ $lulus ? 'âœ“ LULUS' : 'âœ— TIDAK LULUS' }}</p>
             </div>
         </div>
     </div>
@@ -70,15 +70,15 @@
             $isEssay     = $soal && in_array($soal->tipe, ['essay', 'isian_singkat', 'free_text']);
             $isBenar     = $hasil->is_correct;
             $tipeLabels  = [
-                'pilihan_ganda' => ['label' => 'Pilihan Ganda', 'color' => 'bg-blue-100 text-blue-700'],
+                'pilihan_ganda' => ['label' => 'Pilihan Ganda', 'color' => 'bg-violet-900/30 text-[#fcd34d]'],
                 'multi_select'  => ['label' => 'Multi Select',  'color' => 'bg-violet-100 text-violet-700'],
                 'essay'         => ['label' => 'Essay',          'color' => 'bg-green-100 text-green-700'],
                 'isian_singkat' => ['label' => 'Isian Singkat',  'color' => 'bg-yellow-100 text-yellow-700'],
                 'menjodohkan'   => ['label' => 'Menjodohkan',    'color' => 'bg-orange-100 text-orange-700'],
             ];
-            $tipeInfo = $tipeLabels[$soal->tipe ?? ''] ?? ['label' => ucfirst($soal->tipe ?? '-'), 'color' => 'bg-gray-100 text-gray-700'];
+            $tipeInfo = $tipeLabels[$soal->tipe ?? ''] ?? ['label' => ucfirst($soal->tipe ?? '-'), 'color' => 'bg-[#13161c] text-gray-300'];
         @endphp
-        <div class="bg-white rounded-xl border {{ $isEssay ? 'border-border' : ($isBenar ? 'border-success/30' : 'border-danger/30') }} shadow-sm overflow-hidden">
+        <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border {{ $isEssay ? 'border-border' : ($isBenar ? 'border-success/30' : 'border-danger/30') }} shadow-sm overflow-hidden">
             {{-- Soal header --}}
             <div class="px-5 py-4 border-b border-border flex items-start justify-between gap-4 {{ $isEssay ? 'bg-secondary/20' : ($isBenar ? 'bg-success/5' : 'bg-danger/5') }}">
                 <div class="flex items-start gap-3 flex-1 min-w-0">
@@ -97,7 +97,7 @@
                             {{ $isBenar ? '+' : '0' }}{{ $hasil->skor }}
                         </div>
                         <div class="text-xs {{ $isBenar ? 'text-success' : 'text-danger' }} font-bold mt-0.5">
-                            {{ $isBenar ? '✓ Benar' : '✗ Salah' }}
+                            {{ $isBenar ? 'âœ“ Benar' : 'âœ— Salah' }}
                         </div>
                     @else
                         <div class="text-lg font-bold text-accent">{{ $hasil->skor }} / {{ $soal->bobot }}</div>
@@ -120,7 +120,7 @@
                                 {{ $dipilih && !$benarPilihan ? 'bg-danger/10 border border-danger/30' : '' }}
                                 {{ !$dipilih && !$benarPilihan ? 'bg-secondary/30 border border-border' : '' }}">
                                 <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shrink-0
-                                    {{ $benarPilihan ? 'bg-success text-white' : ($dipilih ? 'bg-danger text-white' : 'bg-secondary text-text-secondary') }}">
+                                    {{ $benarPilihan ? 'bg-success text-white' : ($dipilih ? 'bg-danger text-[var(--text-primary)]' : 'bg-secondary text-text-secondary') }}">
                                     {{ $pilihan->label ?? chr(64 + $loop->iteration) }}
                                 </span>
                                 <span class="{{ $benarPilihan ? 'text-success font-semibold' : ($dipilih ? 'text-danger' : 'text-text-secondary') }}">
@@ -128,10 +128,10 @@
                                 </span>
                                 @if($dipilih)
                                     <span class="ml-auto text-xs font-bold {{ $benarPilihan ? 'text-success' : 'text-danger' }}">
-                                        {{ $benarPilihan ? '✓ Dipilih (Benar)' : '✗ Dipilih (Salah)' }}
+                                        {{ $benarPilihan ? 'âœ“ Dipilih (Benar)' : 'âœ— Dipilih (Salah)' }}
                                     </span>
                                 @elseif($benarPilihan)
-                                    <span class="ml-auto text-xs font-bold text-success">✓ Jawaban Benar</span>
+                                    <span class="ml-auto text-xs font-bold text-success">âœ“ Jawaban Benar</span>
                                 @endif
                             </div>
                         @endforeach
@@ -186,16 +186,16 @@
                         </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-text-primary mb-1.5">Nilai (0 – {{ $soal->bobot }})</label>
+                                <label class="block text-xs font-semibold text-text-primary mb-1.5">Nilai (0 â€“ {{ $soal->bobot }})</label>
                                 <input type="number" name="penilaian[{{ $hasil->id }}][skor]"
                                     value="{{ $hasil->skor }}" min="0" max="{{ $soal->bobot }}" step="0.5"
-                                    class="w-full px-4 py-2.5 border border-border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent outline-none text-center text-lg font-bold">
+                                    class="w-full px-4 py-2.5 border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-sm focus:ring-2 focus:ring-accent focus:border-accent outline-none text-center text-lg font-bold">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-text-primary mb-1.5">Catatan Admin (opsional)</label>
                                 <input type="text" name="penilaian[{{ $hasil->id }}][catatan]"
                                     value="{{ $hasil->catatan_admin }}" placeholder="Misal: Jawaban kurang lengkap"
-                                    class="w-full px-4 py-2.5 border border-border rounded-lg bg-white focus:ring-2 focus:ring-accent focus:border-accent outline-none text-sm">
+                                    class="w-full px-4 py-2.5 border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-sm focus:ring-2 focus:ring-accent focus:border-accent outline-none text-sm">
                             </div>
                         </div>
                         @if($hasil->catatan_admin)
@@ -210,7 +210,7 @@
 
 @if($essaySoals->isNotEmpty())
     <div class="mt-6 flex justify-end">
-        <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
+        <button type="submit" class="bg-accent hover:bg-accent-hover text-[var(--text-primary)] font-bold py-3 px-8 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
             <i data-lucide="save" class="w-5 h-5"></i> Simpan Penilaian Manual
         </button>
     </div>
@@ -218,3 +218,4 @@
 @endif
 
 @endsection
+

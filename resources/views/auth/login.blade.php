@@ -44,7 +44,7 @@
         </label>
     </div>
 
-    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-lg transition-colors">
+    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-4 rounded-lg transition-colors">
         Masuk
     </button>
 </form>
@@ -55,3 +55,4 @@
 </div>
 
 @endsection
+

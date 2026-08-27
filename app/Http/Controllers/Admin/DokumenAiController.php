@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\DokumenAi;
 use App\Services\RAGService;
+use App\Jobs\ProcessDokumenAiJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -32,14 +33,10 @@ class DokumenAiController extends Controller
             'file_path' => $filePath,
         ]);
 
-        // Process PDF and generate embeddings (synchronously for now based on the plan query)
-        $success = $ragService->processPdf($dokumen);
+        // Process PDF and generate embeddings asynchronously
+        ProcessDokumenAiJob::dispatch($dokumen);
 
-        if (!$success) {
-            return back()->with('error', 'Dokumen berhasil diupload tetapi gagal diproses oleh sistem AI (cek log).');
-        }
-
-        return back()->with('success', 'Dokumen berhasil ditambahkan dan siap digunakan oleh AI.');
+        return back()->with('success', 'Dokumen berhasil ditambahkan dan sedang diproses di background. Harap tunggu beberapa saat hingga potongan teks terisi.');
     }
 
     public function destroy(DokumenAi $dokumen_ai)

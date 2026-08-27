@@ -31,7 +31,7 @@ class AccountRejectedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pendaftaran Akun LMS Pas Sulsel Ditolak',
+            subject: 'Pendaftaran Akun SPEKTRA Ditolak',
         );
     }
 

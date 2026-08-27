@@ -4,23 +4,23 @@
 
 @section('content')
 
-<div class="h-[calc(100vh-8rem)] flex flex-col bg-white rounded-xl shadow-sm border border-border overflow-hidden relative">
+<div class="h-[calc(100vh-8rem)] flex flex-col bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden relative">
     
     <!-- Background Decor -->
     <div class="absolute inset-0 bg-secondary/30 pointer-events-none"></div>
     
     <!-- Header -->
-    <div class="bg-primary text-white p-4 flex items-center justify-between shrink-0 relative z-10 shadow-md">
+    <div class="bg-primary text-[var(--text-primary)] p-4 flex items-center justify-between shrink-0 relative z-10 shadow-md">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary shadow-sm">
+            <div class="w-10 h-10 bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-full flex items-center justify-center text-primary shadow-sm">
                 <i data-lucide="bot" class="w-6 h-6"></i>
             </div>
             <div>
                 <h2 class="font-display font-bold">Asisten Virtual Pemasyarakatan</h2>
-                <p class="text-xs text-white/80">Didukung oleh Google Gemini</p>
+                <p class="text-xs text-[var(--text-primary)]/80">Didukung oleh Google Gemini</p>
             </div>
         </div>
-        <div class="text-xs bg-white/20 px-3 py-1 rounded-full font-medium flex items-center gap-2">
+        <div class="text-xs bg-[var(--card)] border border-[var(--border)] shadow-sm px-3 py-1 rounded-full font-medium flex items-center gap-2">
             <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div> Online
         </div>
     </div>
@@ -30,12 +30,12 @@
         
         <!-- Welcome Message -->
         <div class="flex gap-4">
-            <div class="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white mt-1">
+            <div class="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-[var(--text-primary)] mt-1">
                 <i data-lucide="bot" class="w-4 h-4"></i>
             </div>
             <div class="flex-1 bg-secondary rounded-2xl rounded-tl-none p-4 shadow-sm border border-border max-w-[85%] md:max-w-[75%]">
                 <p class="text-text-primary text-sm leading-relaxed">
-                    Halo, {{ explode(' ', Auth::user()->nama)[0] }}! Saya Asisten Virtual untuk LMS Pemasyarakatan Sulawesi Selatan. Ada yang bisa saya bantu terkait regulasi, tugas pokok, atau pembuatan laporan hari ini?
+                    Halo, {{ explode(' ', Auth::user()->nama)[0] }}! Saya Asisten Virtual untuk SPEKTRA. Ada yang bisa saya bantu terkait regulasi, tugas pokok, atau pembuatan laporan hari ini?
                 </p>
             </div>
         </div>
@@ -44,7 +44,7 @@
         @foreach($histories as $msg)
             <div class="flex gap-4 {{ $msg->role === 'user' ? 'flex-row-reverse' : '' }}">
                 @if($msg->role === 'assistant')
-                    <div class="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white mt-1">
+                    <div class="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-[var(--text-primary)] mt-1">
                         <i data-lucide="bot" class="w-4 h-4"></i>
                     </div>
                 @else
@@ -53,7 +53,7 @@
                     </div>
                 @endif
                 
-                <div class="flex-1 {{ $msg->role === 'user' ? 'bg-primary text-white rounded-tr-none' : 'bg-secondary text-text-primary rounded-tl-none border border-border' }} rounded-2xl p-4 shadow-sm max-w-[85%] md:max-w-[75%]">
+                <div class="flex-1 {{ $msg->role === 'user' ? 'bg-primary text-[var(--text-primary)] rounded-tr-none' : 'bg-secondary text-text-primary rounded-tl-none border border-border' }} rounded-2xl p-4 shadow-sm max-w-[85%] md:max-w-[75%]">
                     <div class="text-sm leading-relaxed whitespace-pre-wrap">{!! nl2br(e($msg->content)) !!}</div>
                     
                     @if($msg->role === 'assistant' && !empty($msg->references))
@@ -61,7 +61,7 @@
                             <p class="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">Sumber Referensi:</p>
                             <div class="flex flex-wrap gap-2">
                                 @foreach($msg->references as $ref)
-                                    <a href="{{ Storage::url($ref['file_path']) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-border rounded-lg text-xs text-primary hover:bg-primary/5 hover:border-primary/30 transition-colors">
+                                    <a href="{{ Storage::url($ref['file_path']) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-lg text-xs text-primary hover:bg-primary/5 hover:border-primary/30 transition-colors">
                                         <i data-lucide="file-text" class="w-3.5 h-3.5 shrink-0"></i>
                                         <span class="truncate max-w-[200px]">{{ $ref['judul'] }}</span>
                                     </a>
@@ -75,7 +75,7 @@
 
         <!-- Typing Indicator (Hidden by default) -->
         <div id="typing-indicator" class="flex gap-4 hidden">
-            <div class="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white mt-1">
+            <div class="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-[var(--text-primary)] mt-1">
                 <i data-lucide="bot" class="w-4 h-4"></i>
             </div>
             <div class="bg-secondary rounded-2xl rounded-tl-none p-4 shadow-sm border border-border">
@@ -89,13 +89,13 @@
     </div>
 
     <!-- Input Area -->
-    <div class="p-4 bg-white border-t border-border shrink-0 relative z-10">
+    <div class="p-4 bg-[var(--card)] border border-[var(--border)] shadow-sm border-t border-border shrink-0 relative z-10">
         <form id="chat-form" class="relative flex items-end gap-2">
             @csrf
             <div class="flex-1 bg-secondary rounded-xl border border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all overflow-hidden relative">
                 <textarea id="chat-input" rows="1" placeholder="Ketik pertanyaan Anda di sini..." class="w-full bg-transparent border-none outline-none resize-none p-3 max-h-32 min-h-[44px] text-sm text-text-primary scrollbar-hide"></textarea>
             </div>
-            <button type="submit" id="send-btn" class="shrink-0 w-11 h-11 bg-primary hover:bg-primary-hover text-white rounded-xl flex items-center justify-center transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="submit" id="send-btn" class="shrink-0 w-11 h-11 bg-primary hover:bg-primary-hover text-[var(--text-primary)] rounded-xl flex items-center justify-center transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                 <i data-lucide="send" class="w-5 h-5 ml-1"></i>
             </button>
         </form>
@@ -202,7 +202,7 @@
                     <div class="shrink-0 w-8 h-8 rounded-full bg-accent flex items-center justify-center text-primary font-bold mt-1 shadow-sm border border-white">
                         ${initial}
                     </div>
-                    <div class="flex-1 bg-primary text-white rounded-2xl rounded-tr-none p-4 shadow-sm max-w-[85%] md:max-w-[75%]">
+                    <div class="flex-1 bg-primary text-[var(--text-primary)] rounded-2xl rounded-tr-none p-4 shadow-sm max-w-[85%] md:max-w-[75%]">
                         <div class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</div>
                     </div>
                 </div>
@@ -220,7 +220,7 @@
             let referencesHtml = '';
             if (references && references.length > 0) {
                 let refLinks = references.map(ref => {
-                    return `<a href="/storage/${ref.file_path}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-border rounded-lg text-xs text-primary hover:bg-primary/5 hover:border-primary/30 transition-colors">
+                    return `<a href="/storage/${ref.file_path}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-lg text-xs text-primary hover:bg-primary/5 hover:border-primary/30 transition-colors">
                                 <i data-lucide="file-text" class="w-3.5 h-3.5 shrink-0"></i>
                                 <span class="truncate max-w-[200px]">${escapeHtml(ref.judul)}</span>
                             </a>`;
@@ -238,7 +238,7 @@
 
             const html = `
                 <div class="flex gap-4">
-                    <div class="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white mt-1">
+                    <div class="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-[var(--text-primary)] mt-1">
                         <i data-lucide="bot" class="w-4 h-4"></i>
                     </div>
                     <div class="flex-1 bg-secondary text-text-primary rounded-2xl rounded-tl-none border border-border p-4 shadow-sm max-w-[85%] md:max-w-[75%]">
@@ -263,3 +263,4 @@
     });
 </script>
 @endpush
+

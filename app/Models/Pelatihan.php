@@ -12,4 +12,9 @@ class Pelatihan extends Model
     {
         return $this->hasMany(Materi::class)->orderBy('urutan');
     }
+
+    public function topikPelatihans()
+    {
+        return $this->hasMany(TopikPelatihan::class);
+    }
 }

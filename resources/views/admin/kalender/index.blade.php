@@ -9,7 +9,7 @@
         <h1 class="text-2xl font-display font-bold text-primary">Kalender Akademik</h1>
         <p class="text-text-secondary mt-1">Kelola hari libur dan jadwal evaluasi dalam kalender sistem.</p>
     </div>
-    <a href="{{ route('admin.kalender.create') }}" class="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+    <a href="{{ route('admin.kalender.create') }}" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
         <i data-lucide="calendar-plus" class="w-5 h-5"></i> Tambah Agenda
     </a>
 </div>
@@ -17,7 +17,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     <!-- List Events -->
-    <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+    <div class="lg:col-span-3 bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-text-secondary uppercase bg-secondary border-b border-border">
@@ -77,3 +77,4 @@
 </div>
 
 @endsection
+

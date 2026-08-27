@@ -11,7 +11,8 @@ class User extends Authenticatable
 
     protected $fillable = [
         'nip', 'nama', 'email', 'golongan', 'jabatan_id', 'role',
-        'status_akun', 'password', 'avatar', 'force_change_password',
+        'status_akun', 'password', 'avatar', 'force_change_password', 'has_taken_pretest',
+        'unit_kerja_id', 'alamat', 'no_hp'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -27,6 +28,11 @@ class User extends Authenticatable
     public function jabatan()
     {
         return $this->belongsTo(Jabatan::class);
+    }
+
+    public function unitKerja()
+    {
+        return $this->belongsTo(UnitKerja::class);
     }
 
     public function progresMateri()
@@ -57,6 +63,11 @@ class User extends Authenticatable
     public function getActivePelatihan()
     {
         return $this->progresPelatihans()->where('status', 'aktif')->first();
+    }
+
+    public function hasilPretestTopiks()
+    {
+        return $this->hasMany(HasilPretestTopik::class);
     }
 
     // ==========================================
@@ -161,20 +172,24 @@ class User extends Authenticatable
             return (int) $this->attributes['total_poin'];
         }
 
-        // Sum 'poin' from materi that have been completed (ensure unique materi_id)
-        $poinMateri = \App\Models\ProgresMateri::where('user_id', $this->id)
+        // Poin dari MEMBACA materi (non-quiz saja, agar tidak double-count dengan xp_earned kuis)
+        $completedNonQuizIds = \App\Models\ProgresMateri::where('user_id', $this->id)
             ->where('status', 'selesai')
-            ->join('materis', 'progres_materis.materi_id', '=', 'materis.id')
-            ->distinct('progres_materis.materi_id')
-            ->sum('materis.poin');
+            ->get('materi_id')
+            ->pluck('materi_id')
+            ->unique();
 
-        // Sum max 'skor' for each unique quiz (materi_id)
+        $poinMateri = \App\Models\Materi::whereIn('id', $completedNonQuizIds)
+            ->where('jenis', '!=', 'quiz')
+            ->sum('poin');
+
+        // Poin dari KUIS: hanya ambil xp_earned terbaik per kuis (dihitung saat submit)
         $poinEvaluasi = \App\Models\SesiEvaluasi::where('user_id', $this->id)
             ->where('status', 'selesai')
             ->groupBy('materi_id')
-            ->selectRaw('MAX(skor) as max_skor')
+            ->selectRaw('MAX(xp_earned) as max_xp')
             ->get()
-            ->sum('max_skor');
+            ->sum('max_xp');
         
         return (int) $poinMateri + (int) $poinEvaluasi;
     }

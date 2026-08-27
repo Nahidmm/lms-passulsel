@@ -9,12 +9,20 @@ class SesiEvaluasi extends Model
     protected $fillable = [
         'user_id', 'materi_id', 'status', 'mulai_at',
         'selesai_at', 'durasi_menit', 'total_soal', 'benar', 'skor',
+        'current_soal_index', 'jawaban_tersimpan', 'waktu_mulai_soal',
+        'waktu_terakhir_aksi', 'streak', 'xp_earned', 'is_paused',
+        'last_activity_at', 'tab_blur_count'
     ];
 
     protected $casts = [
         'mulai_at' => 'datetime',
         'selesai_at' => 'datetime',
+        'waktu_mulai_soal' => 'datetime',
+        'waktu_terakhir_aksi' => 'datetime',
+        'last_activity_at' => 'datetime',
+        'jawaban_tersimpan' => 'array',
         'skor' => 'float',
+        'is_paused' => 'boolean',
     ];
 
     public function user() { return $this->belongsTo(User::class); }

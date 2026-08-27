@@ -9,12 +9,12 @@
         <h1 class="text-2xl font-display font-bold text-primary">Modul Pembelajaran</h1>
         <p class="text-text-secondary mt-1">Kelola daftar modul utama yang dapat diakses oleh semua pengguna.</p>
     </div>
-    <a href="{{ route('admin.modul.create') }}" class="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+    <a href="{{ route('admin.modul.create') }}" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
         <i data-lucide="plus" class="w-5 h-5"></i> Tambah Modul Baru
     </a>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
     @if($moduls->isEmpty())
         <p class="text-center text-text-secondary py-6 text-sm">Belum ada modul. Silakan tambah modul baru.</p>
     @else
@@ -54,16 +54,16 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <a href="{{ route('admin.modul.show', $modul->id) }}" class="inline-block border border-border text-text-secondary hover:text-primary hover:border-primary px-2.5 py-1.5 rounded transition-colors bg-white shadow-sm" title="Kelola Materi">
+                            <a href="{{ route('admin.modul.show', $modul->id) }}" class="inline-block border border-border text-text-secondary hover:text-primary hover:border-primary px-2.5 py-1.5 rounded transition-colors bg-[var(--card)] border border-[var(--border)] shadow-sm shadow-sm" title="Kelola Materi">
                                 <i data-lucide="list" class="w-4 h-4"></i>
                             </a>
-                            <a href="{{ route('admin.modul.edit', $modul->id) }}" class="inline-block border border-border text-text-secondary hover:text-primary hover:border-primary px-2.5 py-1.5 rounded transition-colors bg-white shadow-sm" title="Edit">
+                            <a href="{{ route('admin.modul.edit', $modul->id) }}" class="inline-block border border-border text-text-secondary hover:text-primary hover:border-primary px-2.5 py-1.5 rounded transition-colors bg-[var(--card)] border border-[var(--border)] shadow-sm shadow-sm" title="Edit">
                                 <i data-lucide="edit-2" class="w-4 h-4"></i>
                             </a>
                             <form action="{{ route('admin.modul.destroy', $modul->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus modul ini berserta seluruh isinya?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="border border-border text-text-secondary hover:text-danger hover:border-danger px-2.5 py-1.5 rounded transition-colors bg-white shadow-sm" title="Hapus">
+                                <button type="submit" class="border border-border text-text-secondary hover:text-danger hover:border-danger px-2.5 py-1.5 rounded transition-colors bg-[var(--card)] border border-[var(--border)] shadow-sm shadow-sm" title="Hapus">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </form>
@@ -76,3 +76,4 @@
 </div>
 
 @endsection
+

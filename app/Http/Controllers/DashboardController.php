@@ -64,34 +64,44 @@ class DashboardController extends Controller
         $rataNilai = $user->getRataRataSkor();
         $progres = $user->getProgresKeseluruhan();
 
-        // Leaderboard Calculation
-        // Calculate total_poin for all participants
+        // Leaderboard: hitung total_poin per user menggunakan getTotalPoin()
+        // yang sudah benar dan konsisten (menghindari MySQL correlated subquery di derived table)
         $allPeserta = User::where('role', 'peserta')
-            ->select('users.*')
-            ->selectRaw('
-                (
-                    (SELECT COUNT(*) FROM progres_materis WHERE progres_materis.user_id = users.id AND progres_materis.status = "selesai") * 50
-                ) + 
-                COALESCE(
-                    (SELECT SUM(skor) FROM sesi_evaluasis WHERE sesi_evaluasis.user_id = users.id AND sesi_evaluasis.status = "selesai"), 0
-                ) as total_poin
-            ')
-            ->orderByDesc('total_poin')
-            ->get();
+            ->where('status_akun', 'approved')
+            ->get()
+            ->map(function ($u) {
+                $u->total_poin = $u->getTotalPoin();
+                return $u;
+            })
+            ->sortByDesc('total_poin')
+            ->values();
 
         $leaderboard = $allPeserta->take(5);
 
         // Find current user's rank
-        $userRank = $allPeserta->search(function ($item) use ($user) {
-            return $item->id === $user->id;
-        });
-        
-        // search() returns 0-based index, so add 1 for rank. If not found (e.g. not a peserta), return '-'.
+        $userRank = $allPeserta->search(fn($item) => $item->id === $user->id);
         $userRank = $userRank !== false ? $userRank + 1 : '-';
+
+        // Pretest Results & Recommendations
+        $pretestResults = \App\Models\HasilPretestTopik::with('topik.pelatihan')
+            ->where('user_id', $user->id)
+            ->get();
+            
+        $rekomendasi = collect();
+        foreach ($pretestResults as $hasil) {
+            if ($hasil->topik && $hasil->skor < $hasil->topik->batas_nilai && $hasil->topik->pelatihan_id) {
+                if (!$rekomendasi->contains('id', $hasil->topik->pelatihan_id)) {
+                    $rekomendasi->push((object)[
+                        'pelatihan' => $hasil->topik->pelatihan,
+                        'alasan' => 'Skor ' . $hasil->topik->nama_topik . ' Anda (' . $hasil->skor . ') masih di bawah standar (' . $hasil->topik->batas_nilai . ').'
+                    ]);
+                }
+            }
+        }
 
         return view('peserta.dashboard', compact(
             'materiSelesai', 'totalMateri', 'rataNilai', 'progres',
-            'leaderboard', 'userRank'
+            'leaderboard', 'userRank', 'pretestResults', 'rekomendasi'
         ));
     }
 }

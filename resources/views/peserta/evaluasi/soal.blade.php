@@ -1,428 +1,653 @@
 @extends('layouts.evaluasi')
 
 @section('content')
+@php
+    $themeClass = $materi->mode_tampilan === 'interaktif' ? 'quiz-theme-game' : 'quiz-theme-standard';
+    $isPractice = $materi->sub_mode === 'practice';
+    $isTimeAttack = $materi->sub_mode === 'time_attack';
+    $timerPerSoal = $materi->timer_per_soal > 0 ? (int)$materi->timer_per_soal : 0;
+@endphp
 
-<div class="relative max-w-7xl mx-auto pb-20">
-    <div class="flex items-start gap-4 md:gap-6">
+<div class="relative max-w-7xl mx-auto {{ $themeClass }}">
+    <div class="quiz-container">
         
-        {{-- ========================================== --}}
-        {{-- KOLOM KIRI: AREA SOAL (WIZARD)               --}}
-        {{-- ========================================== --}}
-        <div class="flex-1 min-w-0">
-            <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden relative">
-                
-                {{-- Header Area Soal --}}
-                <div class="px-4 py-3 md:px-6 md:py-4 border-b border-border bg-secondary/20 flex justify-between items-center">
+        {{-- Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ MAIN AREA Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ --}}
+        <div class="quiz-main-area">
+            
+            {{-- INTERACTIVE HEADER --}}
+            @if($materi->mode_tampilan === 'interaktif')
+            <div class="mb-5 rounded-2xl border border-violet-500/20 bg-black/40 backdrop-blur p-5 relative overflow-hidden">
+                <div class="absolute w-40 h-40 bg-violet-600/30 blur-[50px] -top-10 -right-10 rounded-full"></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h2 class="text-lg md:text-xl font-bold text-text-primary">{{ $materi->judul }}</h2>
-                        <p class="text-xs md:text-sm text-text-secondary mt-0.5">Jawablah pertanyaan berikut dengan cermat.</p>
+                        <span class="inline-flex items-center gap-1.5 bg-violet-900/40 border border-violet-500/30 text-violet-300 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full mb-2">
+                            <i data-lucide="swords" class="w-3 h-3"></i> {{ $isTimeAttack ? 'Time Attack' : 'Quest Mode' }}
+                        </span>
+                        <h2 class="font-display font-black text-2xl text-[var(--text-primary)]">{{ $materi->judul }}</h2>
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        @if($materi->durasi_menit > 0)
+                        <div id="main-timer-box" class="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 text-rose-400 px-3 py-2 rounded-xl text-sm font-black transition-all">
+                            <i data-lucide="timer" class="w-4 h-4"></i>
+                            <span id="countdown-timer">{{ gmdate('i:s', $sesi->sisaWaktu) }}</span>
+                        </div>
+                        @endif
+                        <div class="flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 px-3 py-2 rounded-xl text-sm font-black">
+                            <i data-lucide="target" class="w-4 h-4"></i> <span id="progress-text">1/{{ $soals->count() }}</span>
+                        </div>
                     </div>
                 </div>
+                <div class="quiz-progress-track">
+                    <div id="progress-bar" class="quiz-progress-fill" style="width:1%"></div>
+                </div>
+            </div>
+            @endif
+
+            <div class="quiz-card">
+                {{-- Standard Header --}}
+                @if($materi->mode_tampilan !== 'interaktif')
+                <div class="quiz-header-bar">
+                    <div>
+                        <h2 class="font-bold text-lg leading-tight">{{ $materi->judul }}</h2>
+                        @if($isPractice)
+                        <span class="text-xs font-semibold text-[var(--quiz-primary)] bg-[var(--quiz-primary-soft)] px-2 py-0.5 rounded mt-1 inline-block">Practice Mode</span>
+                        @endif
+                        @if($isTimeAttack)
+                        <span class="text-xs font-semibold text-[var(--quiz-danger)] bg-rose-500/10 px-2 py-0.5 rounded mt-1 inline-block">Time Attack</span>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-3">
+                        @if($materi->durasi_menit > 0)
+                        <div id="main-timer-box" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--quiz-border)] font-bold text-sm transition-all">
+                            <i data-lucide="timer" class="w-4 h-4 text-[var(--quiz-muted)]"></i>
+                            <span id="countdown-timer">{{ gmdate('i:s', $sesi->sisaWaktu) }}</span>
+                        </div>
+                        @endif
+                        <div class="text-sm font-bold text-[var(--quiz-muted)]" id="progress-text">1/{{ $soals->count() }}</div>
+                    </div>
+                </div>
+                @if($materi->mode_tampilan !== 'interaktif')
+                <div class="quiz-progress-track rounded-none m-0 h-1">
+                    <div id="progress-bar" class="quiz-progress-fill rounded-none" style="width:1%"></div>
+                </div>
+                @endif
+                @endif
 
                 <form id="quiz-form" action="{{ route('peserta.evaluasi.submit', $sesi->id) }}" method="POST" onsubmit="clearSavedAnswers()">
                     @csrf
-                    
-                    <div class="p-4 md:p-8">
+                    <div class="p-6 md:p-8">
                         @foreach($soals as $index => $soal)
-                            <div class="soal-item {{ $index === 0 ? '' : 'hidden' }}" id="soal-step-{{ $index + 1 }}" data-index="{{ $index + 1 }}">
-                                <div class="flex gap-3 md:gap-4 mb-4 md:mb-6">
-                                    <div class="shrink-0 w-8 h-8 md:w-10 md:h-10 bg-primary/10 text-primary rounded-lg md:rounded-xl flex items-center justify-center font-bold md:text-lg border border-primary/20">
-                                        {{ $index + 1 }}
+                            <div class="soal-item {{ $index === 0 ? '' : 'hidden' }}" id="soal-step-{{ $index+1 }}" data-index="{{ $index+1 }}" data-id="{{ $soal->id }}">
+                                
+                                {{-- Timer per Soal UI --}}
+                                @if($timerPerSoal > 0)
+                                <div class="flex justify-end mb-4">
+                                    <div class="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--quiz-danger)] bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/20 pulse-animation">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        <span class="soal-timer" id="soal-timer-{{ $index+1 }}">{{ $timerPerSoal }}s</span>
                                     </div>
-                                    <div class="flex-1 pt-1 md:pt-1.5">
-                                        {{-- Teks Soal --}}
-                                        <div class="text-text-primary font-medium text-base md:text-lg leading-relaxed mb-4 md:mb-6">
-                                            {!! nl2br(e($soal->pertanyaan)) !!}
-                                        </div>
+                                </div>
+                                @endif
 
-                                        {{-- Pilihan Jawaban / Input --}}
-                                        <div class="space-y-3">
+                                <div class="flex flex-col md:flex-row gap-5">
+                                    {{-- Number badge --}}
+                                    <div class="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[var(--quiz-primary-soft)] text-[var(--quiz-primary)] flex items-center justify-center font-black text-xl">
+                                        {{ $index+1 }}
+                                    </div>
+                                    
+                                    <div class="flex-1 min-w-0">
+                                        {{-- Question text --}}
+                                        <div class="font-bold text-lg md:text-xl leading-relaxed mb-6 whitespace-pre-wrap">{{ $soal->pertanyaan }}</div>
+
+                                        {{-- Options --}}
+                                        <div class="space-y-3" id="options-container-{{ $soal->id }}">
+                                            @if($soal->tipe === 'pilihan_ganda' || $soal->tipe === 'multi_select')
+                                                @if($index === 0)
+                                                <style>
+                                                    input[type="radio"]:checked ~ .radio-indicator .radio-dot {
+                                                        opacity: 1;
+                                                        transform: scale(1);
+                                                    }
+                                                    .check-indicator .check-mark {
+                                                        opacity: 0;
+                                                        transform: scale(0.5);
+                                                        transition: all 0.2s ease;
+                                                    }
+                                                    input[type="checkbox"]:checked ~ .check-indicator .check-mark {
+                                                        opacity: 1;
+                                                        transform: scale(1);
+                                                    }
+                                                </style>
+                                                @endif
+                                            @endif
+
                                             @if($soal->tipe === 'pilihan_ganda')
                                                 @foreach($soal->pilihanJawaban as $pilihan)
-                                                    <label class="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl border border-border hover:border-primary hover:bg-primary/5 cursor-pointer transition-all group">
-                                                        <div class="flex items-center h-5 mt-0.5">
-                                                            <input type="radio" name="jawaban[{{ $soal->id }}]" value="{{ $pilihan->id }}" 
-                                                                onchange="markAnswered({{ $index + 1 }}, {{ $soal->id }}, '{{ $soal->tipe }}')"
-                                                                class="w-5 h-5 text-primary focus:ring-primary border-border">
+                                                    <label class="quiz-option" id="opt-{{ $pilihan->id }}">
+                                                        <input type="radio" name="jawaban[{{ $soal->id }}]" value="{{ $pilihan->id }}"
+                                                            onchange="markAnswered({{ $index+1 }}, {{ $soal->id }}, '{{ $soal->tipe }}')"
+                                                            data-correct="{{ $pilihan->is_correct ? 'true' : 'false' }}"
+                                                            class="hidden peer">
+                                                        <div class="radio-indicator w-5 h-5 rounded-full border-2 border-[var(--quiz-border)] peer-checked:border-[var(--quiz-primary)] flex items-center justify-center shrink-0 mt-0.5 transition-all">
+                                                            <div class="radio-dot w-2.5 h-2.5 rounded-full bg-[var(--quiz-primary)] opacity-0 scale-0 transition-all duration-200"></div>
                                                         </div>
-                                                        <div class="flex-1 text-sm md:text-base">
-                                                            @if($pilihan->label)<span class="font-bold text-text-primary mr-2">{{ $pilihan->label }}.</span>@endif
-                                                            <span class="text-text-secondary group-hover:text-text-primary transition-colors">{{ $pilihan->teks }}</span>
+                                                        <div class="flex-1 text-base">
+                                                            @if(isset($pilihan->huruf) && $pilihan->huruf)<span class="font-black text-[var(--quiz-primary)] mr-2">{{ $pilihan->huruf }}.</span>@endif
+                                                            <span>{{ $pilihan->teks }}</span>
                                                         </div>
                                                     </label>
                                                 @endforeach
-
                                             @elseif($soal->tipe === 'multi_select')
                                                 @foreach($soal->pilihanJawaban as $pilihan)
-                                                    <label class="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl border border-border hover:border-primary hover:bg-primary/5 cursor-pointer transition-all group">
-                                                        <div class="flex items-center h-5 mt-0.5">
-                                                            <input type="checkbox" name="jawaban[{{ $soal->id }}][]" value="{{ $pilihan->id }}" 
-                                                                onchange="markAnswered({{ $index + 1 }}, {{ $soal->id }}, '{{ $soal->tipe }}')"
-                                                                class="w-5 h-5 text-primary rounded border-border focus:ring-primary">
+                                                    <label class="quiz-option" id="opt-{{ $pilihan->id }}">
+                                                        <input type="checkbox" name="jawaban[{{ $soal->id }}][]" value="{{ $pilihan->id }}"
+                                                            onchange="markAnswered({{ $index+1 }}, {{ $soal->id }}, '{{ $soal->tipe }}')"
+                                                            data-correct="{{ $pilihan->is_correct ? 'true' : 'false' }}"
+                                                            class="hidden peer">
+                                                        <div class="check-indicator w-5 h-5 rounded border-2 border-[var(--quiz-border)] peer-checked:border-[var(--quiz-primary)] peer-checked:bg-[var(--quiz-primary)] text-white flex items-center justify-center shrink-0 mt-0.5 transition-all">
+                                                            <svg class="check-mark" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                                         </div>
-                                                        <div class="flex-1 text-sm md:text-base">
-                                                            @if($pilihan->label)<span class="font-bold text-text-primary mr-2">{{ $pilihan->label }}.</span>@endif
-                                                            <span class="text-text-secondary group-hover:text-text-primary transition-colors">{{ $pilihan->teks }}</span>
+                                                        <div class="flex-1 text-base">
+                                                            @if(isset($pilihan->huruf) && $pilihan->huruf)<span class="font-black text-[var(--quiz-primary)] mr-2">{{ $pilihan->huruf }}.</span>@endif
+                                                            <span>{{ $pilihan->teks }}</span>
                                                         </div>
                                                     </label>
                                                 @endforeach
-
                                             @elseif($soal->tipe === 'essay' || $soal->tipe === 'isian_singkat')
-                                                <textarea name="jawaban[{{ $soal->id }}]" rows="{{ $soal->tipe === 'essay' ? 5 : 2 }}" 
-                                                    oninput="markAnswered({{ $index + 1 }}, {{ $soal->id }}, '{{ $soal->tipe }}')"
+                                                <textarea name="jawaban[{{ $soal->id }}]"
+                                                    rows="{{ $soal->tipe === 'essay' ? 5 : 2 }}"
+                                                    oninput="markAnswered({{ $index+1 }}, {{ $soal->id }}, '{{ $soal->tipe }}')"
                                                     placeholder="Ketik jawaban Anda di sini..."
-                                                    class="w-full px-4 md:px-5 py-3 md:py-4 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-y text-sm md:text-base"></textarea>
-
+                                                    class="w-full bg-[var(--quiz-bg)] border border-[var(--quiz-border)] rounded-xl p-4 text-[var(--quiz-text)] focus:ring-2 focus:ring-[var(--quiz-primary)] focus:border-[var(--quiz-primary)] outline-none resize-y"></textarea>
                                             @elseif($soal->tipe === 'menjodohkan')
-                                                <div class="grid grid-cols-1 gap-3">
+                                                <div class="grid grid-cols-1 gap-4">
                                                     @foreach($soal->pilihanJawaban as $pilihan)
                                                         @php $parts = explode('|||', $pilihan->teks); @endphp
-                                                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                                                            <div class="w-full sm:flex-1 p-3 bg-secondary/50 rounded-lg text-sm font-medium border border-border">
-                                                                {{ $parts[0] ?? '' }}
-                                                            </div>
-                                                            <i data-lucide="arrow-down" class="w-4 h-4 text-text-secondary shrink-0 hidden sm:block sm:rotate-[-90deg]"></i>
-                                                            <div class="w-full sm:flex-1">
-                                                                <input type="text" name="jawaban[{{ $soal->id }}][{{ $pilihan->id }}]" 
-                                                                    oninput="markAnswered({{ $index + 1 }}, {{ $soal->id }}, '{{ $soal->tipe }}')"
-                                                                    placeholder="Ketik jodohnya..." 
-                                                                    class="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm">
+                                                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                                            <div class="flex-1 p-4 bg-[var(--quiz-bg)] border border-[var(--quiz-border)] rounded-xl text-sm font-bold">{{ $parts[0] ?? '' }}</div>
+                                                            <i data-lucide="arrow-right" class="w-5 h-5 text-[var(--quiz-muted)] hidden sm:block shrink-0"></i>
+                                                            <div class="flex-1">
+                                                                <input type="text" name="jawaban[{{ $soal->id }}][{{ $pilihan->id }}]"
+                                                                    oninput="markAnswered({{ $index+1 }}, {{ $soal->id }}, '{{ $soal->tipe }}')"
+                                                                    placeholder="Pasangkan dengan..."
+                                                                    class="w-full bg-[var(--quiz-bg)] border border-[var(--quiz-border)] rounded-xl p-4 text-[var(--quiz-text)] focus:ring-2 focus:ring-[var(--quiz-primary)] outline-none">
                                                             </div>
                                                         </div>
                                                     @endforeach
                                                 </div>
                                             @endif
                                         </div>
+
+                                        {{-- Practice Mode Action --}}
+                                        @if($isPractice && in_array($soal->tipe, ['pilihan_ganda', 'multi_select']))
+                                        <div class="mt-6 flex items-center justify-between">
+                                            <button type="button" onclick="checkPracticeAnswer({{ $soal->id }}, '{{ $soal->tipe }}')" class="bg-[var(--quiz-bg)] hover:bg-[var(--quiz-border)] border border-[var(--quiz-border)] text-[var(--quiz-text)] font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
+                                                Cek Jawaban
+                                            </button>
+                                            <div id="practice-feedback-{{ $soal->id }}" class="hidden text-sm font-bold px-3 py-1.5 rounded-lg"></div>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
 
-                    {{-- Footer Navigasi Prev/Next --}}
-                    <div class="px-4 py-3 md:px-6 md:py-5 border-t border-border bg-secondary/20 flex items-center justify-between">
-                        <button type="button" id="btn-prev" onclick="prevSoal()" class="hidden px-4 md:px-5 py-2 md:py-2.5 rounded-lg border border-border bg-white text-text-secondary hover:text-primary hover:border-primary font-bold text-xs md:text-sm transition-all flex items-center gap-1 md:gap-2">
-                            <i data-lucide="chevron-left" class="w-4 h-4"></i> Sebelumnya
+                    {{-- Nav Footer --}}
+                    <div class="flex items-center justify-between px-6 py-4 border-t border-[var(--quiz-border)] bg-[var(--quiz-bg)]">
+                        <button type="button" id="btn-prev" onclick="prevSoal()" class="hidden items-center gap-2 px-4 py-2 rounded-lg border border-[var(--quiz-border)] text-[var(--quiz-muted)] hover:text-[var(--quiz-text)] hover:bg-[var(--quiz-card)] font-bold text-sm transition-all">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali
                         </button>
                         <div class="flex-1"></div>
-                        <button type="button" id="btn-next" onclick="nextSoal()" class="px-4 md:px-5 py-2 md:py-2.5 rounded-lg bg-primary hover:bg-primary-hover text-white font-bold text-xs md:text-sm transition-all shadow-sm flex items-center gap-1 md:gap-2">
-                            Selanjutnya <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        <button type="button" id="btn-next" onclick="nextSoal()" class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--quiz-primary)] text-[var(--text-primary)] font-bold text-sm hover:opacity-90 shadow-lg shadow-[var(--quiz-primary-soft)] transition-all">
+                            Selanjutnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        {{-- ========================================== --}}
-        {{-- KOLOM KANAN: QUESTION MAP                  --}}
-        {{-- ========================================== --}}
-        <div class="w-[200px] md:w-[260px] shrink-0">
-            <div class="sticky top-20 space-y-4">
-
-                {{-- Question Map --}}
-                <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
-                    <div class="px-4 py-3 border-b border-border bg-secondary/20">
-                        <h3 class="font-bold text-text-primary flex items-center gap-2 text-sm">
-                            <i data-lucide="layout-grid" class="w-4 h-4 text-primary"></i> Navigasi Soal
-                        </h3>
+        {{-- Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ SIDEBAR MAP Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ --}}
+        <div class="quiz-sidebar">
+            <div class="quiz-card sticky top-24">
+                <div class="px-5 py-4 border-b border-[var(--quiz-border)] flex items-center justify-between gap-2 bg-[var(--quiz-bg)]">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="layout-grid" class="w-4 h-4 text-[var(--quiz-primary)]"></i>
+                        <span class="font-bold text-sm">Navigasi Soal</span>
                     </div>
-                    <div class="p-4">
-                        <div class="flex flex-wrap gap-1.5" id="question-map">
-                            @foreach($soals as $index => $soal)
-                                <button type="button" onclick="goToSoal({{ $index + 1 }})" id="map-btn-{{ $index + 1 }}"
-                                    class="relative w-7 h-9 border-2 border-text-secondary rounded-sm text-xs font-semibold flex items-start justify-center pt-0.5 overflow-hidden transition-all hover:border-primary bg-white text-text-primary">
-                                    <div id="map-bg-{{ $index + 1 }}" class="absolute bottom-0 left-0 right-0 h-1/2 bg-text-secondary hidden"></div>
-                                    <span class="relative z-10">{{ $index + 1 }}</span>
-                                </button>
-                            @endforeach
-                        </div>
+                    <button type="button" id="mute-btn" onclick="toggleMute()" class="p-1.5 rounded-lg hover:bg-[var(--quiz-border)] text-[var(--quiz-muted)] transition-colors" title="Toggle Sound">
+                        <i data-lucide="volume-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div class="p-5">
+                    <div class="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-5 gap-2" id="question-map">
+                        @foreach($soals as $index => $soal)
+                            <button type="button" onclick="goToSoal({{ $index+1 }})"
+                                id="map-btn-{{ $index+1 }}"
+                                class="w-10 h-10 rounded-lg border-2 border-[var(--quiz-border)] flex items-center justify-center font-bold text-sm text-[var(--quiz-muted)] transition-all hover:border-[var(--quiz-primary)] hover:text-[var(--quiz-primary)]">
+                                {{ $index+1 }}
+                            </button>
+                        @endforeach
+                    </div>
 
-                        <div class="mt-6 pt-5 border-t border-border space-y-3">
-                            <div class="flex items-center gap-3 text-xs text-text-secondary font-medium">
-                                <div class="w-6 h-8 border-2 border-primary ring-2 ring-primary/30 rounded-sm bg-white"></div>
-                                <span>Posisi Saat Ini</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-text-secondary font-medium">
-                                <div class="w-6 h-8 border-2 border-text-secondary rounded-sm bg-white relative">
-                                    <div class="absolute bottom-0 left-0 right-0 h-1/2 bg-text-secondary"></div>
-                                </div>
-                                <span>Sudah Dijawab</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-text-secondary font-medium">
-                                <div class="w-6 h-8 border-2 border-text-secondary rounded-sm bg-white"></div>
-                                <span>Belum Dijawab</span>
-                            </div>
+                    <!-- Legend -->
+                    <div class="mt-6 pt-5 border-t border-[var(--quiz-border)] space-y-3">
+                        <div class="flex items-center gap-3 text-sm font-semibold text-[var(--quiz-muted)]">
+                            <div class="w-5 h-5 rounded border-2 border-[var(--quiz-primary)] bg-[var(--quiz-primary-soft)]"></div> Aktif
+                        </div>
+                        <div class="flex items-center gap-3 text-sm font-semibold text-[var(--quiz-muted)]">
+                            <div class="w-5 h-5 rounded border-2 border-[var(--quiz-success)] bg-[var(--quiz-bg)] text-[var(--quiz-success)] flex items-center justify-center"><div class="w-2.5 h-2.5 bg-[var(--quiz-success)] rounded-sm"></div></div> Terjawab
+                        </div>
+                        <div class="flex items-center gap-3 text-sm font-semibold text-[var(--quiz-muted)]">
+                            <div class="w-5 h-5 rounded border-2 border-[var(--quiz-border)] bg-[var(--quiz-bg)]"></div> Belum
                         </div>
                     </div>
                 </div>
-
-                {{-- Submit Button --}}
-                <button type="button" onclick="confirmSubmit()" class="w-full bg-accent hover:bg-accent-hover text-white font-bold py-4 px-6 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 text-lg">
-                    <i data-lucide="check-square" class="w-6 h-6"></i> Kumpulkan
-                </button>
-                <p class="text-center text-xs text-text-secondary mt-2 px-4">
-                    Pastikan semua soal telah terjawab.
-                </p>
-
+                
+                <div class="p-5 border-t border-[var(--quiz-border)] bg-[var(--quiz-bg)]">
+                    <button type="button" onclick="confirmSubmit()" class="w-full py-3.5 rounded-xl bg-[var(--quiz-danger)] text-[var(--text-primary)] font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 shadow-lg shadow-rose-500/20 transition-all">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Selesaikan Kuis
+                    </button>
+                    <p class="text-center text-xs text-[var(--quiz-muted)] mt-3">Pastikan semua terjawab.</p>
+                </div>
             </div>
         </div>
 
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
 <script>
-    const totalSoal = {{ $soals->count() }};
-    let currentSoal = 1;
+const totalSoal = {{ $soals->count() }};
+let currentSoal = 1;
+const isPractice = {{ $isPractice ? 'true' : 'false' }};
+const showAnswerReview = {{ $materi->show_answer_review ? 'true' : 'false' }};
+const timerPerSoalLimit = {{ $timerPerSoal }};
+let soalTimers = {};
 
-    // Initialize View
-    document.addEventListener('DOMContentLoaded', () => {
-        updateView();
+function updateProgress() {
+    const pct = Math.round((currentSoal / totalSoal) * 100);
+    const bar = document.getElementById('progress-bar');
+    if (bar) bar.style.width = pct + '%';
+    const txt = document.getElementById('progress-text');
+    if(txt) txt.textContent = currentSoal + '/' + totalSoal;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateView();
+    loadAnswers();
+    updateMapStyling();
+    lucide.createIcons();
+    initGlobalTimer();
+});
+
+function initGlobalTimer() {
+    @if($materi->durasi_menit > 0)
+    let distance = {{ $sesi->sisaWaktu }} * 1000;
+    const timerEl = document.getElementById("countdown-timer");
+    const boxEl = document.getElementById("main-timer-box");
+    const interval = setInterval(() => {
+        distance -= 1000;
+        if (!timerEl) return;
+        if (distance <= 0) {
+            clearInterval(interval);
+            timerEl.textContent = '00:00';
+            @if($sesi->id === 'preview')
+                alert("Waktu ujian habis! (Simulasi Preview Selesai).");
+                window.location.reload();
+            @else
+                alert("Waktu habis! Jawaban akan dikirim otomatis.");
+                document.getElementById("quiz-form").submitted = true;
+                document.getElementById("quiz-form").submit();
+            @endif
+            return;
+        }
+        const m = Math.floor(distance / 60000), s = Math.floor((distance % 60000) / 1000);
+        timerEl.textContent = (m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
         
-        // Timer Logic
-        @if($materi->durasi_menit > 0)
-            const sisaDetikAwal = {{ $sesi->sisaWaktu }};
-            let distance = sisaDetikAwal * 1000;
+        // Time attack / warning state
+        if (distance < 60000 && boxEl) {
+            boxEl.classList.add('timer-danger');
+        }
+    }, 1000);
+    @endif
+}
+
+// Timer per soal logic
+let currentSoalInterval = null;
+let currentSoalDistance = timerPerSoalLimit;
+
+function startSoalTimer(idx) {
+    if (timerPerSoalLimit <= 0) return;
+    if (currentSoalInterval) clearInterval(currentSoalInterval);
+    
+    // Check if we already spent time or if it's locked
+    if (soalTimers[idx] === 'locked') {
+        lockQuestion(idx);
+        return;
+    }
+    
+    currentSoalDistance = soalTimers[idx] !== undefined ? soalTimers[idx] : timerPerSoalLimit;
+    const el = document.getElementById('soal-timer-' + idx);
+    if (!el) return;
+    el.textContent = currentSoalDistance + 's';
+    
+    currentSoalInterval = setInterval(() => {
+        currentSoalDistance--;
+        soalTimers[idx] = currentSoalDistance;
+        el.textContent = currentSoalDistance + 's';
+        
+        if (currentSoalDistance <= 0) {
+            clearInterval(currentSoalInterval);
+            soalTimers[idx] = 'locked';
+            lockQuestion(idx);
             
-            const timerInterval = setInterval(function() {
-                distance -= 1000;
+            // Mainkan suara salah/habis waktu jika ada
+            if(typeof playWrongSound === 'function') playWrongSound();
 
-                if (distance <= 0) {
-                    clearInterval(timerInterval);
-                    document.getElementById("countdown-timer").innerHTML = "00:00";
-                    alert("Waktu Habis! Jawaban Anda akan otomatis dikumpulkan.");
-                    document.getElementById("quiz-form").submit();
-                    return;
-                }
-
-                const minutes = Math.floor(distance / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                document.getElementById("countdown-timer").innerHTML = 
-                    (minutes < 10 ? "0" + minutes : minutes) + ":" + 
-                    (seconds < 10 ? "0" + seconds : seconds);
-                    
-                if (distance < 300000) { // under 5 minutes
-                    document.getElementById("countdown-timer").classList.add('text-danger');
-                    document.getElementById("countdown-timer").parentElement.classList.replace('text-warning', 'text-danger');
-                    document.getElementById("countdown-timer").parentElement.classList.replace('bg-warning/10', 'bg-danger/10');
-                    document.getElementById("countdown-timer").parentElement.classList.replace('border-warning/20', 'border-danger/20');
-                }
-            }, 1000);
-        @endif
-    });
-
-    // Navigation Logic
-    function nextSoal() {
-        if (currentSoal < totalSoal) {
-            currentSoal++;
-            updateView();
-        }
-    }
-
-    function prevSoal() {
-        if (currentSoal > 1) {
-            currentSoal--;
-            updateView();
-        }
-    }
-
-    function goToSoal(index) {
-        currentSoal = index;
-        updateView();
-    }
-
-    function updateView() {
-        // Hide all, show current
-        for (let i = 1; i <= totalSoal; i++) {
-            document.getElementById(`soal-step-${i}`).classList.add('hidden');
-        }
-        document.getElementById(`soal-step-${currentSoal}`).classList.remove('hidden');
-
-        // Button states
-        document.getElementById('btn-prev').classList.toggle('hidden', currentSoal === 1);
-        document.getElementById('btn-next').classList.toggle('hidden', currentSoal === totalSoal);
-
-        // Update Question Map styling
-        updateMapStyling();
-    }
-
-    const quizSesiId = {{ $sesi->id }};
-    const storageKey = `quiz_answers_${quizSesiId}`;
-
-    // Auto-save logic
-    function saveAnswers() {
-        const form = document.getElementById('quiz-form');
-        const formData = new FormData(form);
-        const data = {};
-        for(let [key, value] of formData.entries()) {
-            if (key !== '_token') {
-                if(!data[key]) {
-                    data[key] = [];
-                }
-                data[key].push(value);
+            if (idx < totalSoal) {
+                nextSoal();
+            } else {
+                // Jika soal terakhir habis waktu, otomatis kumpulkan
+                @if($sesi->id === 'preview')
+                    alert("Waktu habis! Kuis Preview Selesai.");
+                    window.location.reload();
+                @else
+                    document.getElementById('quiz-form').submitted = true;
+                    document.getElementById('quiz-form').submit();
+                @endif
             }
         }
-        localStorage.setItem(storageKey, JSON.stringify(data));
+    }, 1000);
+}
+
+function lockQuestion(idx) {
+    const container = document.getElementById(`soal-step-${idx}`);
+    if(!container) return;
+    
+    // Jangan gunakan disabled=true agar data tetap bisa dikumpulkan oleh form
+    // Gunakan trik CSS untuk menonaktifkan interaksi klik/ubah
+    container.style.pointerEvents = 'none';
+    container.style.opacity = '0.6';
+
+    const el = document.getElementById('soal-timer-' + idx);
+    if(el) el.textContent = 'Habis';
+}
+
+function nextSoal() { if (currentSoal < totalSoal) { currentSoal++; updateView(); playClickSound(); } }
+function prevSoal() { if (currentSoal > 1) { currentSoal--; updateView(); playClickSound(); } }
+function goToSoal(i) { currentSoal = i; updateView(); playClickSound(); }
+
+function updateView() {
+    for (let i = 1; i <= totalSoal; i++) {
+        document.getElementById(`soal-step-${i}`).classList.add('hidden');
+    }
+    document.getElementById(`soal-step-${currentSoal}`).classList.remove('hidden');
+    document.getElementById('btn-prev').classList.toggle('hidden', currentSoal === 1);
+    document.getElementById('btn-next').classList.toggle('hidden', currentSoal === totalSoal);
+    if (currentSoal > 1) document.getElementById('btn-prev').classList.remove('hidden');
+    updateProgress();
+    updateMapStyling();
+    startSoalTimer(currentSoal);
+}
+
+// Ã¢â€â‚¬Ã¢â€â‚¬ Practice Mode Ã¢â€â‚¬Ã¢â€â‚¬
+function checkPracticeAnswer(soalId, tipe) {
+    const container = document.getElementById(`options-container-${soalId}`);
+    const feedback = document.getElementById(`practice-feedback-${soalId}`);
+    if(!container || !feedback) return;
+    
+    let isCorrect = false;
+    let answered = false;
+
+    if (tipe === 'pilihan_ganda') {
+        const checked = container.querySelector(`input[type="radio"]:checked`);
+        if(checked) { answered = true; isCorrect = checked.dataset.correct === 'true'; }
+    } else if (tipe === 'multi_select') {
+        const checks = container.querySelectorAll(`input[type="checkbox"]`);
+        let allCorrect = true;
+        let anyChecked = false;
+        checks.forEach(c => {
+            if(c.checked) anyChecked = true;
+            if(c.checked && c.dataset.correct !== 'true') allCorrect = false;
+            if(!c.checked && c.dataset.correct === 'true') allCorrect = false;
+        });
+        if(anyChecked) { answered = true; isCorrect = allCorrect; }
+    }
+    
+    if(!answered) {
+        alert("Pilih jawaban terlebih dahulu."); return;
     }
 
-    function loadAnswers() {
-        const saved = localStorage.getItem(storageKey);
-        if(!saved) return;
-        try {
-            const data = JSON.parse(saved);
-            const form = document.getElementById('quiz-form');
-            
-            for(let key in data) {
-                const values = data[key];
-                const inputs = form.querySelectorAll(`[name="${key}"], [name="${key}[]"]`);
-                if(inputs.length === 0) continue;
-                
-                inputs.forEach(input => {
-                    if(input.type === 'radio' || input.type === 'checkbox') {
-                        if(values.includes(input.value)) {
-                            input.checked = true;
-                        }
-                    } else {
-                        input.value = values[0] || '';
-                    }
-                });
+    feedback.classList.remove('hidden', 'bg-rose-500/10', 'text-[var(--quiz-danger)]', 'bg-emerald-500/10', 'text-[var(--quiz-success)]');
+    
+    if(isCorrect) {
+        playCorrectSound();
+        feedback.textContent = 'Benar!';
+        feedback.classList.add('bg-emerald-500/10', 'text-[var(--quiz-success)]');
+    } else {
+        playWrongSound();
+        feedback.textContent = 'Salah. Coba lagi!';
+        feedback.classList.add('bg-rose-500/10', 'text-[var(--quiz-danger)]');
+    }
+
+    if(showAnswerReview) {
+        // Highlight correct options
+        container.querySelectorAll('input').forEach(i => {
+            const label = document.getElementById(`opt-${i.value}`);
+            if(label) {
+                if(i.dataset.correct === 'true') label.classList.add('is-correct');
+                else if(i.checked) label.classList.add('is-wrong');
             }
-            // Restore visual indicators
-            updateAnsweredStatus();
-        } catch(e) {
-            console.error("Failed to restore answers", e);
-        }
+        });
     }
+}
 
-    function clearSavedAnswers() {
-        localStorage.removeItem(storageKey);
-    }
-
-    function markAnswered(index, soalId, tipe) {
-        checkQuestionAnswered(index, soalId, tipe);
-        saveAnswers();
-    }
-
-    function updateAnsweredStatus() {
-        @foreach($soals as $index => $soal)
-            checkQuestionAnswered({{ $index + 1 }}, {{ $soal->id }}, '{{ $soal->tipe }}');
-        @endforeach
-    }
-
-    function checkQuestionAnswered(index, soalId, tipe) {
-        let isAnswered = false;
+// Ã¢â€â‚¬Ã¢â€â‚¬ Auto-save Ã¢â€â‚¬Ã¢â€â‚¬
+const storageKey = `quiz_answers_{{ $sesi->id }}`;
+function saveAnswers() {
+    const fd = new FormData(document.getElementById('quiz-form'));
+    const d = {};
+    for (const [k,v] of fd.entries()) { if (k!=='_token') { if(!d[k]) d[k]=[]; d[k].push(v); } }
+    localStorage.setItem(storageKey, JSON.stringify(d));
+}
+function loadAnswers() {
+    const saved = localStorage.getItem(storageKey);
+    if (!saved) return;
+    try {
+        const data = JSON.parse(saved);
         const form = document.getElementById('quiz-form');
-        if (tipe === 'pilihan_ganda' || tipe === 'multi_select') {
-            const checked = form.querySelector(`input[name^="jawaban[${soalId}]"]:checked`);
-            isAnswered = !!checked;
-        } else if (tipe === 'essay' || tipe === 'isian_singkat') {
-            const val = form.querySelector(`textarea[name="jawaban[${soalId}]"]`).value.trim();
-            isAnswered = val.length > 0;
-        } else if (tipe === 'menjodohkan') {
-            const inputs = form.querySelectorAll(`input[name^="jawaban[${soalId}]"]`);
-            inputs.forEach(input => {
-                if (input.value.trim().length > 0) isAnswered = true;
+        for (const key in data) {
+            const vals = data[key];
+            form.querySelectorAll(`[name="${key}"], [name="${key}[]"]`).forEach(el => {
+                if (el.type==='radio'||el.type==='checkbox') { if(vals.includes(el.value)) el.checked=true; }
+                else el.value = vals[0]||'';
             });
         }
+        updateAnsweredStatus();
+    } catch(e) {}
+}
+function clearSavedAnswers() { localStorage.removeItem(storageKey); }
+
+function markAnswered(idx, soalId, tipe) { 
+    // Handle visual selection
+    if(tipe === 'pilihan_ganda' || tipe === 'multi_select') {
+        const container = document.getElementById(`options-container-${soalId}`);
+        container.querySelectorAll('.quiz-option').forEach(l => l.classList.remove('selected'));
         
-        const btn = document.getElementById(`map-btn-${index}`);
-        if(btn) {
-            btn.dataset.answered = isAnswered ? 'true' : 'false';
-        }
-        updateMapStyling();
+        container.querySelectorAll('input:checked').forEach(i => {
+            const lbl = document.getElementById(`opt-${i.value}`);
+            if(lbl) lbl.classList.add('selected');
+        });
     }
+    
+    checkQuestion(idx, soalId, tipe); 
+    saveAnswers(); 
+}
 
-    function updateMapStyling() {
-        for (let i = 1; i <= totalSoal; i++) {
-            const btn = document.getElementById(`map-btn-${i}`);
-            const bg = document.getElementById(`map-bg-${i}`);
-            const isAnswered = btn.dataset.answered === 'true';
-            const isActive = (i === currentSoal);
+function updateAnsweredStatus() {
+    @foreach($soals as $i => $s)
+        markAnswered({{ $i+1 }}, {{ $s->id }}, '{{ $s->tipe }}');
+    @endforeach
+}
 
-            // Reset base classes
-            btn.className = "relative w-7 h-9 border-2 rounded-sm text-xs font-semibold flex items-start justify-center pt-0.5 overflow-hidden transition-all bg-white";
-
-            // Active vs Inactive
-            if (isActive) {
-                btn.classList.add('border-primary', 'ring-2', 'ring-primary/30', 'text-text-primary');
-            } else {
-                btn.classList.add('border-text-secondary', 'text-text-primary', 'hover:border-primary');
-            }
-
-            // Answered vs Unanswered
-            if (isAnswered) {
-                bg.classList.remove('hidden');
-            } else {
-                bg.classList.add('hidden');
-            }
-        }
+function checkQuestion(idx, soalId, tipe) {
+    let answered = false;
+    const form = document.getElementById('quiz-form');
+    if (tipe==='pilihan_ganda'||tipe==='multi_select') {
+        answered = !!form.querySelector(`input[name^="jawaban[${soalId}]"]:checked`);
+    } else if (tipe==='essay'||tipe==='isian_singkat') {
+        answered = (form.querySelector(`textarea[name="jawaban[${soalId}]"]`)?.value||'').trim().length > 0;
+    } else if (tipe==='menjodohkan') {
+        form.querySelectorAll(`input[name^="jawaban[${soalId}]"]`).forEach(i => { if(i.value.trim()) answered=true; });
     }
+    const btn = document.getElementById(`map-btn-${idx}`);
+    if (btn) btn.dataset.answered = answered ? 'true' : 'false';
+    updateMapStyling();
+}
 
-    // Submit Logic
-    function confirmSubmit() {
-        // Count unanswered
-        let unanswered = 0;
-        for (let i = 1; i <= totalSoal; i++) {
-            if (document.getElementById(`map-btn-${i}`).dataset.answered !== 'true') {
-                unanswered++;
-            }
-        }
-
-        let msg = 'Apakah Anda yakin ingin mengumpulkan jawaban sekarang? Anda tidak dapat mengubahnya lagi setelah ini.';
-        if (unanswered > 0) {
-            msg = `PERINGATAN: Ada ${unanswered} soal yang belum dijawab!\n\n` + msg;
-        }
-
-        if (confirm(msg)) {
-            document.getElementById('quiz-form').submitted = true;
-            document.getElementById('quiz-form').submit();
-        }
+function updateMapStyling() {
+    for (let i = 1; i <= totalSoal; i++) {
+        const btn = document.getElementById(`map-btn-${i}`);
+        if (!btn) continue;
+        const answered = btn.dataset.answered === 'true';
+        const active = i === currentSoal;
+        
+        btn.className = `w-10 h-10 rounded-lg border-2 flex items-center justify-center font-bold text-sm transition-all ${
+            active ? 'border-[var(--quiz-primary)] bg-[var(--quiz-primary-soft)] text-[var(--quiz-primary)]' :
+            answered ? 'border-[var(--quiz-success)] text-[var(--quiz-success)]' :
+            'border-[var(--quiz-border)] text-[var(--quiz-muted)] hover:border-[var(--quiz-primary)] hover:text-[var(--quiz-primary)]'
+        }`;
     }
+}
 
-    // Unload warning
-    window.addEventListener('beforeunload', function (e) {
-        if (!document.getElementById('quiz-form').submitted) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    });
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        loadAnswers();
-        updateMapStyling();
-    });
-
-    @if($materi->strict_anti_cheat)
-    // Anti-Cheat Logic
-    let warningCount = 0;
-    const maxWarnings = 2; // Auto submit on 3rd violation
-
-    document.addEventListener("visibilitychange", function() {
-        if (document.visibilityState === 'hidden' && !document.getElementById('quiz-form').submitted) {
-            handleCheatViolation();
-        }
-    });
-
-    window.addEventListener("blur", function() {
-        if (!document.getElementById('quiz-form').submitted) {
-            handleCheatViolation();
-        }
-    });
-
-    function handleCheatViolation() {
-        warningCount++;
-        if (warningCount > maxWarnings) {
-            alert("PERINGATAN FINAL!\n\nAnda telah terdeteksi meninggalkan halaman kuis lebih dari batas maksimal. Kuis Anda akan dikumpulkan otomatis sekarang.");
-            document.getElementById('quiz-form').submitted = true;
-            document.getElementById('quiz-form').submit();
-        } else {
-            alert(`PERINGATAN ANTI-CHEAT (${warningCount}/${maxWarnings})\n\nSistem mendeteksi Anda meninggalkan halaman kuis atau membuka tab/aplikasi lain. Mohon kerjakan kuis dengan jujur.\n\nJika pelanggaran terjadi lebih dari ${maxWarnings} kali, kuis akan otomatis dikumpulkan dengan nilai seadanya.`);
-        }
-    }
+// â”€â”€ Submit â”€â”€
+function confirmSubmit() {
+    @if($sesi->id === 'preview')
+        alert("Selesai! Ini hanya simulasi Preview dari Admin, sehingga jawaban tidak dikirim ke server.");
+        window.location.reload();
+        return;
     @endif
+    let unanswered = 0;
+    for (let i=1; i<=totalSoal; i++) {
+        if (document.getElementById(`map-btn-${i}`).dataset.answered !== 'true') unanswered++;
+    }
+    let msg = 'Apakah Anda yakin ingin menyelesaikan kuis ini? Jawaban tidak dapat diubah lagi.';
+    if (unanswered > 0) msg = `PERINGATAN: Ada ${unanswered} soal yang belum dijawab!\n\n` + msg;
+    if (confirm(msg)) {
+        document.getElementById('quiz-form').submitted = true;
+        document.getElementById('quiz-form').submit();
+    }
+}
+window.addEventListener('beforeunload', e => {
+    if (!document.getElementById('quiz-form').submitted) { e.preventDefault(); e.returnValue=''; }
+});
+
+@if($materi->strict_anti_cheat)
+let warnings = 0;
+const maxWarn = 2;
+function handleCheat() {
+    if(document.getElementById('quiz-form').submitted) return;
+    warnings++;
+    if(warnings <= maxWarn) {
+        if(typeof playWrongSound === 'function') playWrongSound();
+        alert(`Peringatan (${warnings}/${maxWarn}): Anda terdeteksi berpindah aplikasi/tab! Lakukan tes dengan jujur.`);
+    } else {
+        @if($sesi->id === 'preview')
+            alert("Terdeteksi pelanggaran (Mode Preview). Halaman akan dimuat ulang.");
+            window.location.reload();
+        @else
+            document.getElementById('quiz-form').submitted = true;
+            document.getElementById('quiz-form').submit();
+        @endif
+    }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') handleCheat(); });
+window.addEventListener('blur', handleCheat);
+@endif
+
+// Ã¢â€â‚¬Ã¢â€â‚¬ Sound Engine Ã¢â€â‚¬Ã¢â€â‚¬
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let isMuted = false;
+@if($materi->mode_tampilan === 'interaktif')
+    const bgmAudio = new Audio('{{ asset("music/electric.mp3") }}');
+    bgmAudio.loop = true;
+    bgmAudio.volume = 0.5; // Sesuaikan volume musik Electric
+
+    const startBGM = () => {
+        if(isMuted) return;
+        bgmAudio.play().catch(e => console.log('Autoplay blocked', e));
+    };
+
+    const stopBGM = () => {
+        bgmAudio.pause();
+    };
+
+    const initAudio = () => {
+        if(bgmAudio.paused && !isMuted) startBGM();
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        // Hapus listener setelah terpanggil sekali
+        window.removeEventListener('click', initAudio);
+        window.removeEventListener('touchstart', initAudio);
+        window.removeEventListener('keydown', initAudio);
+    };
+
+    window.addEventListener('click', initAudio);
+    window.addEventListener('touchstart', initAudio);
+    window.addEventListener('keydown', initAudio);
+@else
+    const startBGM = () => {};
+    const stopBGM = () => {};
+@endif
+
+function toggleMute() {
+    isMuted = !isMuted;
+    const btn = document.getElementById('mute-btn');
+    if(btn) {
+        btn.innerHTML = isMuted ? '<i data-lucide="volume-x" class="w-4 h-4"></i>' : '<i data-lucide="volume-2" class="w-4 h-4"></i>';
+        if(window.lucide) window.lucide.createIcons();
+    }
+    
+    if(isMuted) stopBGM();
+    else startBGM();
+}
+
+const playTone = (freq, type, duration, vol=0.1) => {
+    if(isMuted) return;
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+};
+
+const playCorrectSound = () => {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    playTone(523.25, 'sine', 0.1, 0.2); 
+    setTimeout(() => playTone(659.25, 'sine', 0.2, 0.2), 100); 
+    setTimeout(() => playTone(783.99, 'sine', 0.4, 0.3), 200); 
+};
+
+const playWrongSound = () => {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    playTone(300, 'sawtooth', 0.2, 0.2);
+    setTimeout(() => playTone(250, 'sawtooth', 0.4, 0.2), 150);
+};
+
+const playClickSound = () => {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    playTone(800, 'sine', 0.05, 0.05);
+};
+
 </script>
 @endpush
+
+

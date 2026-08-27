@@ -9,12 +9,12 @@
         <h1 class="text-2xl font-display font-bold text-primary">Video Orientasi</h1>
         <p class="text-text-secondary mt-1">Kelola video pengantar yang dapat ditonton oleh semua pengguna.</p>
     </div>
-    <a href="{{ route('admin.video.create') }}" class="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+    <a href="{{ route('admin.video.create') }}" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
         <i data-lucide="plus" class="w-5 h-5"></i> Tambah Video
     </a>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
             <thead class="text-xs text-text-secondary uppercase bg-secondary border-b border-border">
@@ -70,3 +70,4 @@
 </div>
 
 @endsection
+

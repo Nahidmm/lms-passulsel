@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Import Soal – ' . $materi->judul)
+@section('title', 'Import Soal â€“ ' . $materi->judul)
 
 @section('content')
 
@@ -42,23 +42,23 @@
     @endif
 
     {{-- Download Template --}}
-    <div class="bg-white rounded-xl border border-border shadow-sm p-6">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm p-6">
         <h3 class="text-lg font-bold text-text-primary mb-3 flex items-center gap-2">
-            <i data-lucide="file-down" class="w-5 h-5 text-accent"></i> Langkah 1 – Download Template CSV
+            <i data-lucide="file-down" class="w-5 h-5 text-accent"></i> Langkah 1 â€“ Download Template CSV
         </h3>
         <p class="text-sm text-text-secondary mb-4 leading-relaxed">
             Download template berikut, isi dengan soal-soal Anda, lalu upload kembali. Jangan mengubah nama kolom header.
         </p>
         <a href="{{ route('admin.soal.template', $materi->id) }}"
-           class="inline-flex items-center gap-2 bg-accent/10 hover:bg-accent text-accent hover:text-white font-bold px-5 py-2.5 rounded-xl transition-all border border-accent/30">
+           class="inline-flex items-center gap-2 bg-accent/10 hover:bg-accent text-accent hover:text-[var(--text-primary)] font-bold px-5 py-2.5 rounded-xl transition-all border border-accent/30">
             <i data-lucide="download" class="w-4 h-4"></i> Download Template (CSV)
         </a>
     </div>
 
     {{-- Format Penjelasan --}}
-    <div class="bg-white rounded-xl border border-border shadow-sm p-6">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm p-6">
         <h3 class="text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
-            <i data-lucide="info" class="w-5 h-5 text-primary"></i> Langkah 2 – Panduan Format CSV
+            <i data-lucide="info" class="w-5 h-5 text-primary"></i> Langkah 2 â€“ Panduan Format CSV
         </h3>
         <div class="overflow-x-auto">
             <table class="w-full text-xs border-collapse">
@@ -72,13 +72,13 @@
                 <tbody class="divide-y divide-border">
                     <tr class="hover:bg-secondary/20">
                         <td class="px-3 py-2 border border-border font-medium">Pilihan Ganda</td>
-                        <td class="px-3 py-2 border border-border font-mono text-blue-600">pilihan_ganda</td>
-                        <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_a–opsi_d, <strong>kunci_jawaban</strong> (isi A/B/C/D)</td>
+                        <td class="px-3 py-2 border border-border font-mono text-[#f0b429]">pilihan_ganda</td>
+                        <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_aâ€“opsi_d, <strong>kunci_jawaban</strong> (isi A/B/C/D)</td>
                     </tr>
                     <tr class="hover:bg-secondary/20">
                         <td class="px-3 py-2 border border-border font-medium">Multi Select</td>
                         <td class="px-3 py-2 border border-border font-mono text-violet-600">multi_select</td>
-                        <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_a–opsi_d, <strong>jawaban_benar_multi</strong> (misal: A,C,D)</td>
+                        <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_aâ€“opsi_d, <strong>jawaban_benar_multi</strong> (misal: A,C,D)</td>
                     </tr>
                     <tr class="hover:bg-secondary/20">
                         <td class="px-3 py-2 border border-border font-medium">Essay</td>
@@ -101,9 +101,9 @@
     </div>
 
     {{-- Upload Form --}}
-    <div class="bg-white rounded-xl border border-border shadow-sm p-6">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm p-6">
         <h3 class="text-lg font-bold text-text-primary mb-5 flex items-center gap-2">
-            <i data-lucide="upload" class="w-5 h-5 text-success"></i> Langkah 3 – Upload File CSV
+            <i data-lucide="upload" class="w-5 h-5 text-success"></i> Langkah 3 â€“ Upload File CSV
         </h3>
         <form action="{{ route('admin.soal.import.store', $materi->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
@@ -121,14 +121,14 @@
             <div>
                 <label class="block text-sm font-semibold text-text-primary mb-3">Mode Import <span class="text-danger">*</span></label>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <label class="group flex items-start gap-4 p-4 bg-white border border-border rounded-xl cursor-pointer hover:border-primary hover:shadow-sm transition-all">
+                    <label class="group flex items-start gap-4 p-4 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-xl cursor-pointer hover:border-primary hover:shadow-sm transition-all">
                         <input type="radio" name="mode_import" value="tambah" checked class="mt-1 w-5 h-5 text-primary border-border focus:ring-primary">
                         <div>
                             <p class="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">Tambahkan ke Soal Existing</p>
                             <p class="text-xs text-text-secondary mt-1 leading-relaxed">Soal dari CSV akan ditambahkan ke soal yang sudah ada.</p>
                         </div>
                     </label>
-                    <label class="group flex items-start gap-4 p-4 bg-white border border-danger/30 rounded-xl cursor-pointer hover:border-danger hover:shadow-sm transition-all">
+                    <label class="group flex items-start gap-4 p-4 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-danger/30 rounded-xl cursor-pointer hover:border-danger hover:shadow-sm transition-all">
                         <input type="radio" name="mode_import" value="ganti" class="mt-1 w-5 h-5 text-danger border-border focus:ring-danger">
                         <div>
                             <p class="text-sm font-bold text-danger">Ganti Semua Soal</p>
@@ -139,7 +139,7 @@
             </div>
 
             <div class="flex justify-end pt-4 border-t border-border">
-                <button type="submit" id="submit-btn" class="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-8 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
+                <button type="submit" id="submit-btn" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-3 px-8 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
                     <i data-lucide="upload-cloud" class="w-5 h-5"></i> Import Soal
                 </button>
             </div>
@@ -175,10 +175,11 @@
     function updateDropText(input) {
         const text = document.getElementById('drop-text');
         if (input.files && input.files[0]) {
-            text.textContent = '✓ ' + input.files[0].name;
+            text.textContent = 'âœ“ ' + input.files[0].name;
             text.classList.add('text-success');
             dropZone.classList.add('border-success', 'bg-success/5');
         }
     }
 </script>
 @endpush
+

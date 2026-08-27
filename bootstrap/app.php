@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'account.approved' => \App\Http\Middleware\CheckAccountApproved::class,
             'evaluasi.mode'    => \App\Http\Middleware\CheckEvaluasiMode::class,
             'force.password'   => \App\Http\Middleware\ForceChangePassword::class,
+            'pretest.completed'=> \App\Http\Middleware\EnsurePretestCompleted::class,
         ]);
     })
 

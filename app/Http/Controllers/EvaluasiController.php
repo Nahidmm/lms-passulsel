@@ -54,8 +54,17 @@ class EvaluasiController extends Controller
             'materi_id' => $materi->id,
             'status' => 'berlangsung',
             'mulai_at' => now(),
-            'durasi_menit' => $materi->durasi_menit, // Could be 0 for unlimited
+            'durasi_menit' => $materi->durasi_menit,
             'total_soal' => $totalSoal,
+            'current_soal_index' => 0,
+            'jawaban_tersimpan' => [],
+            'waktu_mulai_soal' => now(),
+            'waktu_terakhir_aksi' => now(),
+            'streak' => 0,
+            'xp_earned' => 0,
+            'is_paused' => false,
+            'last_activity_at' => now(),
+            'tab_blur_count' => 0,
         ]);
 
         return redirect()->route('peserta.evaluasi.soal', ['sesi' => $sesi->id]);
@@ -82,6 +91,11 @@ class EvaluasiController extends Controller
         }
         
         $soals = $soalsQuery->get();
+        $sesi->update([
+            'current_soal_index' => max(0, (int) $sesi->current_soal_index),
+            'last_activity_at' => now(),
+            'waktu_terakhir_aksi' => now(),
+        ]);
 
         return view('peserta.evaluasi.soal', compact('sesi', 'soals', 'materi'));
     }
@@ -93,7 +107,14 @@ class EvaluasiController extends Controller
             return redirect()->route('peserta.pelatihan.index');
         }
 
-        return $this->processSubmit($sesi, $request->input('jawaban', []));
+        $jawaban = $request->input('jawaban', []);
+        $sesi->update([
+            'jawaban_tersimpan' => $jawaban,
+            'last_activity_at' => now(),
+            'waktu_terakhir_aksi' => now(),
+        ]);
+
+        return $this->processSubmit($sesi, $jawaban);
     }
 
     private function processSubmit(SesiEvaluasi $sesi, array $jawaban)
@@ -101,6 +122,8 @@ class EvaluasiController extends Controller
         $benar = 0;
         $totalSkor = 0;
         $maxSkor = 0;
+        $streakSaatIni = 0;
+        $streakTertinggi = 0;
 
         $materi = $sesi->materi;
         $soals = $materi->soals()->where('is_active', true)->get();
@@ -110,21 +133,75 @@ class EvaluasiController extends Controller
             $jawabanUser = $jawaban[$soal->id] ?? null;
             $isCorrect = false;
 
-            if ($soal->tipe === 'pilihan_ganda' && $jawabanUser) {
-                $pilihan = $soal->pilihanJawaban()->find($jawabanUser);
-                if ($pilihan && $pilihan->is_correct) {
-                    $isCorrect = true;
-                    $benar++;
-                    $totalSkor += $soal->bobot;
+            if ($jawabanUser) {
+                if ($soal->tipe === 'pilihan_ganda') {
+                    $pilihan = $soal->pilihanJawaban()->find($jawabanUser);
+                    if ($pilihan && $pilihan->is_correct) {
+                        $isCorrect = true;
+                    }
+                } elseif ($soal->tipe === 'multi_select' && is_array($jawabanUser)) {
+                    $correctIds = $soal->pilihanJawaban()->where('is_correct', true)->pluck('id')->map(fn($id) => (string)$id)->toArray();
+                    $userAnsw = array_map('strval', $jawabanUser);
+                    sort($correctIds);
+                    sort($userAnsw);
+                    if ($correctIds === $userAnsw) {
+                        $isCorrect = true;
+                    }
+                } elseif ($soal->tipe === 'isian_singkat') {
+                    $kunci = $soal->pilihanJawaban()->first();
+                    if ($kunci) {
+                        $cleanUser = strtolower(trim(preg_replace('/\s+/', ' ', $jawabanUser)));
+                        $cleanKunci = strtolower(trim(preg_replace('/\s+/', ' ', $kunci->teks)));
+                        if ($cleanUser === $cleanKunci) {
+                            $isCorrect = true;
+                        }
+                    }
+                } elseif ($soal->tipe === 'menjodohkan' && is_array($jawabanUser)) {
+                    $allMatch = true;
+                    $pilihans = $soal->pilihanJawaban;
+                    if ($pilihans->count() > 0) {
+                        foreach ($pilihans as $pilihan) {
+                            $parts = explode('|||', $pilihan->teks);
+                            $kunciKanan = isset($parts[1]) ? strtolower(trim($parts[1])) : '';
+                            $userKanan = isset($jawabanUser[$pilihan->id]) ? strtolower(trim($jawabanUser[$pilihan->id])) : '';
+                            if ($kunciKanan !== $userKanan) {
+                                $allMatch = false;
+                                break;
+                            }
+                        }
+                        if ($allMatch) {
+                            $isCorrect = true;
+                        }
+                    }
                 }
+            }
+
+            if ($isCorrect) {
+                $benar++;
+                $totalSkor += $soal->bobot;
+                $streakSaatIni++;
+                $streakTertinggi = max($streakTertinggi, $streakSaatIni);
+            } else {
+                $streakSaatIni = 0;
+            }
+
+            $pilihanId = null;
+            $jawabanTeks = null;
+
+            if ($soal->tipe === 'pilihan_ganda' && $jawabanUser) {
+                $pilihanId = $jawabanUser;
+            } elseif (in_array($soal->tipe, ['isian_singkat', 'essay'])) {
+                $jawabanTeks = $jawabanUser;
+            } elseif (is_array($jawabanUser)) {
+                $jawabanTeks = json_encode($jawabanUser);
             }
 
             HasilLatihan::create([
                 'sesi_evaluasi_id' => $sesi->id,
                 'user_id' => $sesi->user_id,
                 'soal_id' => $soal->id,
-                'pilihan_id' => $soal->tipe === 'pilihan_ganda' ? $jawabanUser : null,
-                'jawaban_esai' => $soal->tipe === 'esai' ? $jawabanUser : null,
+                'pilihan_id' => $pilihanId,
+                'jawaban_esai' => $jawabanTeks,
                 'is_correct' => $isCorrect,
                 'skor' => $isCorrect ? $soal->bobot : 0,
             ]);
@@ -132,12 +209,23 @@ class EvaluasiController extends Controller
 
         // Calculate 0-100 score scale
         $skorAkhir = $maxSkor > 0 ? round(($totalSkor / $maxSkor) * 100, 2) : 0;
+        
+        // XP = proporsional terhadap poin konfigurasi admin di materi
+        // Mode interaktif mendapat bonus 20%
+        $poinMaxMateri = $materi->poin ?? 50;
+        $multiplier = $materi->mode_tampilan === 'interaktif' ? 1.2 : 1.0;
+        $xpEarned = (int) round(($skorAkhir / 100) * $poinMaxMateri * $multiplier);
 
         $sesi->update([
             'status' => 'selesai',
             'selesai_at' => now(),
             'benar' => $benar,
             'skor' => $skorAkhir,
+            'streak' => $streakTertinggi,
+            'xp_earned' => $xpEarned,
+            'jawaban_tersimpan' => $jawaban,
+            'last_activity_at' => now(),
+            'waktu_terakhir_aksi' => now(),
         ]);
         
         // Update progres materi for this user
@@ -152,7 +240,54 @@ class EvaluasiController extends Controller
                 'tanggal_selesai' => now(),
             ]);
             
-            \App\Models\ProgresPelatihan::checkCompletion($sesi->user_id, $materi->pelatihan_id);
+            if ($materi->pelatihan_id) {
+                \App\Models\ProgresPelatihan::checkCompletion($sesi->user_id, $materi->pelatihan_id);
+            }
+        }
+
+        // ==========================================
+        // PRETEST LOGIC
+        // ==========================================
+        if ($materi->is_pretest) {
+            $user = \App\Models\User::find($sesi->user_id);
+            if ($user) {
+                // Calculate score per topik
+                $topikScores = [];
+                $topikTotals = [];
+                
+                $hasilLatihans = HasilLatihan::where('sesi_evaluasi_id', $sesi->id)->get()->keyBy('soal_id');
+
+                foreach ($soals as $soal) {
+                    if ($soal->topik_pelatihan_id) {
+                        $topikId = $soal->topik_pelatihan_id;
+                        if (!isset($topikTotals[$topikId])) {
+                            $topikTotals[$topikId] = 0;
+                            $topikScores[$topikId] = 0;
+                        }
+                        
+                        $topikTotals[$topikId] += $soal->bobot;
+                        
+                        $hasil = $hasilLatihans->get($soal->id);
+                        if ($hasil && $hasil->is_correct) {
+                            $topikScores[$topikId] += $soal->bobot;
+                        }
+                    }
+                }
+                
+                // Save to hasil_pretest_topiks
+                foreach ($topikTotals as $topikId => $totalBobot) {
+                    if ($totalBobot > 0) {
+                        $score = round(($topikScores[$topikId] / $totalBobot) * 100, 2);
+                        \App\Models\HasilPretestTopik::updateOrCreate(
+                            ['user_id' => $user->id, 'topik_pelatihan_id' => $topikId],
+                            ['skor' => $score]
+                        );
+                    }
+                }
+                
+                // Mark user as has taken pretest
+                $user->update(['has_taken_pretest' => true]);
+            }
         }
 
         return redirect()->route('peserta.evaluasi.hasil', ['sesi' => $sesi->id]);

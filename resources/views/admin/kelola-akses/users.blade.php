@@ -18,7 +18,7 @@
 </div>
 
 {{-- Filter & Search --}}
-<div class="bg-white rounded-xl shadow-sm border border-border p-4 mb-6">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-4 mb-6">
     <form method="GET" class="flex flex-col sm:flex-row gap-3">
         <div class="relative flex-1">
             <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary"></i>
@@ -26,12 +26,12 @@
                    placeholder="Cari nama atau NIP..."
                    class="w-full pl-9 pr-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
         </div>
-        <select name="base_role" class="px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none bg-white">
+        <select name="base_role" class="px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm">
             <option value="">Semua Role Dasar</option>
             <option value="admin" @selected(request('base_role') === 'admin')>Admin</option>
             <option value="peserta" @selected(request('base_role') === 'peserta')>Peserta</option>
         </select>
-        <button type="submit" class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+        <button type="submit" class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-[var(--text-primary)] text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
             <i data-lucide="filter" class="w-4 h-4"></i> Filter
         </button>
         @if(request()->hasAny(['search', 'base_role']))
@@ -43,7 +43,7 @@
 </div>
 
 {{-- Users Table --}}
-<div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
     <div class="p-4 border-b border-border bg-secondary/40 flex items-center justify-between">
         <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
             <i data-lucide="users" class="w-5 h-5 text-primary"></i> Daftar Pengguna
@@ -82,7 +82,7 @@
                     {{-- Base Role Badge --}}
                     <td class="px-4 py-3">
                         <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase
-                            {{ $user->role === 'admin' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
+                            {{ $user->role === 'admin' ? 'bg-violet-900/30 text-[#fcd34d]' : 'bg-green-100 text-green-700' }}">
                             {{ $user->role }}
                         </span>
                     </td>
@@ -133,12 +133,12 @@
 {{-- Assign Role Modal --}}
 {{-- ============================== --}}
 <div id="assignModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {{-- Modal Header --}}
         <div class="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
                 <h3 class="font-bold text-lg text-text-primary">Atur Role Kustom</h3>
-                <p class="text-sm text-text-secondary" id="modal-username">—</p>
+                <p class="text-sm text-text-secondary" id="modal-username">â€”</p>
             </div>
             <button onclick="closeAssignModal()" class="text-text-secondary hover:text-danger transition-colors p-1">
                 <i data-lucide="x" class="w-5 h-5"></i>
@@ -180,12 +180,12 @@
             {{-- Modal Footer --}}
             <div class="px-6 py-4 bg-secondary/30 border-t border-border flex justify-end gap-2">
                 <button type="button" onclick="closeAssignModal()"
-                        class="px-4 py-2 text-sm font-semibold border border-border rounded-lg bg-white hover:bg-secondary transition-colors">
+                        class="px-4 py-2 text-sm font-semibold border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-sm hover:bg-secondary transition-colors">
                     Batal
                 </button>
                 @if($customRoles->isNotEmpty())
                 <button type="submit"
-                        class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors">
+                        class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-[var(--text-primary)] bg-primary hover:bg-primary/90 rounded-lg transition-colors">
                     <i data-lucide="save" class="w-4 h-4"></i> Simpan
                 </button>
                 @endif
@@ -242,3 +242,4 @@
     });
 </script>
 @endpush
+

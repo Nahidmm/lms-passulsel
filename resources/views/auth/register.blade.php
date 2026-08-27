@@ -49,7 +49,7 @@
     <div>
         <label for="jabatan_id" class="block text-sm font-medium text-text-primary mb-1">Jabatan (Eselon V) <span class="text-danger">*</span></label>
         <select id="jabatan_id" name="jabatan_id" required
-            class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-shadow bg-white">
+            class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-shadow bg-[var(--card)] border border-[var(--border)] shadow-sm">
             <option value="">-- Pilih Jabatan --</option>
             @foreach($jabatans as $jabatan)
                 <option value="{{ $jabatan->id }}" {{ old('jabatan_id') == $jabatan->id ? 'selected' : '' }}>
@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-lg transition-colors mt-2">
+    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-4 rounded-lg transition-colors mt-2">
         Daftar
     </button>
 </form>
@@ -84,3 +84,4 @@
 </div>
 
 @endsection
+

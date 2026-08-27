@@ -10,7 +10,7 @@
     </a>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden mb-8">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden mb-8">
     <div class="p-6 md:p-8 bg-secondary/30">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -18,7 +18,7 @@
                 <p class="text-text-secondary">{{ $modul->deskripsi ?: 'Tidak ada deskripsi.' }}</p>
             </div>
             <div class="flex items-center gap-4">
-                <div class="text-center bg-white px-4 py-2 border border-border rounded-lg shadow-sm">
+                <div class="text-center bg-[var(--card)] border border-[var(--border)] shadow-sm px-4 py-2 border border-border rounded-lg shadow-sm">
                     <p class="text-xs text-text-secondary font-medium uppercase tracking-wider mb-1">Status</p>
                     @if($modul->is_active)
                         <span class="text-success font-bold text-sm">Aktif</span>
@@ -26,7 +26,7 @@
                         <span class="text-danger font-bold text-sm">Draft</span>
                     @endif
                 </div>
-                <a href="{{ route('admin.modul.edit', $modul->id) }}" class="bg-white hover:bg-secondary border border-border text-text-primary px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
+                <a href="{{ route('admin.modul.edit', $modul->id) }}" class="bg-[var(--card)] border border-[var(--border)] shadow-sm hover:bg-secondary border border-border text-text-primary px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
                     <i data-lucide="edit-2" class="w-4 h-4"></i> Edit Modul
                 </a>
             </div>
@@ -39,12 +39,12 @@
         <h3 class="text-xl font-display font-bold text-text-primary">Materi & Kuis</h3>
         <p class="text-text-secondary mt-1">Kelola konten pembelajaran di dalam modul ini.</p>
     </div>
-    <a href="{{ route('admin.modul.materi.create', $modul->id) }}" class="bg-accent hover:bg-accent-hover text-white font-bold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+    <a href="{{ route('admin.modul.materi.create', $modul->id) }}" class="bg-accent hover:bg-accent-hover text-[var(--text-primary)] font-bold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
         <i data-lucide="plus" class="w-5 h-5"></i> Tambah Materi / Kuis
     </a>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
     @if($materis->isEmpty())
         <p class="text-center text-text-secondary py-8">Belum ada materi di dalam modul ini.</p>
     @else
@@ -96,17 +96,17 @@
                         </td>
                         <td class="px-6 py-4 text-right space-x-2">
                             @if($materi->jenis === 'quiz')
-                                <a href="{{ route('admin.materi.soal.create', $materi->id) }}" class="inline-block border border-border text-text-secondary hover:text-accent hover:border-accent px-2.5 py-1.5 rounded transition-colors bg-white shadow-sm" title="Kelola Soal">
+                                <a href="{{ route('admin.materi.soal.create', $materi->id) }}" class="inline-block border border-border text-text-secondary hover:text-accent hover:border-accent px-2.5 py-1.5 rounded transition-colors bg-[var(--card)] border border-[var(--border)] shadow-sm shadow-sm" title="Kelola Soal">
                                     <i data-lucide="help-circle" class="w-4 h-4"></i>
                                 </a>
                             @endif
-                            <a href="{{ route('admin.materi.edit', $materi->id) }}" class="inline-block border border-border text-text-secondary hover:text-primary hover:border-primary px-2.5 py-1.5 rounded transition-colors bg-white shadow-sm" title="Edit">
+                            <a href="{{ route('admin.materi.edit', $materi->id) }}" class="inline-block border border-border text-text-secondary hover:text-primary hover:border-primary px-2.5 py-1.5 rounded transition-colors bg-[var(--card)] border border-[var(--border)] shadow-sm shadow-sm" title="Edit">
                                 <i data-lucide="edit-2" class="w-4 h-4"></i>
                             </a>
                             <form action="{{ route('admin.materi.destroy', $materi->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus materi ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="border border-border text-text-secondary hover:text-danger hover:border-danger px-2.5 py-1.5 rounded transition-colors bg-white shadow-sm" title="Hapus">
+                                <button type="submit" class="border border-border text-text-secondary hover:text-danger hover:border-danger px-2.5 py-1.5 rounded transition-colors bg-[var(--card)] border border-[var(--border)] shadow-sm shadow-sm" title="Hapus">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </form>
@@ -116,7 +116,7 @@
                     @if($materi->jenis === 'quiz' && $materi->soals->isNotEmpty())
                         <tr class="bg-secondary/10 border-b border-border">
                             <td colspan="6" class="p-4 pl-20">
-                                <div class="bg-white border border-border rounded-lg shadow-sm">
+                                <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-lg shadow-sm">
                                     <table class="w-full text-sm text-left">
                                         <thead class="text-xs text-text-secondary uppercase bg-secondary/30">
                                             <tr>
@@ -154,3 +154,4 @@
 </div>
 
 @endsection
+

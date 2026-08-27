@@ -9,7 +9,7 @@
     </a>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden max-w-3xl">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden max-w-3xl">
     <div class="px-6 py-4 border-b border-border bg-secondary/30">
         <h2 class="text-lg font-bold text-text-primary">Edit Pelatihan: {{ $pelatihan->judul }}</h2>
     </div>
@@ -40,9 +40,10 @@
 
             <div class="mt-8 pt-5 border-t border-border flex justify-end gap-3">
                 <a href="{{ route('admin.pelatihan.index') }}" class="px-5 py-2.5 rounded-lg font-medium text-text-secondary hover:bg-secondary border border-transparent transition-colors">Batal</a>
-                <button type="submit" class="px-5 py-2.5 rounded-lg font-medium text-white bg-primary hover:bg-primary-hover shadow-sm transition-colors">Perbarui Pelatihan</button>
+                <button type="submit" class="px-5 py-2.5 rounded-lg font-medium text-[var(--text-primary)] bg-primary hover:bg-primary-hover shadow-sm transition-colors">Perbarui Pelatihan</button>
             </div>
         </form>
     </div>
 </div>
 @endsection
+

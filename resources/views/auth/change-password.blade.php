@@ -41,7 +41,7 @@
             placeholder="Ketik ulang password">
     </div>
 
-    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-lg transition-colors mt-2">
+    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-4 rounded-lg transition-colors mt-2">
         Simpan & Lanjutkan
     </button>
 </form>
@@ -56,3 +56,4 @@
 </div>
 
 @endsection
+

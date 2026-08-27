@@ -1,17 +1,23 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Soal — ' . $materi->judul)
+@section('title', 'Tambah Soal â€” ' . $materi->judul)
 
 @section('content')
 
 <div class="mb-6 flex items-center gap-2">
+    @if($materi->is_pretest)
+    <a href="{{ route('admin.pretest.index') }}" class="text-text-secondary hover:text-primary flex items-center gap-1.5 font-medium transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Kelola Pretest
+    </a>
+    @else
     <a href="{{ route('admin.materi.edit', $materi->id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1.5 font-medium transition-colors">
         <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Konfigurasi Kuis
     </a>
+    @endif
 </div>
 
 <div class="max-w-3xl">
-    <div class="bg-white rounded-xl shadow-sm border border-border p-6 md:p-8">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-6 md:p-8">
         <div class="mb-6 pb-4 border-b border-border">
             <h2 class="text-xl font-bold text-text-primary flex items-center gap-2">
                 <i data-lucide="plus-circle" class="w-5 h-5 text-accent"></i> Tambah Soal Baru
@@ -137,7 +143,7 @@
                 </div>
                 <div class="grid grid-cols-11 gap-2 mb-2 text-xs font-semibold text-text-secondary px-1">
                     <div class="col-span-5">Kolom Kiri (Soal)</div>
-                    <div class="col-span-1 text-center">→</div>
+                    <div class="col-span-1 text-center">â†’</div>
                     <div class="col-span-5">Kolom Kanan (Jawaban)</div>
                 </div>
                 <div id="pairs-container" class="space-y-2">
@@ -145,7 +151,7 @@
                     <div class="grid grid-cols-11 gap-2 pair-row">
                         <input type="text" name="pasangan_kiri[]" placeholder="Item kiri {{ $p }}" required
                             class="col-span-5 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
-                        <div class="col-span-1 flex items-center justify-center text-text-secondary">→</div>
+                        <div class="col-span-1 flex items-center justify-center text-text-secondary">â†’</div>
                         <input type="text" name="pasangan_kanan[]" placeholder="Pasangannya {{ $p }}" required
                             class="col-span-5 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
                     </div>
@@ -176,11 +182,26 @@
                         </label>
                     </div>
                 </div>
+                @if($materi->is_pretest)
+                <div>
+                    <label for="topik_pelatihan_id" class="block text-sm font-semibold text-text-primary mb-1">Pilih Topik Penilaian (Untuk Pretest) <span class="text-danger">*</span></label>
+                    <select name="topik_pelatihan_id" id="topik_pelatihan_id" class="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm" required>
+                        <option value="">-- Pilih Topik --</option>
+                        @foreach($topiks as $topik)
+                            <option value="{{ $topik->id }}" {{ old('topik_pelatihan_id') == $topik->id ? 'selected' : '' }}>{{ $topik->nama_topik }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
             </div>
 
             <div class="flex justify-end gap-3 pt-4 border-t border-border">
+                @if($materi->is_pretest)
+                <a href="{{ route('admin.pretest.index') }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
+                @else
                 <a href="{{ route('admin.materi.edit', $materi->id) }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
-                <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+                @endif
+                <button type="submit" class="bg-accent hover:bg-accent-hover text-[var(--text-primary)] font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
                     Simpan Soal
                 </button>
             </div>
@@ -316,7 +337,7 @@ document.getElementById('btn-add-pair').addEventListener('click', function() {
     div.innerHTML = `
         <input type="text" name="pasangan_kiri[]" placeholder="Item kiri ${pairCount}" required
             class="col-span-5 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
-        <div class="col-span-1 flex items-center justify-center text-text-secondary">→</div>
+        <div class="col-span-1 flex items-center justify-center text-text-secondary">â†’</div>
         <input type="text" name="pasangan_kanan[]" placeholder="Pasangannya ${pairCount}" required
             class="col-span-4 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
         <button type="button" onclick="removePair(this)" class="col-span-1 flex items-center justify-center p-1 text-text-secondary hover:text-danger transition-colors">
@@ -334,3 +355,4 @@ function removePair(btn) {
 }
 </script>
 @endpush
+

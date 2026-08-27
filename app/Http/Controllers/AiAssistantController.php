@@ -102,22 +102,29 @@ class AiAssistantController extends Controller
             }
         }
 
-        // Call Gemini
-        $response = $this->gemini->chat($message, $history, $ragContext);
+        try {
+            // Call Gemini
+            $response = $this->gemini->chat($message, $history, $ragContext);
 
-        // Save AI Response with references
-        $aiMessage = AiChatHistory::create([
-            'user_id' => $user->id,
-            'role' => 'assistant',
-            'content' => $response,
-            'session_id' => $sessionId,
-            'references' => empty($referenceDocs) ? null : array_values($referenceDocs),
-        ]);
+            // Save AI Response with references
+            $aiMessage = AiChatHistory::create([
+                'user_id' => $user->id,
+                'role' => 'assistant',
+                'content' => $response,
+                'session_id' => $sessionId,
+                'references' => empty($referenceDocs) ? null : array_values($referenceDocs),
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => $response,
-            'data' => $aiMessage
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => $response,
+                'data' => $aiMessage
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

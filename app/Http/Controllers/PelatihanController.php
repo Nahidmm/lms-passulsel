@@ -112,7 +112,8 @@ class PelatihanController extends Controller
         // If status filter is applied, we filter the collection manually since status depends on pivot table
         if ($status) {
             $pelatihans = $pelatihans->filter(function ($pelatihan) use ($status, $activePelatihan) {
-                $progres = \App\Models\ProgresPelatihan::where('user_id', auth()->id())
+                $userId = auth()->user()->id;
+                $progres = \App\Models\ProgresPelatihan::where('user_id', $userId)
                     ->where('pelatihan_id', $pelatihan->id)
                     ->first();
                 
@@ -195,9 +196,13 @@ class PelatihanController extends Controller
             }
         }
 
-        // If user is not enrolled in this course, redirect to index to enroll
+        // If user is not enrolled yet, auto-enroll them now
         if (!$progresPelatihan) {
-            return redirect()->route('peserta.pelatihan.index')->with('error', 'Harap konfirmasi mulai pelatihan terlebih dahulu.');
+            $progresPelatihan = \App\Models\ProgresPelatihan::create([
+                'user_id'     => $user->id,
+                'pelatihan_id' => $pelatihan->id,
+                'status'      => 'aktif',
+            ]);
         }
 
         $materis = $pelatihan->materis()->where('is_active', true)->orderBy('urutan')->get();
@@ -243,6 +248,14 @@ class PelatihanController extends Controller
         $totalMateris = $materis->count();
         $persenProgress = $totalMateris > 0 ? floor(($completedCount / $totalMateris) * 100) : 0;
 
-        return view('peserta.pelatihan.show', compact('pelatihan', 'materis', 'materiStatus', 'persenProgress'));
+        // Fetch certificate if pelatihan is completed
+        $sertifikat = null;
+        if ($progresPelatihan && $progresPelatihan->status === 'selesai') {
+            $sertifikat = \App\Models\Sertifikat::where('user_id', $user->id)
+                ->where('pelatihan_id', $pelatihan->id)
+                ->first();
+        }
+
+        return view('peserta.pelatihan.show', compact('pelatihan', 'materis', 'materiStatus', 'persenProgress', 'progresPelatihan', 'sertifikat'));
     }
 }

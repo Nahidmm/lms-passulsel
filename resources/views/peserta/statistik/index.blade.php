@@ -11,7 +11,7 @@
 
 <!-- Chart Nilai -->
 @if(count($chartData) > 0)
-<div class="bg-white rounded-xl shadow-sm border border-border p-6 mb-6">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-6 mb-6">
     <h3 class="font-display font-bold text-lg mb-4 text-text-primary">Perkembangan Nilai Kuis</h3>
     <div class="h-[300px] w-full">
         <canvas id="skorChart"></canvas>
@@ -22,7 +22,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     
     <!-- Progres Materi -->
-    <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
         <div class="p-4 border-b border-border flex items-center justify-between bg-secondary/50">
             <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
                 <i data-lucide="book-open" class="w-5 h-5 text-primary"></i> Materi Dipelajari
@@ -54,7 +54,7 @@
     </div>
 
     <!-- Riwayat Evaluasi -->
-    <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
         <div class="p-4 border-b border-border flex items-center justify-between bg-secondary/50">
             <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
                 <i data-lucide="award" class="w-5 h-5 text-accent"></i> Riwayat Nilai Kuis
@@ -97,15 +97,15 @@
                 datasets: [{
                     label: 'Skor Kuis',
                     data: data,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderColor: '#f0b429', // Gold
+                    backgroundColor: 'rgba(240, 180, 41, 0.1)', // Gold soft
                     borderWidth: 2,
                     pointBackgroundColor: function(context) {
                         const index = context.dataIndex;
                         const value = context.dataset.data[index];
-                        return value >= 70 ? '#10b981' : '#ef4444'; // Green if pass, red if fail
+                        return value >= 70 ? '#10b981' : '#f43f5e'; // Green if pass, red if fail
                     },
-                    pointBorderColor: '#ffffff',
+                    pointBorderColor: '#13161c',
                     pointBorderWidth: 2,
                     pointRadius: 5,
                     fill: true,
@@ -115,15 +115,18 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                color: '#e5e7eb', // global text color for chart
                 plugins: {
                     legend: {
                         display: false
                     },
                     tooltip: {
-                        backgroundColor: '#1e293b',
+                        backgroundColor: '#1a1d24',
+                        borderColor: '#2a2e37',
+                        borderWidth: 1,
                         padding: 12,
-                        titleFont: { size: 13, family: "'Inter', sans-serif" },
-                        bodyFont: { size: 14, family: "'Inter', sans-serif", weight: 'bold' },
+                        titleFont: { size: 13, family: "'Plus Jakarta Sans', sans-serif" },
+                        bodyFont: { size: 14, family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' },
                         displayColors: false,
                         callbacks: {
                             label: function(context) {
@@ -136,12 +139,13 @@
                     y: {
                         beginAtZero: true,
                         max: 100,
-                        ticks: { stepSize: 20 },
-                        grid: { borderDash: [4, 4], color: '#e2e8f0' }
+                        ticks: { stepSize: 20, color: '#9ca3af' },
+                        grid: { borderDash: [4, 4], color: '#2a2e37' }
                     },
                     x: {
                         grid: { display: false },
                         ticks: {
+                            color: '#9ca3af',
                             maxRotation: 45,
                             minRotation: 45
                         }
@@ -155,3 +159,4 @@
 @endpush
 
 @endsection
+

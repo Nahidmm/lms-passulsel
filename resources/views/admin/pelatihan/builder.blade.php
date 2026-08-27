@@ -25,10 +25,10 @@
         <h1 class="text-2xl font-bold text-text-primary">{{ $pelatihan->judul }}</h1>
     </div>
     <div class="flex items-center gap-2">
-        <a href="{{ route('admin.pelatihan.materi.create', $pelatihan->id) }}" class="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm">
+        <a href="{{ route('admin.pelatihan.materi.create', $pelatihan->id) }}" class="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm">
             <i data-lucide="file-plus" class="w-4 h-4"></i> Tambah Materi
         </a>
-        <a href="{{ route('admin.pelatihan.materi.create', ['pelatihan' => $pelatihan->id, 'jenis' => 'quiz']) }}" class="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm">
+        <a href="{{ route('admin.pelatihan.materi.create', ['pelatihan' => $pelatihan->id, 'jenis' => 'quiz']) }}" class="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-[var(--text-primary)] font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm">
             <i data-lucide="help-circle" class="w-4 h-4"></i> Tambah Kuis
         </a>
         <a href="{{ route('peserta.pelatihan.show', $pelatihan->id) }}" target="_blank" class="inline-flex items-center justify-center gap-2 bg-secondary border border-border hover:bg-secondary/70 text-text-primary font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm">
@@ -40,7 +40,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Builder Canvas -->
     <div class="lg:col-span-2">
-        <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+        <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
             <div class="p-4 border-b border-border bg-secondary/30 flex items-center justify-between">
                 <h3 class="font-bold text-text-primary flex items-center gap-2">
                     <i data-lucide="network" class="w-5 h-5 text-primary"></i> Kurikulum Pelatihan
@@ -54,7 +54,7 @@
                         <i data-lucide="folder-open" class="w-12 h-12 text-border mx-auto mb-3"></i>
                         <h4 class="text-text-primary font-medium">Belum ada Materi</h4>
                         <p class="text-text-secondary text-sm mt-1 mb-4">Mulai bangun kurikulum dengan menambahkan materi pertama Anda.</p>
-                        <a href="{{ route('admin.pelatihan.materi.create', $pelatihan->id) }}" class="inline-flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-white font-medium px-4 py-2 rounded-lg transition-colors">
+                        <a href="{{ route('admin.pelatihan.materi.create', $pelatihan->id) }}" class="inline-flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-[var(--text-primary)] font-medium px-4 py-2 rounded-lg transition-colors">
                             Tambah Materi Pertama
                         </a>
                     </div>
@@ -62,7 +62,7 @@
                     <!-- Materis List -->
                     <div id="materis-container" class="space-y-2 materis-container">
                         @foreach($pelatihan->materis as $materi)
-                        <div class="bg-white border border-border rounded-lg shadow-sm overflow-hidden" data-id="{{ $materi->id }}" data-type="materi">
+                        <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-lg shadow-sm overflow-hidden" data-id="{{ $materi->id }}" data-type="materi">
                             <div class="flex items-center justify-between p-3 cursor-move group hover:bg-secondary/20 transition-colors">
                                 <div class="flex items-center gap-3">
                                     <i data-lucide="grip-vertical" class="w-5 h-5 text-text-secondary opacity-30 group-hover:opacity-100 transition-opacity"></i>
@@ -76,7 +76,7 @@
                                             <i data-lucide="youtube" class="w-4 h-4"></i>
                                         </div>
                                     @elseif($materi->jenis === 'link')
-                                        <div class="w-8 h-8 rounded bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                                        <div class="w-8 h-8 rounded bg-[#f0b429]/10 flex items-center justify-center text-[#c8891a] shrink-0">
                                             <i data-lucide="link" class="w-4 h-4"></i>
                                         </div>
                                     @else
@@ -123,7 +123,7 @@
     
     <!-- Info Panel -->
     <div class="lg:col-span-1 space-y-6">
-        <div class="bg-white rounded-xl shadow-sm border border-border p-5">
+        <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-5">
             <h3 class="font-bold text-text-primary flex items-center gap-2 mb-4">
                 <i data-lucide="info" class="w-5 h-5 text-primary"></i> Statistik Pelatihan
             </h3>
@@ -171,3 +171,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+

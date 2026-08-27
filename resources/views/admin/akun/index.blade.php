@@ -1,160 +1,198 @@
 @extends('layouts.app')
-
 @section('title', 'Manajemen Akun')
 
 @section('content')
+<div class="space-y-5 py-1">
 
-<div class="mb-6">
-    <h1 class="text-2xl font-display font-bold text-primary">Manajemen Akun</h1>
-    <p class="text-text-secondary mt-1">Kelola persetujuan pendaftaran dan akun pengguna sistem.</p>
-</div>
+    {{-- Breadcrumb --}}
+    <div class="breadcrumb">
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <span class="sep">/</span>
+        <span class="current">Manajemen Akun</span>
+    </div>
 
-@if(session('success_reset'))
-    <div class="bg-success/10 border border-success/30 p-4 rounded-lg mb-6 shadow-sm">
-        <h3 class="font-bold text-success flex items-center gap-2 mb-2">
-            <i data-lucide="check-circle" class="w-5 h-5"></i> Password Berhasil Direset!
-        </h3>
-        <p class="text-sm text-text-primary mb-2">Harap beritahukan informasi berikut kepada pengguna:</p>
-        <div class="bg-white border border-border rounded p-3 text-sm font-mono">
-            <div>NIP: <span class="font-bold">{{ session('success_reset')['nip'] }}</span></div>
-            <div>Nama: <span class="font-bold">{{ session('success_reset')['nama'] }}</span></div>
-            <div class="mt-2 text-danger">Password Baru: <span class="font-bold text-lg bg-gray-100 px-2 rounded">{{ session('success_reset')['password_baru'] }}</span></div>
+    <div>
+        <h1 class="text-2xl font-black text-[var(--text-primary)]">Manajemen Akun</h1>
+        <p class="text-[var(--text-secondary)] text-sm mt-1">Kelola persetujuan pendaftaran dan akun pengguna sistem.</p>
+    </div>
+
+    {{-- Password reset success --}}
+    @if(session('success_reset'))
+        <div class="alert alert-info">
+            <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+            <div>
+                <p class="font-bold">Password Berhasil Direset</p>
+                <div class="mt-2 bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-lg p-3 text-sm font-mono space-y-1">
+                    <div>NIP: <span class="font-bold text-[var(--text-primary)]">{{ session('success_reset')['nip'] }}</span></div>
+                    <div>Nama: <span class="font-bold text-[var(--text-primary)]">{{ session('success_reset')['nama'] }}</span></div>
+                    <div class="mt-1">Password Baru: <span class="font-black text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">{{ session('success_reset')['password_baru'] }}</span></div>
+                </div>
+                <p class="text-xs mt-2 opacity-70">*Pengguna akan diminta mengganti password ini saat login pertama kali.</p>
+            </div>
         </div>
-        <p class="text-xs text-text-secondary mt-2">*Pengguna akan diminta mengganti password ini saat login pertama kali.</p>
-    </div>
-@endif
+    @endif
 
-<!-- Pending Requests Section -->
-<div class="bg-white rounded-xl shadow-sm border border-warning/30 overflow-hidden mb-8">
-    <div class="p-4 border-b border-warning/20 bg-warning/5 flex items-center justify-between">
-        <h3 class="font-display font-bold text-warning flex items-center gap-2">
-            <i data-lucide="user-plus" class="w-5 h-5"></i> Menunggu Persetujuan
-            <span class="bg-warning text-white text-xs px-2 py-0.5 rounded-full">{{ $pendingRequests->count() }}</span>
-        </h3>
-    </div>
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
-            <thead class="text-xs text-text-secondary uppercase bg-secondary border-b border-border">
-                <tr>
-                    <th class="px-4 py-3">NIP / Nama</th>
-                    <th class="px-4 py-3">Jabatan & Golongan</th>
-                    <th class="px-4 py-3">Tanggal Daftar</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($pendingRequests as $req)
-                    <tr class="border-b border-border hover:bg-secondary/50">
-                        <td class="px-4 py-3">
-                            <p class="font-bold text-text-primary">{{ $req->nama }}</p>
-                            <p class="text-text-secondary">{{ $req->nip }}</p>
-                        </td>
-                        <td class="px-4 py-3">
-                            <p class="text-text-primary">{{ $req->jabatan->nama_jabatan ?? '-' }}</p>
-                            <p class="text-text-secondary">{{ $req->golongan ?? '-' }}</p>
-                        </td>
-                        <td class="px-4 py-3 text-text-secondary">
-                            {{ $req->created_at->format('d M Y, H:i') }}
-                        </td>
-                        <td class="px-4 py-3 text-right space-x-2">
-                            <form action="{{ route('admin.akun.approve', $req->id) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="bg-success text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-success/90 transition-colors">
-                                    Setujui
-                                </button>
-                            </form>
-                            <!-- Reject Button triggers modal -->
-                            <button type="button" onclick="openRejectModal({{ $req->id }}, '{{ $req->nama }}')" class="bg-danger text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-danger/90 transition-colors">
-                                Tolak
-                            </button>
-                        </td>
+    {{-- â•â•â• PENDING REQUESTS â•â•â• --}}
+    <div class="game-card overflow-hidden">
+        <div class="card-header">
+            <h3>
+                <i data-lucide="user-plus" class="w-4 h-4 text-amber-400"></i>
+                Menunggu Persetujuan
+                @if($pendingRequests->count() > 0)
+                    <span class="badge badge-rose text-[9px]">{{ $pendingRequests->count() }}</span>
+                @endif
+            </h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-white/7 bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                        <th class="py-3.5 px-5 text-left text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">NIP / Nama</th>
+                        <th class="py-3.5 px-5 text-left text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">Jabatan & Golongan</th>
+                        <th class="py-3.5 px-5 text-left text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">Tanggal Daftar</th>
+                        <th class="py-3.5 px-5 text-right text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">Aksi</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="px-4 py-8 text-center text-text-secondary">Tidak ada pendaftaran yang menunggu persetujuan.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-white/[0.04]">
+                    @forelse($pendingRequests as $req)
+                        <tr class="hover:bg-[var(--card)] border border-[var(--border)] shadow-sm transition-colors">
+                            <td class="py-4 px-5">
+                                <p class="font-bold text-[var(--text-primary)] text-sm">{{ $req->nama }}</p>
+                                <p class="text-xs text-[var(--text-muted)] font-mono mt-0.5">{{ $req->nip }}</p>
+                            </td>
+                            <td class="py-4 px-5">
+                                <p class="text-sm text-[var(--text-primary)] font-semibold">{{ $req->jabatan->nama_jabatan ?? '-' }}</p>
+                                <p class="text-xs text-[var(--text-muted)] mt-0.5">Gol. {{ $req->golongan ?? '-' }}</p>
+                            </td>
+                            <td class="py-4 px-5 text-sm text-[var(--text-secondary)]">{{ $req->created_at->format('d M Y, H:i') }}</td>
+                            <td class="py-4 px-5 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <form action="{{ route('admin.akun.approve', $req->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success text-xs px-3 py-2 min-h-0 h-8">
+                                            <i data-lucide="check" class="w-3.5 h-3.5"></i> Setujui
+                                        </button>
+                                    </form>
+                                    <button type="button" onclick="openRejectModal({{ $req->id }}, '{{ $req->nama }}')"
+                                        class="btn btn-danger text-xs px-3 py-2 min-h-0 h-8">
+                                        <i data-lucide="x" class="w-3.5 h-3.5"></i> Tolak
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state py-8">
+                                    <div class="empty-state-icon">
+                                        <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-400"></i>
+                                    </div>
+                                    <h4>Semua Sudah Ditangani</h4>
+                                    <p>Tidak ada pendaftaran yang menunggu persetujuan saat ini.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    {{-- â•â•â• ACTIVE USERS â•â•â• --}}
+    <div class="game-card overflow-hidden">
+        <div class="card-header flex items-center justify-between">
+            <h3>
+                <i data-lucide="users" class="w-4 h-4 text-violet-400"></i>
+                Pengguna Aktif
+                <span class="badge badge-violet text-[9px] ml-1">{{ $users->count() }}</span>
+            </h3>
+            <a href="{{ route('admin.users.import') }}" class="btn btn-primary text-xs px-3 py-2 min-h-0 h-8 flex items-center gap-1 bg-violet-600 hover:bg-violet-700 text-white rounded">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import Excel
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-white/7 bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                        <th class="py-3.5 px-5 text-left text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">NIP / Nama</th>
+                        <th class="py-3.5 px-5 text-left text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">Jabatan</th>
+                        <th class="py-3.5 px-5 text-left text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">Role</th>
+                        <th class="py-3.5 px-5 text-right text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.04]">
+                    @foreach($users as $user)
+                        <tr class="hover:bg-[var(--card)] border border-[var(--border)] shadow-sm transition-colors">
+                            <td class="py-4 px-5">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ $user->avatar_url }}" alt="" class="w-8 h-8 rounded-xl border border-[var(--border)] shrink-0">
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-[var(--text-primary)] text-sm truncate">{{ $user->nama }}</p>
+                                        <p class="text-xs text-[var(--text-muted)] font-mono mt-0.5">{{ $user->nip }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-5 text-sm text-[var(--text-primary)]">{{ $user->jabatan->nama_jabatan ?? '-' }}</td>
+                            <td class="py-4 px-5">
+                                <span class="badge {{ $user->role === 'admin' || $user->role === 'superadmin' ? 'badge-violet' : 'badge-cyan' }} text-[10px] uppercase">
+                                    {{ $user->role }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-5 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <form action="{{ route('admin.akun.reset-password', $user->id) }}" method="POST" class="inline"
+                                          onsubmit="return confirm('Yakin ingin mereset password user ini?')">
+                                        @csrf
+                                        <button type="submit" class="action-btn is-edit" title="Reset Password">
+                                            <i data-lucide="key" class="w-4 h-4"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.akun.destroy', $user->id) }}" method="POST" class="inline"
+                                          onsubmit="return confirm('BAHAYA: Yakin hapus permanen user ini dan seluruh data progresnya?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="action-btn is-delete" title="Hapus User Permanen">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
-<!-- Active Users Section -->
-<div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
-    <div class="p-4 border-b border-border bg-secondary/50 flex items-center justify-between">
-        <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
-            <i data-lucide="users" class="w-5 h-5 text-primary"></i> Pengguna Aktif
-        </h3>
-    </div>
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
-            <thead class="text-xs text-text-secondary uppercase bg-secondary border-b border-border">
-                <tr>
-                    <th class="px-4 py-3">NIP / Nama</th>
-                    <th class="px-4 py-3">Jabatan</th>
-                    <th class="px-4 py-3">Role</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($users as $user)
-                    <tr class="border-b border-border hover:bg-secondary/50">
-                        <td class="px-4 py-3 flex items-center gap-3">
-                            <img src="{{ $user->avatar_url }}" alt="Avatar" class="w-8 h-8 rounded-full border border-border">
-                            <div>
-                                <p class="font-bold text-text-primary">{{ $user->nama }}</p>
-                                <p class="text-text-secondary text-xs">{{ $user->nip }}</p>
-                            </div>
-                        </td>
-                        <td class="px-4 py-3 text-text-primary">
-                            {{ $user->jabatan->nama_jabatan ?? '-' }}
-                        </td>
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded text-xs font-bold {{ $user->role === 'admin' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-600' }} uppercase">
-                                {{ $user->role }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-right space-x-2">
-                            <form action="{{ route('admin.akun.reset-password', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin mereset password user ini? Password baru akan digenerate otomatis.')">
-                                @csrf
-                                <button type="submit" class="border border-border text-text-secondary hover:text-primary hover:border-primary px-2 py-1.5 rounded text-xs transition-colors" title="Reset Password">
-                                    <i data-lucide="key" class="w-4 h-4"></i>
-                                </button>
-                            </form>
-                            <form action="{{ route('admin.akun.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus permanen user ini beserta semua data progresnya?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="border border-border text-text-secondary hover:text-danger hover:border-danger px-2 py-1.5 rounded text-xs transition-colors" title="Hapus User">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Reject Modal -->
-<div id="rejectModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-        <div class="p-4 border-b border-border flex justify-between items-center">
-            <h3 class="font-bold text-lg text-text-primary">Tolak Pendaftaran</h3>
-            <button onclick="closeRejectModal()" class="text-text-secondary hover:text-danger"><i data-lucide="x" class="w-5 h-5"></i></button>
+{{-- Reject Modal --}}
+<div id="rejectModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="flex items-center justify-between p-5 border-b border-[var(--border)]">
+            <h3 class="font-black text-[var(--text-primary)] text-base">Tolak Pendaftaran</h3>
+            <button onclick="closeRejectModal()" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
         </div>
         <form id="rejectForm" method="POST" action="">
             @csrf
-            <div class="p-4">
-                <p class="text-sm mb-3 text-text-secondary">Tolak pendaftaran untuk: <strong id="rejectName" class="text-text-primary"></strong></p>
+            <div class="p-5 space-y-4">
+                <p class="text-sm text-[var(--text-secondary)]">Tolak pendaftaran untuk: <strong id="rejectName" class="text-[var(--text-primary)]"></strong></p>
                 <div>
-                    <label class="block text-sm font-medium text-text-primary mb-1">Alasan Penolakan <span class="text-danger">*</span></label>
-                    <textarea name="alasan_tolak" required rows="3" class="w-full px-3 py-2 border border-border rounded focus:ring-1 focus:ring-danger outline-none" placeholder="Masukkan alasan penolakan..."></textarea>
+                    <label class="block text-xs font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">
+                        Alasan Penolakan <span class="text-rose-400">*</span>
+                    </label>
+                    <textarea name="alasan_tolak" required rows="3"
+                        class="form-input resize-none"
+                        placeholder="Masukkan alasan penolakan..."></textarea>
                 </div>
             </div>
-            <div class="p-4 border-t border-border bg-secondary/30 flex justify-end gap-2">
-                <button type="button" onclick="closeRejectModal()" class="px-4 py-2 text-sm font-medium border border-border rounded bg-white hover:bg-secondary">Batal</button>
-                <button type="submit" class="px-4 py-2 text-sm font-bold text-white bg-danger hover:bg-danger/90 rounded">Tolak Akun</button>
+            <div class="flex justify-end gap-3 p-5 border-t border-[var(--border)]">
+                <button type="button" onclick="closeRejectModal()" class="btn btn-ghost text-sm px-4 py-2 min-h-0 h-9">Batal</button>
+                <button type="submit" class="btn btn-danger text-sm px-4 py-2 min-h-0 h-9">Tolak Akun</button>
             </div>
         </form>
     </div>
@@ -164,13 +202,14 @@
 
 @push('scripts')
 <script>
-    function openRejectModal(id, name) {
-        document.getElementById('rejectModal').classList.remove('hidden');
-        document.getElementById('rejectName').innerText = name;
-        document.getElementById('rejectForm').action = `/admin/akun/reject/${id}`;
-    }
-    function closeRejectModal() {
-        document.getElementById('rejectModal').classList.add('hidden');
-    }
+function openRejectModal(id, name) {
+    document.getElementById('rejectModal').classList.remove('hidden');
+    document.getElementById('rejectName').innerText = name;
+    document.getElementById('rejectForm').action = `/admin/akun/reject/${id}`;
+}
+function closeRejectModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+}
 </script>
 @endpush
+

@@ -1,109 +1,145 @@
-<aside class="bg-white text-text-primary w-64 shrink-0 h-screen sticky top-0 flex flex-col hidden md:flex transition-all duration-300 z-40 border-r border-border">
-    <!-- Logo & Branding -->
-    <div class="h-16 flex items-center px-6 border-b border-border shrink-0">
-        <img src="{{ asset('logo/logo.png') }}" alt="Logo LMS" class="h-8 w-auto object-contain mr-3">
-        <div class="font-display font-bold text-lg tracking-wide truncate text-text-primary">LMS Pas Sulsel</div>
+{{-- â•â•â• SIDEBAR â€” Cinematic dark glass panel â•â•â• --}}
+<aside id="app-sidebar" class="sidebar-game">
+
+    {{-- Logo --}}
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <i data-lucide="zap" class="w-4 h-4 text-[var(--text-primary)]"></i>
+        </div>
+        <div class="leading-none">
+            <p class="text-sm font-black text-[var(--text-primary)] tracking-tight" style="font-family:'Fraunces',serif;">SPEKTRA</p>
+            <p class="text-[9px] font-bold uppercase tracking-[0.18em]" style="color:var(--amber-bright);">Pas Sulsel</p>
+        </div>
+        {{-- Close button (mobile only) --}}
+        <button onclick="closeSidebar()"
+            class="ml-auto w-8 h-8 rounded-xl flex items-center justify-center transition-all md:hidden"
+            style="color:var(--text-muted);" onmouseenter="this.style.color='var(--paper)'" onmouseleave="this.style.color='var(--text-muted)'">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
     </div>
 
-    <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-1.5">
-        
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('dashboard') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-            <span class="text-sm">Dashboard</span>
+
+    {{-- Navigation --}}
+    <nav class="flex-1 overflow-y-auto py-2">
+
+        <p class="nav-section-label">Utama</p>
+
+        <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <i data-lucide="layout-dashboard"></i>
+            <span>{{ Auth::user()->isPeserta() ? 'Dashboard Peserta' : 'Dashboard Admin' }}</span>
         </a>
 
         @if(Auth::user()->isPeserta())
-            <div class="text-xs font-semibold text-text-secondary/60 uppercase tracking-wider mt-5 mb-2 px-4">Pembelajaran</div>
-            
-            <a href="{{ route('peserta.pelatihan.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('peserta.pelatihan.*', 'peserta.pembelajaran.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="book-open" class="w-5 h-5"></i>
-                <span class="text-sm">Katalog Pelatihan</span>
+
+            <div class="nav-divider"></div>
+            <p class="nav-section-label">Belajar</p>
+
+            <a href="{{ route('peserta.pelatihan.index') }}" class="nav-item {{ request()->routeIs('peserta.pelatihan.*', 'peserta.pembelajaran.*') ? 'active' : '' }}">
+                <i data-lucide="book-open"></i>
+                <span>Katalog Pelatihan</span>
             </a>
-            
-            <a href="{{ route('peserta.statistik.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('peserta.statistik.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
-                <span class="text-sm">Statistik Belajar</span>
+
+            <a href="{{ route('peserta.statistik.index') }}" class="nav-item {{ request()->routeIs('peserta.statistik.*') ? 'active' : '' }}">
+                <i data-lucide="bar-chart-2"></i>
+                <span>Statistik Saya</span>
             </a>
 
             @if(!Auth::user()->hasActiveSesiEvaluasi())
-            <a href="{{ route('ai.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors mt-2 {{ request()->routeIs('ai.*') ? 'bg-accent/10 text-accent-hover font-bold shadow-sm border border-accent/20' : 'text-text-secondary hover:bg-accent/5 hover:text-accent-hover' }}">
-                <i data-lucide="bot" class="w-5 h-5"></i>
-                <span class="text-sm">AI Assistant</span>
-            </a>
+                <a href="{{ route('ai.index') }}" class="nav-item {{ request()->routeIs('ai.*') ? 'active' : '' }}">
+                    <i data-lucide="bot" class="text-cyan-400"></i>
+                    <span>AI Tutor</span>
+                    <span class="ml-auto text-[9px] font-black bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-1.5 py-0.5 rounded-full">AI</span>
+                </a>
             @endif
 
         @else
-            <!-- Menu Admin / Superadmin -->
-            <div class="text-xs font-semibold text-text-secondary/60 uppercase tracking-wider mt-5 mb-2 px-4">Manajemen Konten</div>
-            
-            <a href="{{ route('admin.pelatihan.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.pelatihan.*', 'admin.materi.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="book-open" class="w-5 h-5"></i>
-                <span class="text-sm">Kelola Pelatihan</span>
-            </a>
-            
-            <div class="text-xs font-semibold text-text-secondary/60 uppercase tracking-wider mt-5 mb-2 px-4">Laporan & Pengguna</div>
-            
-            <a href="{{ route('admin.statistik.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.statistik.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="trending-up" class="w-5 h-5"></i>
-                <span class="text-sm">Statistik Peserta</span>
+
+            <div class="nav-divider"></div>
+            <p class="nav-section-label">Kelola</p>
+
+            <a href="{{ route('admin.pelatihan.index') }}" class="nav-item {{ request()->routeIs('admin.pelatihan.*', 'admin.materi.*') ? 'active' : '' }}">
+                <i data-lucide="folder-open"></i>
+                <span>Kelola Pelatihan</span>
             </a>
 
-            <a href="{{ route('admin.penilaian.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.penilaian.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="clipboard-check" class="w-5 h-5"></i>
-                <span class="text-sm">Penilaian Peserta</span>
+            <a href="{{ route('admin.pretest.index') }}" class="nav-item {{ request()->routeIs('admin.pretest.*') ? 'active' : '' }}">
+                <i data-lucide="clipboard-check"></i>
+                <span>Kelola Pretest</span>
             </a>
-            
-            <a href="{{ route('admin.akun.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.akun.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="users" class="w-5 h-5"></i>
-                <span class="text-sm">Manajemen Akun</span>
-                @php
-                    $pendingCount = \App\Models\AccountRequest::where('status', 'menunggu')->count();
-                @endphp
+
+            <a href="{{ route('admin.statistik.index') }}" class="nav-item {{ request()->routeIs('admin.statistik.*') ? 'active' : '' }}">
+                <i data-lucide="bar-chart-2"></i>
+                <span>Statistik Peserta</span>
+            </a>
+
+            <a href="{{ route('admin.penilaian.index') }}" class="nav-item {{ request()->routeIs('admin.penilaian.*') ? 'active' : '' }}">
+                <i data-lucide="clipboard-list"></i>
+                <span>Penilaian</span>
+            </a>
+
+            <a href="{{ route('admin.akun.index') }}" class="nav-item {{ request()->routeIs('admin.akun.*') ? 'active' : '' }}">
+                <i data-lucide="users"></i>
+                <span>Manajemen Akun</span>
+                @php $pendingCount = \App\Models\AccountRequest::where('status', 'menunggu')->count(); @endphp
                 @if($pendingCount > 0)
-                    <span class="ml-auto bg-danger/10 text-danger text-xs font-bold px-2 py-0.5 rounded-full">{{ $pendingCount }}</span>
+                    <span class="ml-auto text-[9px] font-black bg-rose-500/15 text-rose-400 border border-rose-500/25 px-1.5 py-0.5 rounded-full">{{ $pendingCount }}</span>
                 @endif
             </a>
-            
-            <a href="{{ route('admin.jabatan.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.jabatan.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="briefcase" class="w-5 h-5"></i>
-                <span class="text-sm">Kelola Jabatan</span>
+
+            <a href="{{ route('admin.jabatan.index') }}" class="nav-item {{ request()->routeIs('admin.jabatan.*') ? 'active' : '' }}">
+                <i data-lucide="briefcase"></i>
+                <span>Kelola Jabatan</span>
             </a>
-            
-            <a href="{{ route('admin.kalender.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.kalender.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                <i data-lucide="calendar" class="w-5 h-5"></i>
-                <span class="text-sm">Kalender Akademik</span>
+
+            <a href="{{ route('admin.unit-kerja.index') }}" class="nav-item {{ request()->routeIs('admin.unit-kerja.*') ? 'active' : '' }}">
+                <i data-lucide="building-2"></i>
+                <span>Kelola Unit Kerja</span>
+            </a>
+
+            <a href="{{ route('admin.kalender.index') }}" class="nav-item {{ request()->routeIs('admin.kalender.*') ? 'active' : '' }}">
+                <i data-lucide="calendar"></i>
+                <span>Kalender Akademik</span>
             </a>
 
             @if(Auth::user()->isSuperadmin())
-                <div class="text-xs font-semibold text-text-secondary/60 uppercase tracking-wider mt-5 mb-2 px-4">Akses & Keamanan</div>
-                
-                <a href="{{ route('admin.kelola-akses.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.kelola-akses.index', 'admin.kelola-akses.roles.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                    <i data-lucide="shield-check" class="w-5 h-5"></i>
-                    <span class="text-sm">Kelola Akses Fitur</span>
+                <div class="nav-divider"></div>
+                <p class="nav-section-label">Sistem</p>
+
+                <a href="{{ route('admin.sertifikat-setting.edit') }}" class="nav-item {{ request()->routeIs('admin.sertifikat-setting.*') ? 'active' : '' }}">
+                    <i data-lucide="award"></i>
+                    <span>Sertifikat</span>
                 </a>
 
-                <a href="{{ route('admin.kelola-akses.users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.kelola-akses.users') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                    <i data-lucide="user-cog" class="w-5 h-5"></i>
-                    <span class="text-sm">Assign Role User</span>
+                <a href="{{ route('admin.kelola-akses.index') }}" class="nav-item {{ request()->routeIs('admin.kelola-akses.index','admin.kelola-akses.roles.*') ? 'active' : '' }}">
+                    <i data-lucide="shield-check"></i>
+                    <span>Kelola Akses</span>
                 </a>
-
-                <a href="{{ route('admin.kelola-akses.dokumen-ai.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors {{ request()->routeIs('admin.kelola-akses.dokumen-ai.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-text-secondary hover:bg-primary/5 hover:text-primary' }}">
-                    <i data-lucide="database" class="w-5 h-5"></i>
-                    <span class="text-sm">Knowledge Base AI</span>
+                <a href="{{ route('admin.kelola-akses.users') }}" class="nav-item {{ request()->routeIs('admin.kelola-akses.users') ? 'active' : '' }}">
+                    <i data-lucide="user-cog"></i>
+                    <span>Assign Role</span>
+                </a>
+                <a href="{{ route('admin.kelola-akses.dokumen-ai.index') }}" class="nav-item {{ request()->routeIs('admin.kelola-akses.dokumen-ai.*') ? 'active' : '' }}">
+                    <i data-lucide="database"></i>
+                    <span>Knowledge Base AI</span>
                 </a>
             @endif
-        @endif
 
-        
-        <div class="mt-auto pt-6">
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-text-secondary hover:bg-danger/10 hover:text-danger">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                    <span class="text-sm font-medium">Keluar</span>
-                </button>
-            </form>
-        </div>
+        @endif
     </nav>
+
+    {{-- Logout --}}
+    <div class="p-3 shrink-0" style="border-top:1px solid rgba(255,255,255,0.05);">
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="sidebar-logout-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all"
+                style="color:var(--text-muted);" onmouseenter="this.style.color='#fda4af';this.style.background='rgba(244,63,94,0.08)'" onmouseleave="this.style.color='var(--text-muted)';this.style.background='transparent'">
+                <i data-lucide="log-out" class="w-4 h-4 shrink-0"></i>
+                <span class="sidebar-logout-text">Keluar</span>
+            </button>
+        </form>
+    </div>
 </aside>
+
+
+
+

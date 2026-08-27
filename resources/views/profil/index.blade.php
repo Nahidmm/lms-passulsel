@@ -13,7 +13,7 @@
     
     <!-- Profile Info Card -->
     <div class="lg:col-span-1 space-y-6">
-        <div class="bg-white rounded-xl shadow-sm border border-border p-6 text-center">
+        <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-6 text-center">
             <div class="relative w-32 h-32 mx-auto mb-4 group">
                 <img src="{{ $user->avatar_url }}" alt="Avatar" class="w-full h-full object-cover rounded-full border-4 border-secondary shadow-sm">
                 <!-- Avatar upload trigger could go here -->
@@ -37,7 +37,7 @@
     <div class="lg:col-span-2 space-y-6">
         
         <!-- Update Profile Form -->
-        <div class="bg-white rounded-xl shadow-sm border border-border p-6 md:p-8">
+        <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-6 md:p-8">
             <h3 class="text-lg font-display font-bold text-text-primary mb-4 flex items-center gap-2">
                 <i data-lucide="user-cog" class="w-5 h-5 text-primary"></i> Informasi Dasar
             </h3>
@@ -68,7 +68,7 @@
                 </div>
 
                 <div class="flex justify-end pt-4">
-                    <button type="submit" class="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+                    <button type="submit" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
                         Simpan Perubahan
                     </button>
                 </div>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Update Password Form -->
-        <div class="bg-white rounded-xl shadow-sm border border-border p-6 md:p-8">
+        <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-6 md:p-8">
             <h3 class="text-lg font-display font-bold text-text-primary mb-4 flex items-center gap-2">
                 <i data-lucide="shield-check" class="w-5 h-5 text-warning"></i> Keamanan (Ganti Password)
             </h3>
@@ -107,7 +107,7 @@
                 </div>
 
                 <div class="flex justify-end pt-4">
-                    <button type="submit" class="bg-warning hover:bg-warning/90 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+                    <button type="submit" class="bg-warning hover:bg-warning/90 text-[var(--text-primary)] font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
                         Ubah Password
                     </button>
                 </div>
@@ -118,3 +118,4 @@
 </div>
 
 @endsection
+

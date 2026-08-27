@@ -14,7 +14,8 @@ class SoalController extends Controller
         if ($materi->jenis !== 'quiz') {
             return redirect()->back()->with('error', 'Hanya materi berjenis kuis yang dapat memiliki soal.');
         }
-        return view('admin.soal.create', compact('materi'));
+        $topiks = \App\Models\TopikPelatihan::all();
+        return view('admin.soal.create', compact('materi', 'topiks'));
     }
 
     public function store(Request $request, Materi $materi)
@@ -56,6 +57,7 @@ class SoalController extends Controller
             'bobot'      => $validated['bobot'] ?? 10,
             'pembahasan' => $validated['pembahasan'] ?? null,
             'is_active'  => $request->input('is_active', '1') !== '0',
+            'topik_pelatihan_id' => $request->input('topik_pelatihan_id'),
         ]);
 
         // Attach to Materi Quiz via pivot
@@ -64,6 +66,10 @@ class SoalController extends Controller
         // Store answer choices based on type
         $this->storeAnswers($soal, $tipe, $request);
 
+        if ($materi->is_pretest) {
+            return redirect()->route('admin.pretest.index')
+                ->with('success', 'Soal berhasil ditambahkan.');
+        }
         return redirect()->route('admin.materi.edit', $materi->id)
             ->with('success', 'Soal berhasil ditambahkan.');
     }
@@ -72,7 +78,8 @@ class SoalController extends Controller
     {
         $materi = $soal->materis()->first();
         $soal->load('pilihanJawaban');
-        return view('admin.soal.edit', compact('soal', 'materi'));
+        $topiks = \App\Models\TopikPelatihan::all();
+        return view('admin.soal.edit', compact('soal', 'materi', 'topiks'));
     }
 
     public function update(Request $request, Soal $soal)
@@ -112,6 +119,7 @@ class SoalController extends Controller
             'bobot'      => $request->input('bobot', 10),
             'pembahasan' => $request->input('pembahasan'),
             'is_active'  => $request->input('is_active', '1') !== '0',
+            'topik_pelatihan_id' => $request->input('topik_pelatihan_id'),
         ]);
 
         // Clear old choices and re-create
@@ -119,6 +127,10 @@ class SoalController extends Controller
         $this->storeAnswers($soal, $tipe, $request);
 
         $materi = $soal->materis()->first();
+        if ($materi && $materi->is_pretest) {
+            return redirect()->route('admin.pretest.index')
+                ->with('success', 'Soal berhasil diperbarui.');
+        }
         return redirect()->route('admin.materi.edit', $materi->id)
             ->with('success', 'Soal berhasil diperbarui.');
     }
@@ -129,6 +141,10 @@ class SoalController extends Controller
         $soal->delete();
 
         if ($materi) {
+            if ($materi->is_pretest) {
+                return redirect()->route('admin.pretest.index')
+                    ->with('success', 'Soal berhasil dihapus.');
+            }
             return redirect()->route('admin.materi.edit', $materi->id)
                 ->with('success', 'Soal berhasil dihapus.');
         }

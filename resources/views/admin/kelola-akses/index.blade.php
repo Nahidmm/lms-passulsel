@@ -7,7 +7,7 @@
     .tab-btn.active { @apply bg-primary text-white shadow-sm; }
     .tab-btn { @apply px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-text-secondary hover:bg-primary/10 hover:text-primary; }
     .badge-superadmin { @apply bg-purple-100 text-purple-700; }
-    .badge-admin      { @apply bg-blue-100 text-blue-700; }
+    .badge-admin      { @apply bg-violet-900/30 text-[#fcd34d]; }
     .badge-peserta    { @apply bg-green-100 text-green-700; }
     .badge-custom     { @apply bg-amber-100 text-amber-700; }
 </style>
@@ -24,14 +24,14 @@
         <p class="text-text-secondary mt-1">Buat role kustom, atur permission, dan assign ke pengguna sistem.</p>
     </div>
     <a href="{{ route('admin.kelola-akses.roles.create') }}"
-       class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors shadow-sm shrink-0">
+       class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-[var(--text-primary)] text-sm font-bold px-5 py-2.5 rounded-lg transition-colors shadow-sm shrink-0">
         <i data-lucide="plus" class="w-4 h-4"></i> Buat Role Baru
     </a>
 </div>
 
 {{-- Stats Cards --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white rounded-xl border border-border p-4 shadow-sm hover:border-primary transition-colors">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border p-4 shadow-sm hover:border-primary transition-colors">
         <div class="flex items-center gap-3 mb-1">
             <div class="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
                 <i data-lucide="shield" class="w-4 h-4"></i>
@@ -40,7 +40,7 @@
         </div>
         <p class="text-3xl font-display font-bold text-text-primary mt-2">{{ $stats['total_roles'] }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-border p-4 shadow-sm hover:border-accent transition-colors">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border p-4 shadow-sm hover:border-accent transition-colors">
         <div class="flex items-center gap-3 mb-1">
             <div class="w-9 h-9 bg-accent/10 rounded-lg flex items-center justify-center text-accent-hover">
                 <i data-lucide="key" class="w-4 h-4"></i>
@@ -49,7 +49,7 @@
         </div>
         <p class="text-3xl font-display font-bold text-text-primary mt-2">{{ $stats['total_permissions'] }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-border p-4 shadow-sm hover:border-success transition-colors">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border p-4 shadow-sm hover:border-success transition-colors">
         <div class="flex items-center gap-3 mb-1">
             <div class="w-9 h-9 bg-success/10 rounded-lg flex items-center justify-center text-success">
                 <i data-lucide="users" class="w-4 h-4"></i>
@@ -58,7 +58,7 @@
         </div>
         <p class="text-3xl font-display font-bold text-text-primary mt-2">{{ $stats['total_users'] }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-border p-4 shadow-sm hover:border-warning transition-colors">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border p-4 shadow-sm hover:border-warning transition-colors">
         <div class="flex items-center gap-3 mb-1">
             <div class="w-9 h-9 bg-warning/10 rounded-lg flex items-center justify-center text-warning">
                 <i data-lucide="user-check" class="w-4 h-4"></i>
@@ -83,7 +83,7 @@
 {{-- Tab 1: Daftar Role --}}
 {{-- ============================== --}}
 <div id="content-roles">
-    <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
         <div class="p-4 border-b border-border bg-secondary/40 flex items-center justify-between">
             <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
                 <i data-lucide="shield" class="w-5 h-5 text-primary"></i> Semua Role
@@ -98,7 +98,7 @@
                     <div class="flex items-start gap-4">
                         <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0
                             {{ $role->base_role === 'superadmin' ? 'bg-purple-100 text-purple-700' : 
-                               ($role->base_role === 'admin' ? 'bg-blue-100 text-blue-700' : 
+                               ($role->base_role === 'admin' ? 'bg-violet-900/30 text-[#fcd34d]' : 
                                ($role->base_role === 'peserta' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700')) }}">
                             <i data-lucide="{{ $role->base_role === 'superadmin' ? 'crown' : ($role->base_role === 'admin' ? 'shield-half' : ($role->base_role === 'peserta' ? 'user' : 'star')) }}" class="w-5 h-5"></i>
                         </div>
@@ -106,7 +106,7 @@
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h4 class="font-bold text-text-primary">{{ $role->nama }}</h4>
                                 @if($role->is_default)
-                                    <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">Default</span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full bg-[#13161c] text-gray-500 font-medium">Default</span>
                                 @else
                                     <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">Kustom</span>
                                 @endif
@@ -180,7 +180,7 @@
 {{-- Tab 2: Matrix Permission --}}
 {{-- ============================== --}}
 <div id="content-matrix" class="hidden">
-    <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
         <div class="p-4 border-b border-border bg-secondary/40">
             <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
                 <i data-lucide="grid-3x3" class="w-5 h-5 text-primary"></i> Matrix Permission per Role
@@ -194,7 +194,7 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide w-56">Fitur / Permission</th>
                         @foreach($roles as $role)
                         <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide whitespace-nowrap
-                            {{ $role->base_role === 'superadmin' ? 'text-purple-700' : ($role->base_role === 'admin' ? 'text-blue-700' : ($role->base_role === 'peserta' ? 'text-green-700' : 'text-amber-700')) }}">
+                            {{ $role->base_role === 'superadmin' ? 'text-purple-700' : ($role->base_role === 'admin' ? 'text-[#fcd34d]' : ($role->base_role === 'peserta' ? 'text-green-700' : 'text-amber-700')) }}">
                             {{ $role->nama }}
                         </th>
                         @endforeach
@@ -254,3 +254,4 @@
     }
 </script>
 @endpush
+

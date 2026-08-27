@@ -6,18 +6,26 @@
 
 {{-- TOP NAV --}}
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    @if($materi->is_pretest)
+    <a href="{{ route('admin.pretest.index') }}"
+       class="text-text-secondary hover:text-primary flex items-center gap-1.5 font-medium transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Pretest
+    </a>
+    @else
     <a href="{{ route('admin.pelatihan.show', $materi->pelatihan_id) }}"
        class="text-text-secondary hover:text-primary flex items-center gap-1.5 font-medium transition-colors">
         <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Pelatihan
     </a>
+    @endif
     @if($materi->jenis === 'quiz')
     <div class="flex items-center gap-2 flex-wrap">
+        <a href="{{ route('admin.materi.preview-quiz', $materi->id) }}" target="_blank" class="inline-flex items-center gap-2 bg-[#f0b429]/15 border border-blue-500/25 hover:bg-[#f0b429]/25 text-blue-400 font-semibold px-4 py-2 rounded-xl text-sm shadow-sm transition-all"><i data-lucide="eye" class="w-4 h-4"></i> Preview Kuis</a>
         <a href="{{ route('admin.soal.import', $materi->id) }}"
-           class="inline-flex items-center gap-2 bg-white border border-border hover:bg-secondary text-text-primary font-semibold px-4 py-2 rounded-xl text-sm shadow-sm transition-all">
+           class="inline-flex items-center gap-2 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border hover:bg-secondary text-text-primary font-semibold px-4 py-2 rounded-xl text-sm shadow-sm transition-all">
             <i data-lucide="upload-cloud" class="w-4 h-4 text-text-secondary"></i> Import Soal
         </a>
         <a href="{{ route('admin.kuis.peserta', $materi->id) }}"
-           class="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white font-bold px-4 py-2 rounded-xl text-sm shadow-sm transition-all">
+           class="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-[var(--text-primary)] font-bold px-4 py-2 rounded-xl text-sm shadow-sm transition-all">
             <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Nilai Peserta
         </a>
     </div>
@@ -52,7 +60,7 @@
         <div class="lg:col-span-2 space-y-5">
 
             {{-- CARD: Informasi Dasar --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border">
                 <div class="px-5 py-4 border-b border-border flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#EFF6FF">
                         <i data-lucide="file-text" class="w-4 h-4 text-primary"></i>
@@ -85,7 +93,7 @@
             </div>
 
             {{-- CARD: Penilaian & Waktu --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border">
                 <div class="px-5 py-4 border-b border-border flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#FEF9EC">
                         <i data-lucide="sliders-horizontal" class="w-4 h-4 text-accent"></i>
@@ -99,8 +107,8 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
                         {{-- Nilai Lulus --}}
-                        <div class="rounded-xl p-4 text-center" style="background:#FEF9EC;border:1px solid #F0E4B0">
-                            <div class="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-3" style="background:#C5A02E22">
+                        <div class="rounded-xl p-4 text-center bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border">
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-3 bg-[var(--card)] border border-[var(--border)] shadow-sm">
                                 <i data-lucide="target" class="w-4 h-4 text-accent"></i>
                             </div>
                             <label for="passing_grade" class="block text-xs font-bold text-accent uppercase tracking-widest mb-2">Nilai Lulus</label>
@@ -108,10 +116,10 @@
                                 <input type="number" id="passing_grade" name="passing_grade"
                                     value="{{ old('passing_grade', $materi->passing_grade ?? 70) }}"
                                     min="0" max="100" required
-                                    class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-white text-xl font-bold text-center text-accent focus:ring-2 focus:ring-accent">
+                                    class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-xl font-bold text-center text-accent focus:ring-2 focus:ring-accent">
                                 <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-accent font-bold text-sm">%</span>
                             </div>
-                            <p class="text-xs text-text-secondary mt-2">Rentang 0 – 100</p>
+                            <p class="text-xs text-text-secondary mt-2">Rentang 0 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ 100</p>
                         </div>
 
                         {{-- Durasi --}}
@@ -123,7 +131,7 @@
                             <input type="number" id="durasi_menit" name="durasi_menit"
                                 value="{{ old('durasi_menit', $materi->durasi_menit ?? 30) }}"
                                 min="0" required
-                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-white text-xl font-bold text-center focus:ring-2 focus:ring-primary">
+                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-xl font-bold text-center focus:ring-2 focus:ring-primary">
                             <p class="text-xs text-text-secondary mt-2">Menit &bull; 0 = Tanpa batas</p>
                         </div>
 
@@ -136,7 +144,7 @@
                             <input type="number" id="max_attempts" name="max_attempts"
                                 value="{{ old('max_attempts', $materi->max_attempts ?? 3) }}"
                                 min="0" required
-                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-white text-xl font-bold text-center focus:ring-2" style="focus:ring-color:#F97316">
+                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-xl font-bold text-center focus:ring-2" style="focus:ring-color:#F97316">
                             <p class="text-xs text-text-secondary mt-2">0 = Tidak terbatas</p>
                         </div>
 
@@ -145,12 +153,12 @@
                             <div class="w-7 h-7 rounded-lg flex items-center justify-center mx-auto mb-3" style="background:#F3E8FF">
                                 <i data-lucide="award" class="w-4 h-4 text-purple-600"></i>
                             </div>
-                            <label for="poin" class="block text-xs font-bold text-text-secondary uppercase tracking-widest mb-2">Poin</label>
+                            <label for="poin" class="block text-xs font-bold text-text-secondary uppercase tracking-widest mb-2">Poin Maks</label>
                             <input type="number" id="poin" name="poin"
                                 value="{{ old('poin', $materi->poin ?? 50) }}"
                                 min="0" required
-                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-white text-xl font-bold text-center focus:ring-2 focus:ring-purple-500">
-                            <p class="text-xs text-text-secondary mt-2">Reward Poin</p>
+                                class="w-full px-2 py-2 border border-border rounded-lg outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-xl font-bold text-center focus:ring-2 focus:ring-purple-500">
+                            <p class="text-[10px] text-text-secondary mt-2 leading-tight">Maks poin (jika skor 100). Mode Interaktif dapat bonus +20%.</p>
                         </div>
 
                     </div>
@@ -158,7 +166,7 @@
             </div>
 
             {{-- CARD: Perilaku Soal --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border">
                 <div class="px-5 py-4 border-b border-border flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#F5F3FF">
                         <i data-lucide="shuffle" class="w-4 h-4" style="color:#7C3AED"></i>
@@ -221,14 +229,106 @@
                 </div>
             </div>
 
+            {{-- CARD: Mode Interaktif --}}
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border">
+                <div class="px-5 py-4 border-b border-border flex items-center gap-3" style="background:linear-gradient(to right,#F5F3FF,transparent)">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                        <i data-lucide="gamepad-2" class="w-4 h-4 text-violet-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-text-primary text-sm">Mode Interaktif</p>
+                        <p class="text-xs text-text-secondary">Atur pengalaman kuis agar lebih game-like</p>
+                    </div>
+                </div>
+                <div class="p-5 space-y-5">
+                    
+                    {{-- Mode Tampilan (Radio Cards) --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-text-primary mb-2">Mode Tampilan</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="relative flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all {{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'standard' ? 'border-primary bg-primary/5' : 'border-border hover:bg-secondary' }}" id="label-mode-standard" onclick="toggleInteraktifSettings('standard')">
+                                <input type="radio" name="mode_tampilan" value="standard" class="hidden" {{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'standard' ? 'checked' : '' }}>
+                                <div class="w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center {{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'standard' ? 'border-primary' : 'border-text-secondary' }}" id="radio-indicator-standard">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-primary {{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'standard' ? '' : 'hidden' }}" id="radio-dot-standard"></div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-text-primary">Standard</p>
+                                    <p class="text-xs text-text-secondary mt-0.5">Tampilan ujian akademik bersih</p>
+                                </div>
+                            </label>
+                            <label class="relative flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all {{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'interaktif' ? 'border-violet-600 bg-violet-600/5' : 'border-border hover:bg-secondary' }}" id="label-mode-interaktif" onclick="toggleInteraktifSettings('interaktif')">
+                                <input type="radio" name="mode_tampilan" value="interaktif" class="hidden" {{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'interaktif' ? 'checked' : '' }}>
+                                <div class="w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center {{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'interaktif' ? 'border-violet-600' : 'border-text-secondary' }}" id="radio-indicator-interaktif">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-violet-600 {{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'interaktif' ? '' : 'hidden' }}" id="radio-dot-interaktif"></div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-text-primary">Interaktif (Game)</p>
+                                    <p class="text-xs text-text-secondary mt-0.5">Gamifikasi dan efek tantangan</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- Sub Mode & Advanced Settings --}}
+                    <div id="advanced-settings-container" class="{{ old('mode_tampilan', $materi->mode_tampilan ?? 'standard') === 'standard' ? 'hidden' : '' }} space-y-4 pt-4 border-t border-border">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="sub_mode" class="block text-sm font-semibold text-text-primary mb-1.5">Sub Mode</label>
+                                <select id="sub_mode" name="sub_mode" class="w-full px-3 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-violet-600 outline-none text-sm bg-secondary">
+                                    <option value="standard" {{ old('sub_mode', $materi->sub_mode ?? 'standard') === 'standard' ? 'selected' : '' }}>Standard</option>
+                                    <option value="time_attack" {{ old('sub_mode', $materi->sub_mode ?? 'standard') === 'time_attack' ? 'selected' : '' }}>Time Attack</option>
+                                    <option value="practice" {{ old('sub_mode', $materi->sub_mode ?? 'standard') === 'practice' ? 'selected' : '' }}>Practice</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="timer_per_soal" class="block text-sm font-semibold text-text-primary mb-1.5">Waktu per Soal (Detik)</label>
+                                <input type="number" id="timer_per_soal" name="timer_per_soal" min="0" value="{{ old('timer_per_soal', $materi->timer_per_soal ?? 0) }}"
+                                    class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-violet-600 outline-none text-sm bg-secondary">
+                                <p class="text-xs text-text-secondary mt-1">0 = tidak pakai timer per soal</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Efek Suara</p></div>
+                                <input type="checkbox" name="sound_enabled" value="1" {{ old('sound_enabled', $materi->sound_enabled ?? true) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Leaderboard</p></div>
+                                <input type="checkbox" name="leaderboard_enabled" value="1" {{ old('leaderboard_enabled', $materi->leaderboard_enabled ?? false) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Bonus Kecepatan</p></div>
+                                <input type="checkbox" name="bonus_kecepatan_enabled" value="1" {{ old('bonus_kecepatan_enabled', $materi->bonus_kecepatan_enabled ?? false) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Animasi Feedback</p></div>
+                                <input type="checkbox" name="animasi_enabled" value="1" {{ old('animasi_enabled', $materi->animasi_enabled ?? true) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer p-3 rounded-xl border border-border hover:bg-secondary transition-colors">
+                                <div><p class="text-sm font-semibold text-text-primary">Badge / Achievement</p></div>
+                                <input type="checkbox" name="badge_enabled" value="1" {{ old('badge_enabled', $materi->badge_enabled ?? false) ? 'checked' : '' }} class="w-5 h-5 rounded text-violet-600 border-border cursor-pointer shrink-0">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {{-- ACTION BUTTONS --}}
             <div class="flex items-center justify-between gap-3 pb-2">
+                @if($materi->is_pretest)
+                <a href="{{ route('admin.pretest.index') }}"
+                   class="px-5 py-2.5 border border-border rounded-xl text-text-secondary hover:bg-secondary font-medium text-sm transition-colors">
+                    Batal
+                </a>
+                @else
                 <a href="{{ route('admin.pelatihan.show', $materi->pelatihan_id) }}"
                    class="px-5 py-2.5 border border-border rounded-xl text-text-secondary hover:bg-secondary font-medium text-sm transition-colors">
                     Batal
                 </a>
+                @endif
                 <button type="submit"
-                    class="bg-accent hover:bg-accent-hover text-white font-bold py-2.5 px-8 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-all">
+                    class="bg-accent hover:bg-accent-hover text-[var(--text-primary)] font-bold py-2.5 px-8 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-all">
                     <i data-lucide="save" class="w-4 h-4"></i> Simpan Konfigurasi
                 </button>
             </div>
@@ -238,7 +338,7 @@
         <div class="space-y-5">
 
             {{-- Sidebar: Status Publish --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border p-5">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border p-5">
                 <p class="font-bold text-text-primary text-sm mb-3 flex items-center gap-2">
                     <i data-lucide="globe" class="w-4 h-4 text-text-secondary"></i> Status Publikasi
                 </p>
@@ -256,7 +356,7 @@
             </div>
 
             {{-- Sidebar: Anti-Cheat --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border overflow-hidden">
                 <div class="px-5 py-4 border-b border-border flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background:#FEF2F2">
                         <i data-lucide="shield-alert" class="w-5 h-5 text-danger"></i>
@@ -265,7 +365,7 @@
                         <p class="font-bold text-text-primary text-sm">Anti-Cheat Proctoring</p>
                         <p class="text-xs text-text-secondary">Sistem pengawasan otomatis</p>
                     </div>
-                    <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $materi->strict_anti_cheat ? 'bg-danger text-white' : 'bg-secondary text-text-secondary' }}">
+                    <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $materi->strict_anti_cheat ? 'bg-danger text-[var(--text-primary)]' : 'bg-secondary text-text-secondary' }}">
                         {{ $materi->strict_anti_cheat ? 'AKTIF' : 'OFF' }}
                     </span>
                 </div>
@@ -294,7 +394,7 @@
                         </p>
                         <p class="text-xs text-text-secondary flex items-center gap-1.5">
                             <i data-lucide="triangle-alert" class="w-3 h-3 shrink-0" style="color:#F97316"></i>
-                            Auto-submit setelah 3× pelanggaran
+                            Auto-submit setelah 3ÃƒÆ’Ã¢â‚¬â€ pelanggaran
                         </p>
                     </div>
 
@@ -307,7 +407,7 @@
             </div>
 
             {{-- Sidebar: Ringkasan --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-border p-5">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border p-5">
                 <p class="font-bold text-text-primary text-sm mb-3 flex items-center gap-2">
                     <i data-lucide="bar-chart-3" class="w-4 h-4 text-primary"></i> Ringkasan
                 </p>
@@ -316,28 +416,32 @@
                         <span class="text-text-secondary text-xs">Total Soal</span>
                         <span class="font-bold text-text-primary">{{ $materi->soals->count() }}</span>
                     </div>
-                    <div class="flex justify-between py-2">
-                        <span class="text-text-secondary text-xs">Total Poin</span>
+                    <div class="flex justify-between py-2" title="Total nilai/bobot dari seluruh soal yang ada">
+                        <span class="text-text-secondary text-xs">Total Bobot Soal</span>
                         <span class="font-bold text-text-primary">{{ $materi->soals->sum('bobot') }}</span>
+                    </div>
+                    <div class="flex justify-between py-2" title="Poin XP yang didapat jika peserta lulus">
+                        <span class="text-text-secondary text-xs">Reward Poin XP</span>
+                        <span class="font-bold text-purple-400" id="summary-poin">{{ $materi->poin ?? 50 }}</span>
                     </div>
                     <div class="flex justify-between py-2">
                         <span class="text-text-secondary text-xs">Nilai Lulus</span>
-                        <span class="font-bold text-accent">{{ $materi->passing_grade ?? 70 }}%</span>
+                        <span class="font-bold text-accent" id="summary-passing-grade">{{ $materi->passing_grade ?? 70 }}%</span>
                     </div>
                     <div class="flex justify-between py-2">
                         <span class="text-text-secondary text-xs">Durasi</span>
-                        <span class="font-bold text-text-primary text-xs">{{ $materi->durasi_menit ? $materi->durasi_menit.' mnt' : '∞' }}</span>
+                        <span class="font-bold text-text-primary text-xs" id="summary-durasi">{{ $materi->durasi_menit ? $materi->durasi_menit.' mnt' : 'âˆž' }}</span>
                     </div>
                     <div class="flex justify-between py-2">
                         <span class="text-text-secondary text-xs">Maks. Percobaan</span>
-                        <span class="font-bold text-text-primary text-xs">{{ $materi->max_attempts ?: '∞' }}x</span>
+                        <span class="font-bold text-text-primary text-xs" id="summary-max-attempts">{{ $materi->max_attempts ?: 'âˆž' }}x</span>
                     </div>
                 </div>
             </div>
 
             {{-- Sidebar: Komposisi Soal --}}
             @if($materi->soals->isNotEmpty())
-            <div class="bg-white rounded-2xl shadow-sm border border-border p-5">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border p-5">
                 <p class="font-bold text-text-primary text-sm mb-3">Komposisi Jenis Soal</p>
                 <div class="space-y-2">
                     @foreach([['pilihan_ganda','Multiple Choice','blue'],['multi_select','Multiple Select','violet'],['essay','Free Text','green'],['isian_singkat','Fill in Blank','yellow'],['menjodohkan','Matching','orange']] as [$k,$n,$c])
@@ -358,7 +462,7 @@
 </form>
 
 {{-- CARD DAFTAR SOAL (full width) --}}
-<div class="mt-6 bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
+<div class="mt-6 bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border overflow-hidden">
     <div class="px-6 py-4 border-b border-border flex items-center justify-between bg-secondary">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:#EFF6FF">
@@ -373,14 +477,14 @@
             </div>
         </div>
         <a href="{{ route('admin.materi.soal.create', $materi->id) }}"
-           class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm">
+           class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-[var(--text-primary)] text-sm font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm">
             <i data-lucide="plus" class="w-4 h-4"></i> Tambah Soal
         </a>
     </div>
 
     @php
         $tipeLabels = [
-            'pilihan_ganda' => ['label'=>'Multiple Choice','color'=>'bg-blue-100 text-blue-700'],
+            'pilihan_ganda' => ['label'=>'Multiple Choice','color'=>'bg-violet-900/30 text-[#fcd34d]'],
             'multi_select'  => ['label'=>'Multiple Select','color'=>'bg-violet-100 text-violet-700'],
             'essay'         => ['label'=>'Free Text','color'=>'bg-green-100 text-green-700'],
             'isian_singkat' => ['label'=>'Fill in Blank','color'=>'bg-yellow-100 text-yellow-700'],
@@ -396,7 +500,7 @@
             <p class="font-bold text-text-primary">Belum ada soal</p>
             <p class="text-sm text-text-secondary mt-1 mb-5">Klik tombol di bawah untuk mulai menambahkan pertanyaan.</p>
             <a href="{{ route('admin.materi.soal.create', $materi->id) }}"
-               class="inline-flex items-center gap-2 bg-primary text-white hover:bg-primary-hover font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm">
+               class="inline-flex items-center gap-2 bg-primary text-[var(--text-primary)] hover:bg-primary-hover font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm">
                 <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah Soal Pertama
             </a>
         </div>
@@ -416,7 +520,7 @@
                     </div>
                     <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <a href="{{ route('admin.soal.edit', $soal->id) }}"
-                           class="p-2 text-text-secondary hover:text-primary hover:bg-blue-50 rounded-lg transition-colors">
+                           class="p-2 text-text-secondary hover:text-primary hover:bg-violet-900/20 rounded-lg transition-colors">
                             <i data-lucide="edit-2" class="w-4 h-4"></i>
                         </a>
                         <form action="{{ route('admin.soal.destroy', $soal->id) }}" method="POST" class="inline"
@@ -548,7 +652,7 @@
                     <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem 0;">
                         <div style="width:1.75rem;height:1.75rem;background:#C0392B;border:2px solid #C0392B;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;margin-top:0.125rem;">3</div>
                         <div>
-                            <p style="font-size:0.875rem;font-weight:700;color:#C0392B;">Pelanggaran ke-3 → Auto Submit</p>
+                            <p style="font-size:0.875rem;font-weight:700;color:#C0392B;">Pelanggaran ke-3 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Auto Submit</p>
                             <p style="font-size:0.75rem;color:#5C6470;margin-top:0.25rem;">Kuis dikumpulkan otomatis dengan jawaban yang sudah terisi. Percobaan dianggap selesai.</p>
                         </div>
                     </div>
@@ -559,9 +663,9 @@
             <div style="background:#F5F7FA;border:1px solid #E2E6EC;border-radius:0.75rem;padding:1rem;">
                 <p style="font-size:0.6875rem;font-weight:700;color:#5C6470;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.625rem;">Yang Tidak Terdeteksi</p>
                 <div style="display:flex;flex-direction:column;gap:0.375rem;">
-                    <p style="font-size:0.75rem;color:#5C6470;">— Membaca buku / modul cetak</p>
-                    <p style="font-size:0.75rem;color:#5C6470;">— Menggunakan HP / perangkat lain secara bersamaan</p>
-                    <p style="font-size:0.75rem;color:#5C6470;">— Diskusi dengan orang di sekitar</p>
+                    <p style="font-size:0.75rem;color:#5C6470;">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Membaca buku / modul cetak</p>
+                    <p style="font-size:0.75rem;color:#5C6470;">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Menggunakan HP / perangkat lain secara bersamaan</p>
+                    <p style="font-size:0.75rem;color:#5C6470;">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Diskusi dengan orang di sekitar</p>
                 </div>
                 <p style="font-size:0.6875rem;color:#5C6470;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #E2E6EC;line-height:1.5;">
                     Sistem ini adalah pencegahan berbasis browser. Untuk ujian bernilai tinggi, pertimbangkan pengawas manual tambahan.
@@ -585,7 +689,7 @@
 {{-- NON-QUIZ MATERI EDIT                                             --}}
 {{-- ================================================================ --}}
 <div class="max-w-3xl mx-auto">
-    <div class="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border overflow-hidden">
         <div class="px-6 py-5 border-b border-border flex items-center gap-4" style="background:linear-gradient(to right,#EFF6FF,transparent)">
             @php
                 $icon = match($materi->jenis) {
@@ -653,12 +757,12 @@
                             <div>
                                 <label for="jenis" class="block text-sm font-semibold text-text-primary mb-1.5">Jenis <span class="text-danger">*</span></label>
                                 <select id="jenis" name="jenis" required onchange="toggleContentInput(this.value)"
-                                    class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white text-sm transition-all">
-                                    <option value="pdf"         {{ old('jenis',$materi->jenis)=='pdf'         ?'selected':'' }}>📄 PDF</option>
-                                    <option value="ppt"         {{ old('jenis',$materi->jenis)=='ppt'         ?'selected':'' }}>📊 PPT</option>
-                                    <option value="pptx"        {{ old('jenis',$materi->jenis)=='pptx'        ?'selected':'' }}>📊 PPTX</option>
-                                    <option value="video_embed" {{ old('jenis',$materi->jenis)=='video_embed' ?'selected':'' }}>▶️ YouTube</option>
-                                    <option value="link"        {{ old('jenis',$materi->jenis)=='link'        ?'selected':'' }}>🔗 Link Eksternal</option>
+                                    class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm text-sm transition-all">
+                                    <option value="pdf"         {{ old('jenis',$materi->jenis)=='pdf'         ?'selected':'' }}>ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Å¾ PDF</option>
+                                    <option value="ppt"         {{ old('jenis',$materi->jenis)=='ppt'         ?'selected':'' }}>ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â  PPT</option>
+                                    <option value="pptx"        {{ old('jenis',$materi->jenis)=='pptx'        ?'selected':'' }}>ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â  PPTX</option>
+                                    <option value="video_embed" {{ old('jenis',$materi->jenis)=='video_embed' ?'selected':'' }}>ÃƒÂ¢Ã¢â‚¬â€œÃ‚Â¶ÃƒÂ¯Ã‚Â¸Ã‚Â YouTube</option>
+                                    <option value="link"        {{ old('jenis',$materi->jenis)=='link'        ?'selected':'' }}>ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â€ Link Eksternal</option>
                                 </select>
                             </div>
                             <div>
@@ -684,8 +788,8 @@
                             </label>
                             <div class="border-2 border-dashed border-border rounded-xl p-4 text-center hover:border-primary transition-colors bg-secondary">
                                 <input type="file" name="file_upload" accept=".pdf,.ppt,.pptx"
-                                    class="w-full text-sm text-text-secondary file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-primary file:font-semibold cursor-pointer">
-                                <p class="text-xs text-text-secondary mt-2">Maks. 10MB · PDF, PPT, PPTX</p>
+                                    class="w-full text-sm text-text-secondary file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-violet-900/20 file:text-primary file:font-semibold cursor-pointer">
+                                <p class="text-xs text-text-secondary mt-2">Maks. 10MB Ãƒâ€šÃ‚Â· PDF, PPT, PPTX</p>
                                 @if($materi->file_path)
                                     <p class="text-xs text-success font-medium mt-1.5 flex items-center justify-center gap-1">
                                         <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i> File saat ini tersedia
@@ -724,7 +828,7 @@
                             Batal
                         </a>
                         <button type="submit"
-                            class="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-7 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-all">
+                            class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-7 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-all">
                             <i data-lucide="save" class="w-4 h-4"></i> Perbarui Materi
                         </button>
                     </div>
@@ -735,6 +839,63 @@
 </div>
 @endif
 
+
+<script>
+function toggleInteraktifSettings(mode) {
+    const isInteraktif = mode === 'interaktif';
+    const container = document.getElementById('advanced-settings-container');
+    if(container) {
+        if(isInteraktif) container.classList.remove('hidden');
+        else container.classList.add('hidden');
+    }
+    
+    const labelStd = document.getElementById('label-mode-standard');
+    const labelInt = document.getElementById('label-mode-interaktif');
+    const dotStd = document.getElementById('radio-dot-standard');
+    const dotInt = document.getElementById('radio-dot-interaktif');
+    const indStd = document.getElementById('radio-indicator-standard');
+    const indInt = document.getElementById('radio-indicator-interaktif');
+    
+    if (isInteraktif) {
+        labelInt.classList.add('border-violet-600', 'bg-violet-600/5');
+        labelInt.classList.remove('border-border', 'hover:bg-secondary');
+        indInt.classList.add('border-violet-600');
+        indInt.classList.remove('border-text-secondary');
+        dotInt.classList.remove('hidden');
+        
+        labelStd.classList.remove('border-primary', 'bg-primary/5');
+        labelStd.classList.add('border-border', 'hover:bg-secondary');
+        indStd.classList.remove('border-primary');
+        indStd.classList.add('border-text-secondary');
+        dotStd.classList.add('hidden');
+    } else {
+        labelStd.classList.add('border-primary', 'bg-primary/5');
+        labelStd.classList.remove('border-border', 'hover:bg-secondary');
+        indStd.classList.add('border-primary');
+        indStd.classList.remove('border-text-secondary');
+        dotStd.classList.remove('hidden');
+        
+        labelInt.classList.remove('border-violet-600', 'bg-violet-600/5');
+        labelInt.classList.add('border-border', 'hover:bg-secondary');
+        indInt.classList.remove('border-violet-600');
+        indInt.classList.add('border-text-secondary');
+        dotInt.classList.add('hidden');
+    }
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const inputPoin = document.getElementById('poin');
+    const inputPassing = document.getElementById('passing_grade');
+    const inputDurasi = document.getElementById('durasi_menit');
+    const inputMax = document.getElementById('max_attempts');
+
+    if (inputPoin) inputPoin.addEventListener('input', e => document.getElementById('summary-poin').innerText = e.target.value);
+    if (inputPassing) inputPassing.addEventListener('input', e => document.getElementById('summary-passing-grade').innerText = e.target.value + '%');
+    if (inputDurasi) inputDurasi.addEventListener('input', e => document.getElementById('summary-durasi').innerText = (e.target.value && e.target.value !== '0') ? e.target.value + ' mnt' : 'âˆž');
+    if (inputMax) inputMax.addEventListener('input', e => document.getElementById('summary-max-attempts').innerText = (e.target.value && e.target.value !== '0') ? e.target.value + 'x' : 'âˆž');
+});
+</script>
 @endsection
 
 @push('scripts')
@@ -767,3 +928,8 @@ function closeAntiCheatModal() {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAntiCheatModal(); });
 </script>
 @endpush
+
+
+
+
+

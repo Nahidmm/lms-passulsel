@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<div class="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -60,7 +60,7 @@
                     </td>
                     <td class="py-4 px-6 text-right">
                         <a href="{{ route('admin.penilaian.show', $user->id) }}"
-                           class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-semibold rounded-lg transition-colors shadow-sm">
+                           class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary-hover text-[var(--text-primary)] text-xs font-semibold rounded-lg transition-colors shadow-sm">
                             <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>
                             Detail Nilai
                         </a>
@@ -82,3 +82,4 @@
 </div>
 
 @endsection
+

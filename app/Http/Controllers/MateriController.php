@@ -40,6 +40,16 @@ class MateriController extends Controller
             'acak_jawaban' => 'boolean',
             'tampilkan_feedback' => 'boolean',
             'strict_anti_cheat' => 'boolean',
+            'mode_tampilan' => 'nullable|string|in:standard,interaktif',
+            'sub_mode' => 'nullable|string|in:standard,time_attack,practice',
+            'timer_per_soal' => 'nullable|integer|min:0',
+            'sound_enabled' => 'boolean',
+            'leaderboard_enabled' => 'boolean',
+            'bonus_kecepatan_enabled' => 'boolean',
+            'animasi_enabled' => 'boolean',
+            'badge_enabled' => 'boolean',
+            'show_answer_review' => 'boolean',
+            'theme_name' => 'nullable|string|max:50',
             'prasyarat_materi_id' => 'nullable|exists:materis,id',
         ]);
 
@@ -50,6 +60,29 @@ class MateriController extends Controller
         $materi->acak_jawaban = $request->has('acak_jawaban');
         $materi->tampilkan_feedback = $request->has('tampilkan_feedback');
         $materi->strict_anti_cheat = $request->has('strict_anti_cheat');
+        $materi->mode_tampilan = $request->input('mode_tampilan', 'standard');
+        
+        if ($materi->mode_tampilan === 'standard') {
+            $materi->sub_mode = 'standard';
+            $materi->timer_per_soal = 0;
+            $materi->sound_enabled = false;
+            $materi->leaderboard_enabled = false;
+            $materi->bonus_kecepatan_enabled = false;
+            $materi->animasi_enabled = false;
+            $materi->badge_enabled = false;
+            $materi->show_answer_review = false;
+            $materi->theme_name = 'default';
+        } else {
+            $materi->sub_mode = $request->input('sub_mode', 'standard');
+            $materi->timer_per_soal = $request->input('timer_per_soal', 0);
+            $materi->sound_enabled = $request->has('sound_enabled');
+            $materi->leaderboard_enabled = $request->has('leaderboard_enabled');
+            $materi->bonus_kecepatan_enabled = $request->has('bonus_kecepatan_enabled');
+            $materi->animasi_enabled = $request->has('animasi_enabled');
+            $materi->badge_enabled = $request->has('badge_enabled');
+            $materi->show_answer_review = $request->has('show_answer_review');
+            $materi->theme_name = $request->input('theme_name');
+        }
 
         if ($request->hasFile('file_upload') && in_array($validated['jenis'], ['pdf', 'ppt', 'pptx'])) {
             $path = $request->file('file_upload')->store('materis', 'public');
@@ -62,6 +95,11 @@ class MateriController extends Controller
             return redirect()->route('admin.materi.edit', $materi->id)->with('success', 'Kuis berhasil dibuat! Sekarang tambahkan soal-soal kuis.');
         }
         return redirect()->route('admin.pelatihan.show', $pelatihan->id)->with('success', 'Materi berhasil ditambahkan.');
+    }
+
+    public function show(Materi $materi)
+    {
+        return $this->edit($materi);
     }
 
     public function edit(Materi $materi)
@@ -89,6 +127,16 @@ class MateriController extends Controller
             'acak_jawaban' => 'boolean',
             'tampilkan_feedback' => 'boolean',
             'strict_anti_cheat' => 'boolean',
+            'mode_tampilan' => 'nullable|string|in:standard,interaktif',
+            'sub_mode' => 'nullable|string|in:standard,time_attack,practice',
+            'timer_per_soal' => 'nullable|integer|min:0',
+            'sound_enabled' => 'boolean',
+            'leaderboard_enabled' => 'boolean',
+            'bonus_kecepatan_enabled' => 'boolean',
+            'animasi_enabled' => 'boolean',
+            'badge_enabled' => 'boolean',
+            'show_answer_review' => 'boolean',
+            'theme_name' => 'nullable|string|max:50',
             'prasyarat_materi_id' => 'nullable|exists:materis,id',
         ]);
 
@@ -98,6 +146,29 @@ class MateriController extends Controller
         $materi->acak_jawaban = $request->has('acak_jawaban');
         $materi->tampilkan_feedback = $request->has('tampilkan_feedback');
         $materi->strict_anti_cheat = $request->has('strict_anti_cheat');
+        $materi->mode_tampilan = $request->input('mode_tampilan', $materi->mode_tampilan ?? 'standard');
+        
+        if ($materi->mode_tampilan === 'standard') {
+            $materi->sub_mode = 'standard';
+            $materi->timer_per_soal = 0;
+            $materi->sound_enabled = false;
+            $materi->leaderboard_enabled = false;
+            $materi->bonus_kecepatan_enabled = false;
+            $materi->animasi_enabled = false;
+            $materi->badge_enabled = false;
+            $materi->show_answer_review = false;
+            $materi->theme_name = 'default';
+        } else {
+            $materi->sub_mode = $request->input('sub_mode', $materi->sub_mode ?? 'standard');
+            $materi->timer_per_soal = $request->input('timer_per_soal', $materi->timer_per_soal ?? 0);
+            $materi->sound_enabled = $request->has('sound_enabled');
+            $materi->leaderboard_enabled = $request->has('leaderboard_enabled');
+            $materi->bonus_kecepatan_enabled = $request->has('bonus_kecepatan_enabled');
+            $materi->animasi_enabled = $request->has('animasi_enabled');
+            $materi->badge_enabled = $request->has('badge_enabled');
+            $materi->show_answer_review = $request->has('show_answer_review');
+            $materi->theme_name = $request->input('theme_name', $materi->theme_name);
+        }
 
         if ($request->hasFile('file_upload') && in_array($validated['jenis'], ['pdf', 'ppt', 'pptx'])) {
             if ($materi->file_path) {
@@ -187,5 +258,17 @@ class MateriController extends Controller
         \App\Models\ProgresPelatihan::checkCompletion($user->id, $materi->pelatihan_id);
 
         return redirect()->route('peserta.pelatihan.show', $materi->pelatihan_id)->with('success', 'Materi berhasil diselesaikan!');
+    } 
+    public function previewQuiz(Materi $materi)
+    {
+        $soals = $materi->soals()->get();
+        $sesi = (object)[
+            'id' => 'preview',
+            'xp_earned' => 0,
+            'sisaWaktu' => $materi->durasi_menit ? $materi->durasi_menit * 60 : 3600
+        ];
+        return view('peserta.evaluasi.soal', compact('materi', 'soals', 'sesi'));
     }
 }
+
+

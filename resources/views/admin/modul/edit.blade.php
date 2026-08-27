@@ -10,7 +10,7 @@
     </a>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-border p-6 md:p-8 max-w-3xl">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-6 md:p-8 max-w-3xl">
     <div class="mb-6 pb-4 border-b border-border">
         <h2 class="text-xl font-display font-bold text-text-primary">Edit Modul: {{ $modul->judul }}</h2>
         <p class="text-text-secondary mt-1">Perbarui informasi dasar modul. Untuk mengubah materi, gunakan halaman Kelola Materi.</p>
@@ -55,7 +55,7 @@
 
         <div class="flex justify-end pt-4 border-t border-border gap-3">
             <a href="{{ route('admin.modul.index') }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
-            <button type="submit" class="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+            <button type="submit" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
                 Perbarui Modul
             </button>
         </div>
@@ -63,3 +63,4 @@
 </div>
 
 @endsection
+
