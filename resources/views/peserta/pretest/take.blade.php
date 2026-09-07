@@ -1,44 +1,46 @@
 @extends('layouts.app')
-@section('title', 'Asesmen Awal (Pretest)')
+@section('title', 'Asesmen Awal (Pretest) - STRAPSUSPAS')
 
 @section('content')
-<div class="max-w-3xl mx-auto py-10 px-4">
+<div class="max-w-2xl mx-auto py-8 px-4">
     <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-500/20 text-violet-400 mb-4 border border-violet-500/30 shadow-[0_0_15px_rgba(139,92,246,0.3)]">
-            <i data-lucide="brain" class="w-8 h-8"></i>
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 mb-4 shadow-sm ring-4 ring-indigo-500/10">
+            <i data-lucide="clipboard-check" class="w-7 h-7"></i>
         </div>
-        <h1 class="text-3xl font-black text-[var(--text-primary)] mb-2" style="font-family:'Fraunces',serif;">{{ $pretest->judul }}</h1>
-        <p class="text-[var(--text-secondary)]">{{ $pretest->deskripsi ?? 'Mari kita ukur pemahaman awal Anda sebelum memulai pelatihan.' }}</p>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)] mb-2">{{ $pretest->judul }}</h1>
+        <p class="text-xs md:text-sm text-[var(--text-secondary)] max-w-lg mx-auto">
+            {{ $pretest->deskripsi ?? 'Asesmen awal diagnostik untuk mengukur tingkat pemahaman dan kepatuhan terhadap regulasi disiplin ASN sebelum memulai pelatihan.' }}
+        </p>
     </div>
 
-    <div class="game-card p-8 border border-[var(--border)] relative overflow-hidden">
-        <!-- Decoration -->
-        <div class="absolute -top-10 -right-10 w-40 h-40 bg-violet-600/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-600/10 rounded-full blur-3xl"></div>
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 md:p-8 shadow-xs">
+        <div class="space-y-6">
+            <div>
+                <h3 class="font-bold text-sm text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-indigo-600"></i> Petunjuk Asesmen Awal:
+                </h3>
+                <div class="rounded-xl border border-[var(--border)] bg-slate-50/50 dark:bg-slate-900/50 p-4 space-y-3 text-xs text-[var(--text-secondary)]">
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-indigo-600 shrink-0 mt-0.5"></i>
+                        <span>Asesmen ini <strong>wajib</strong> diselesaikan untuk membuka akses penuh ke modul pembelajaran disiplin ASN.</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="clock" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                        <span>Kerjakan dengan jujur dan teliti sesuai pengetahuan Anda saat ini tanpa bantuan referensi.</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i>
+                        <span>Hasil asesmen digunakan pimpinan dan admin untuk memetakan indikator kelemahan kompetensi disiplin pada tiap unit kerja.</span>
+                    </div>
+                </div>
+            </div>
 
-        <div class="relative z-10 text-center">
-            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Instruksi Pretest</h3>
-            <ul class="text-left text-[var(--text-primary)] space-y-3 mb-8 max-w-lg mx-auto bg-black/20 p-6 rounded-xl border border-[var(--border)]">
-                <li class="flex items-start gap-3">
-                    <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
-                    <span>Pretest ini <strong>wajib</strong> diselesaikan sebelum Anda dapat mengakses fitur lain di SPEKTRA.</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i data-lucide="clock" class="w-5 h-5 text-amber-400 shrink-0 mt-0.5"></i>
-                    <span>Pretest ini hanya dapat dilakukan <strong>satu kali</strong>. Pastikan Anda siap.</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i data-lucide="target" class="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"></i>
-                    <span>Hasil pretest akan digunakan untuk memetakan pemahaman Anda dan memberikan <strong>rekomendasi pelatihan</strong> yang sesuai.</span>
-                </li>
-            </ul>
-
-            <form action="{{ route('peserta.evaluasi.start') }}" method="POST">
+            <form action="{{ route('peserta.evaluasi.start') }}" method="POST" class="text-center pt-2">
                 @csrf
                 <input type="hidden" name="materi_id" value="{{ $pretest->id }}">
-                <button type="submit" class="btn btn-primary text-lg px-8 py-3 shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] group">
-                    Mulai Pretest Sekarang
-                    <i data-lucide="arrow-right" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                <button type="submit" class="btn btn-primary text-sm px-8 py-3.5 shadow-md justify-center w-full sm:w-auto inline-flex items-center gap-2">
+                    <span>Mulai Kerjakan Asesmen Awal</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </form>
         </div>

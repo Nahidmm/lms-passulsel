@@ -29,7 +29,7 @@ class AccountApprovedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Akun SPEKTRA Anda Telah Disetujui',
+            subject: 'Akun STRAPSUSPAS Anda Telah Disetujui',
         );
     }
 

@@ -53,7 +53,7 @@ class DemoDataSeeder extends Seeder
         $pelatihan = Pelatihan::firstOrCreate([
             'judul' => 'Orientasi Dasar Pemasyarakatan',
         ], [
-            'deskripsi' => 'Pelatihan wajib untuk seluruh pegawai di lingkungan Kementerian Hukum dan HAM wilayah Sulawesi Selatan.',
+            'deskripsi' => 'Pelatihan wajib untuk seluruh pegawai di lingkungan Kantor Wilayah Ditjen Pemasyarakatan Sulawesi Selatan.',
             'is_active' => true,
         ]);
 
@@ -63,16 +63,16 @@ class DemoDataSeeder extends Seeder
                 'judul' => 'Pengantar Tugas Pokok',
                 'deskripsi' => 'Pengenalan menyeluruh tentang tupoksi dan kewenangan.',
                 'jenis' => 'link',
-                'url_link' => 'https://www.kemenkumham.go.id/profil/tupoksi',
+                'url_link' => 'https://ditjenpas.go.id/profil',
                 'pelatihan_id' => $pelatihan->id,
                 'urutan' => 1,
                 'durasi_baca' => 15,
             ],
             [
-                'judul' => 'Peraturan Menteri Hukum dan HAM',
+                'judul' => 'Peraturan dan Regulasi Pemasyarakatan',
                 'deskripsi' => 'Mempelajari dasar hukum jabatan struktural di pemasyarakatan.',
                 'jenis' => 'link',
-                'url_link' => 'https://www.kemenkumham.go.id/regulasi',
+                'url_link' => 'https://ditjenpas.go.id/regulasi',
                 'pelatihan_id' => $pelatihan->id,
                 'urutan' => 2,
                 'durasi_baca' => 20,

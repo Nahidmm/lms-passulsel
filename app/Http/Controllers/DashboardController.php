@@ -28,31 +28,61 @@ class DashboardController extends Controller
         $totalPengguna = User::where('role', 'peserta')->where('status_akun', 'approved')->count();
         $penggunaAktif = SesiEvaluasi::where('status', 'berlangsung')->count();
         $pendingRequests = AccountRequest::where('status', 'menunggu')->count();
-        
-        $highestScore = SesiEvaluasi::where('status', 'selesai')->max('skor') ?? 0;
-        $lowestScore = SesiEvaluasi::where('status', 'selesai')->min('skor') ?? 0;
 
-        // Chart Data: Registrations per day (last 7 days)
-        $chartDates = [];
-        $chartData = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $chartDates[] = Carbon::now()->subDays($i)->format('d M');
-            $chartData[] = User::where('role', 'peserta')
-                ->whereDate('created_at', $date)
-                ->count();
-        }
+        // Rata-rata Komponen Pembelajaran STRAPSUSPAS
+        $rataPretest = round(\App\Models\RekapNilai::whereNotNull('nilai_pretest')->avg('nilai_pretest') ?? 0, 1);
+        $rataQuiz = round(\App\Models\RekapNilai::whereNotNull('nilai_quiz_rata')->avg('nilai_quiz_rata') ?? 0, 1);
+        $rataTugas = round(\App\Models\RekapNilai::whereNotNull('nilai_tugas')->avg('nilai_tugas') ?? 0, 1);
+        $rataPosttest = round(\App\Models\RekapNilai::whereNotNull('nilai_posttest')->avg('nilai_posttest') ?? 0, 1);
 
-        // Recent Activities: Last 5 completed evaluations
+        // Tingkat Kelulusan & Predikat
+        $totalRekap = \App\Models\RekapNilai::count();
+        $totalLulus = \App\Models\RekapNilai::where('status_kelulusan', 'lulus')->count();
+        $lulusRate = $totalRekap > 0 ? round(($totalLulus / $totalRekap) * 100, 1) : 0;
+
+        $predikatCounts = [
+            'A' => \App\Models\RekapNilai::where('predikat', 'A')->count(),
+            'B' => \App\Models\RekapNilai::where('predikat', 'B')->count(),
+            'C' => \App\Models\RekapNilai::where('predikat', 'C')->count(),
+            'D' => \App\Models\RekapNilai::where('predikat', 'D')->count(),
+        ];
+
+        // Tugas yang Menunggu Penilaian (Pending Review)
+        $pendingSubmissions = \App\Models\TugasSubmission::with(['user', 'tugas.pelatihan'])
+            ->where('status', 'submitted')
+            ->latest()
+            ->take(6)
+            ->get();
+        $countPendingTugas = \App\Models\TugasSubmission::where('status', 'submitted')->count();
+
+        // Analisis Kelemahan Pretest (Topik dengan nilai terendah)
+        $topikKelemahan = \App\Models\HasilPretestTopik::with('topik')
+            ->selectRaw('topik_pelatihan_id, AVG(skor) as avg_skor, COUNT(*) as total_test')
+            ->groupBy('topik_pelatihan_id')
+            ->orderBy('avg_skor', 'asc')
+            ->take(5)
+            ->get();
+
+        // Kursus / Pelatihan Aktif
+        $pelatihans = \App\Models\Pelatihan::withCount(['materis', 'tugas'])
+            ->where('is_active', true)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // Evaluasi Terkini
         $recentActivities = SesiEvaluasi::with(['user', 'materi'])
             ->where('status', 'selesai')
             ->orderBy('updated_at', 'desc')
-            ->take(5)
+            ->take(6)
             ->get();
 
         return view('admin.dashboard', compact(
             'totalPengguna', 'penggunaAktif', 'pendingRequests',
-            'highestScore', 'lowestScore', 'chartDates', 'chartData', 'recentActivities'
+            'rataPretest', 'rataQuiz', 'rataTugas', 'rataPosttest',
+            'lulusRate', 'totalLulus', 'totalRekap', 'predikatCounts',
+            'pendingSubmissions', 'countPendingTugas',
+            'topikKelemahan', 'pelatihans', 'recentActivities'
         ));
     }
 
@@ -64,44 +94,64 @@ class DashboardController extends Controller
         $rataNilai = $user->getRataRataSkor();
         $progres = $user->getProgresKeseluruhan();
 
-        // Leaderboard: hitung total_poin per user menggunakan getTotalPoin()
-        // yang sudah benar dan konsisten (menghindari MySQL correlated subquery di derived table)
-        $allPeserta = User::where('role', 'peserta')
-            ->where('status_akun', 'approved')
-            ->get()
-            ->map(function ($u) {
-                $u->total_poin = $u->getTotalPoin();
-                return $u;
-            })
-            ->sortByDesc('total_poin')
-            ->values();
-
-        $leaderboard = $allPeserta->take(5);
-
-        // Find current user's rank
-        $userRank = $allPeserta->search(fn($item) => $item->id === $user->id);
-        $userRank = $userRank !== false ? $userRank + 1 : '-';
-
-        // Pretest Results & Recommendations
+        // Pretest Results
         $pretestResults = \App\Models\HasilPretestTopik::with('topik.pelatihan')
             ->where('user_id', $user->id)
             ->get();
             
         $rekomendasi = collect();
-        foreach ($pretestResults as $hasil) {
-            if ($hasil->topik && $hasil->skor < $hasil->topik->batas_nilai && $hasil->topik->pelatihan_id) {
-                if (!$rekomendasi->contains('id', $hasil->topik->pelatihan_id)) {
-                    $rekomendasi->push((object)[
-                        'pelatihan' => $hasil->topik->pelatihan,
-                        'alasan' => 'Skor ' . $hasil->topik->nama_topik . ' Anda (' . $hasil->skor . ') masih di bawah standar (' . $hasil->topik->batas_nilai . ').'
-                    ]);
+        // Active Pelatihan & Enrolled Courses
+        $activeProgres = $user->getActivePelatihan();
+        $activePelatihan = $activeProgres ? $activeProgres->pelatihan : null;
+        if (!$activePelatihan) {
+            $latestProgres = $user->progresPelatihans()->with('pelatihan')->latest('updated_at')->first();
+            if ($latestProgres && $latestProgres->pelatihan) {
+                $activePelatihan = $latestProgres->pelatihan;
+                $activeProgres = $latestProgres;
+            } else {
+                $completedMateri = $user->progresMateri()->with('materi.pelatihan')->first();
+                if ($completedMateri && $completedMateri->materi && $completedMateri->materi->pelatihan) {
+                    $activePelatihan = $completedMateri->materi->pelatihan;
+                } else {
+                    $activePelatihan = \App\Models\Pelatihan::where('is_published', true)->first();
                 }
             }
         }
 
+        $activePelatihanMateriCount = $activePelatihan ? $activePelatihan->materis()->where('is_active', true)->count() : 0;
+        $activePelatihanMateriSelesai = 0;
+        $activePelatihanPersen = 0;
+        if ($activePelatihan && $activePelatihanMateriCount > 0) {
+            $materiIds = $activePelatihan->materis()->where('is_active', true)->pluck('id');
+            $activePelatihanMateriSelesai = $user->progresMateri()
+                ->whereIn('materi_id', $materiIds)
+                ->where('status', 'selesai')
+                ->count();
+            $activePelatihanPersen = min(100, (int) round(($activePelatihanMateriSelesai / $activePelatihanMateriCount) * 100));
+        }
+
+        // Pending Tasks for User
+        $pendingTugasPeserta = \App\Models\Tugas::where('is_active', true)
+            ->whereDoesntHave('submissions', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->with('pelatihan')
+            ->orderBy('deadline', 'asc')
+            ->take(4)
+            ->get();
+
+        // Rekap Nilai Peserta
+        $rekapNilais = \App\Models\RekapNilai::with('pelatihan')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
         return view('peserta.dashboard', compact(
             'materiSelesai', 'totalMateri', 'rataNilai', 'progres',
-            'leaderboard', 'userRank', 'pretestResults', 'rekomendasi'
+            'pretestResults', 'rekomendasi',
+            'activeProgres', 'activePelatihan', 'activePelatihanMateriCount',
+            'activePelatihanMateriSelesai', 'activePelatihanPersen',
+            'pendingTugasPeserta', 'rekapNilais'
         ));
     }
 }

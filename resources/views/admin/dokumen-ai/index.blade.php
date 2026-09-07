@@ -8,7 +8,7 @@
         <h1 class="text-2xl font-bold text-text-primary">Knowledge Base AI</h1>
         <p class="text-text-secondary text-sm mt-1">Kelola dokumen PDF untuk dianalisis oleh AI Assistant</p>
     </div>
-    <button onclick="openModal('add-dokumen-modal')" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] px-5 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 shadow-sm">
+    <button onclick="openModal('add-dokumen-modal')" class="btn btn-primary text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-xs">
         <i data-lucide="plus" class="w-4 h-4"></i>
         Upload Dokumen
     </button>
@@ -28,7 +28,7 @@
 </div>
 @endif
 
-<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-2xl overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -114,25 +114,25 @@
                 <div>
                     <label class="block text-sm font-semibold text-[var(--text-primary)] mb-1.5">Judul Dokumen <span class="text-rose-500">*</span></label>
                     <input type="text" name="judul" required placeholder="Contoh: SOP Pelayanan Tahanan"
-                        class="w-full px-4 py-2 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-[var(--border)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none placeholder-white/30">
+                        class="w-full px-4 py-2 bg-[var(--card)] border border-[var(--border)] shadow-xs border border-[var(--border)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none placeholder-white/30">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[var(--text-primary)] mb-1.5">Tipe Dokumen <span class="text-[var(--text-secondary)] text-xs font-normal">(opsional)</span></label>
                     <input type="text" name="tipe" placeholder="Contoh: SOP, Permen, Kepmen"
-                        class="w-full px-4 py-2 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-[var(--border)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none placeholder-white/30">
+                        class="w-full px-4 py-2 bg-[var(--card)] border border-[var(--border)] shadow-xs border border-[var(--border)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none placeholder-white/30">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[var(--text-primary)] mb-1.5">File PDF <span class="text-rose-500">*</span></label>
                     <input type="file" name="file_pdf" required accept="application/pdf"
-                        class="w-full px-4 py-2 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-[var(--border)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-blue-400 hover:file:bg-primary/30 cursor-pointer">
+                        class="w-full px-4 py-2 bg-[var(--card)] border border-[var(--border)] shadow-xs border border-[var(--border)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-blue-400 hover:file:bg-primary/30 cursor-pointer">
                     <p class="text-xs text-[var(--text-secondary)] mt-1">Maksimal 10MB. Hanya file berformat PDF.</p>
                 </div>
             </div>
-            <div class="p-5 border-t border-[var(--border)] flex justify-end gap-3 bg-[#0f1623] rounded-b-2xl sticky bottom-0">
-                <button type="button" onclick="closeModal('add-dokumen-modal')" class="px-5 py-2.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--card)] border border-[var(--border)] shadow-sm font-medium rounded-xl transition-colors">
+            <div class="p-5 border-t border-[var(--border)] flex justify-end gap-3 bg-[var(--card)] rounded-b-2xl sticky bottom-0">
+                <button type="button" onclick="closeModal('add-dokumen-modal')" class="btn btn-secondary text-[var(--text-primary)] px-5 py-2.5 font-medium rounded-xl transition-colors">
                     Batal
                 </button>
-                <button type="submit" id="submit-btn" onclick="this.innerHTML='<i data-lucide=\'loader\' class=\'w-4 h-4 animate-spin\'></i> Memproses...';this.classList.add('opacity-75');" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] px-6 py-2.5 rounded-xl font-medium shadow-sm transition-colors flex items-center gap-2">
+                <button type="submit" id="submit-btn" onclick="this.innerHTML='<i data-lucide=\'loader\' class=\'w-4 h-4 animate-spin\'></i> Memproses...';this.classList.add('opacity-75');" class="btn btn-primary text-white px-6 py-2.5 rounded-xl font-medium shadow-xs transition-colors flex items-center gap-2">
                     <i data-lucide="upload" class="w-4 h-4"></i> Upload & Proses AI
                 </button>
             </div>

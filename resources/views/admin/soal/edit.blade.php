@@ -1,44 +1,60 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Soal')
+@section('title', 'Edit Soal - ' . $materi->judul)
 
 @section('content')
+<div class="max-w-4xl mx-auto space-y-6">
 
-<div class="mb-6 flex items-center gap-2">
-    @if($materi->is_pretest)
-    <a href="{{ route('admin.pretest.index') }}" class="text-text-secondary hover:text-primary flex items-center gap-1.5 font-medium transition-colors">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Kelola Pretest
-    </a>
-    @else
-    <a href="{{ route('admin.materi.edit', $materi->id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1.5 font-medium transition-colors">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Konfigurasi Kuis
-    </a>
-    @endif
-</div>
+    {{-- Top Back Navigation --}}
+    <div class="flex items-center justify-between">
+        @if($materi->is_pretest)
+            <a href="{{ route('admin.pretest.index') }}"
+               class="text-xs font-semibold text-[var(--text-secondary)] hover:text-primary flex items-center gap-1.5 transition-colors group">
+                <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform"></i>
+                <span>Kembali ke Bank Soal Pretest</span>
+            </a>
+        @else
+            <a href="{{ route('admin.materi.edit', $materi->id) }}"
+               class="text-xs font-semibold text-[var(--text-secondary)] hover:text-primary flex items-center gap-1.5 transition-colors group">
+                <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform"></i>
+                <span>Kembali ke Kelola Kuis</span>
+            </a>
+        @endif
+        <div class="text-xs text-[var(--text-secondary)]">
+            Kuis: <strong class="text-[var(--text-primary)] font-semibold">{{ $materi->judul }}</strong>
+        </div>
+    </div>
 
-<div class="max-w-3xl">
-    <div class="bg-[var(--surface)] border-[var(--border)] rounded-xl shadow-sm border p-6 md:p-8">
-        <div class="mb-6 pb-4 border-b border-border">
-            <h2 class="text-xl font-bold text-text-primary flex items-center gap-2">
-                <i data-lucide="edit-2" class="w-5 h-5 text-primary"></i> Edit Soal
-            </h2>
-            <p class="text-sm text-text-secondary mt-1">Kuis: <span class="font-medium text-text-primary">{{ $materi->judul }}</span></p>
+    {{-- Main Form Card --}}
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-2xl p-6 md:p-8 space-y-6">
+        <div class="pb-4 border-b border-[var(--border)] flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <i data-lucide="edit-3" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-[var(--text-primary)]">Edit Butir Soal</h1>
+                <p class="text-xs text-[var(--text-secondary)] mt-0.5">Perbarui pertanyaan, pilihan jawaban, kunci penilaian, atau pembahasan.</p>
+            </div>
         </div>
 
-        @if($errors->any())
-            <div class="bg-danger/10 border border-danger/20 text-danger px-4 py-3 rounded-lg mb-6 text-sm">
-                <ul class="list-disc pl-5">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            @endif
+        @if(isset($errors) && $errors->any())
+            <div class="bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-300 p-4 rounded-2xl text-sm flex gap-3 items-start">
+                <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5 text-rose-600"></i>
+                <div>
+                    <p class="font-bold text-xs uppercase tracking-wider mb-1">Periksa kesalahan input:</p>
+                    <ul class="list-disc pl-4 space-y-0.5 text-xs">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
 
         @php
             $currentTipe = old('tipe', $soal->tipe);
             $pilihanJawabans = $soal->pilihanJawaban;
 
-            // Determine correct answers depending on type
             if ($currentTipe === 'multi_select') {
                 $correctIndexes = $pilihanJawabans->filter(fn($p) => $p->is_correct)->map(fn($p, $i) => $i)->values()->toArray();
             } elseif ($currentTipe === 'pilihan_ganda') {
@@ -50,191 +66,243 @@
             }
         @endphp
 
-        <form action="{{ route('admin.soal.update', $soal->id) }}" method="POST" id="soal-form">
+        <form action="{{ route('admin.soal.update', $soal->id) }}" method="POST" id="soal-form" class="space-y-6">
             @csrf
             @method('PUT')
 
-            {{-- Question Type --}}
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-text-primary mb-2">Jenis Soal <span class="text-danger">*</span></label>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {{-- Question Type Selector --}}
+            <div class="space-y-2.5">
+                <label for="tipe" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                    Jenis Pertanyaan <span class="text-rose-500">*</span>
+                </label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
                     @php
                         $types = [
-                            ['value' => 'pilihan_ganda', 'label' => 'Multiple Choice', 'sub' => 'Satu jawaban benar', 'icon' => 'circle-dot'],
-                            ['value' => 'multi_select',  'label' => 'Multiple Select',  'sub' => 'Lebih dari satu benar', 'icon' => 'check-square'],
-                            ['value' => 'essay',         'label' => 'Free Text',         'sub' => 'Jawaban uraian bebas', 'icon' => 'align-left'],
-                            ['value' => 'isian_singkat', 'label' => 'Fill in the Blank', 'sub' => 'Isian singkat', 'icon' => 'underline'],
-                            ['value' => 'menjodohkan',   'label' => 'Matching',          'sub' => 'Pasangkan kolom', 'icon' => 'git-merge'],
+                            ['value' => 'pilihan_ganda', 'label' => 'Multiple Choice', 'sub' => '1 jawaban benar', 'icon' => 'circle-dot'],
+                            ['value' => 'multi_select',  'label' => 'Multi Select',     'sub' => '>1 jawaban benar', 'icon' => 'check-square'],
+                            ['value' => 'essay',         'label' => 'Uraian / Essay',   'sub' => 'Jawaban bebas', 'icon' => 'align-left'],
+                            ['value' => 'isian_singkat', 'label' => 'Isian Singkat',    'sub' => 'Teks kunci', 'icon' => 'underline'],
+                            ['value' => 'menjodohkan',   'label' => 'Menjodohkan',      'sub' => 'Pasangkan kolom', 'icon' => 'git-merge'],
                         ];
                     @endphp
                     @foreach($types as $type)
-                        <label class="type-card cursor-pointer" data-type="{{ $type['value'] }}">
+                        <label class="type-card cursor-pointer block" data-type="{{ $type['value'] }}">
                             <input type="radio" name="tipe" value="{{ $type['value'] }}" class="sr-only" {{ $currentTipe === $type['value'] ? 'checked' : '' }}>
-                            <div class="type-card-inner border-2 border-border rounded-xl p-3 text-center transition-all hover:border-accent/50">
-                                <i data-lucide="{{ $type['icon'] }}" class="w-6 h-6 mx-auto mb-1.5 text-text-secondary"></i>
-                                <p class="text-xs font-bold text-text-primary">{{ $type['label'] }}</p>
-                                <p class="text-[10px] text-text-secondary mt-0.5 leading-tight">{{ $type['sub'] }}</p>
+                            <div class="type-card-inner border-2 border-[var(--border)] rounded-xl p-3 text-center transition-all hover:border-primary/50 flex flex-col items-center justify-center min-h-[95px]">
+                                <i data-lucide="{{ $type['icon'] }}" class="w-5 h-5 mb-1.5 text-[var(--text-secondary)] transition-colors"></i>
+                                <p class="text-xs font-bold text-[var(--text-primary)]">{{ $type['label'] }}</p>
+                                <p class="text-[10px] text-[var(--text-secondary)] mt-0.5 leading-tight">{{ $type['sub'] }}</p>
                             </div>
                         </label>
                     @endforeach
                 </div>
             </div>
 
-            <hr class="border-border mb-6">
-
-            {{-- Pertanyaan --}}
-            <div class="mb-5">
-                <label for="pertanyaan" class="block text-sm font-semibold text-text-primary mb-1">Teks Pertanyaan <span class="text-danger">*</span></label>
+            {{-- Teks Pertanyaan --}}
+            <div class="space-y-1.5">
+                <label for="pertanyaan" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                    Teks Pertanyaan <span class="text-rose-500">*</span>
+                </label>
                 <textarea id="pertanyaan" name="pertanyaan" rows="3" required
-                    class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none resize-none">{{ old('pertanyaan', $soal->pertanyaan) }}</textarea>
+                    class="w-full px-4 py-3 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none transition-all">{{ old('pertanyaan', $soal->pertanyaan) }}</textarea>
             </div>
 
+            {{-- ============================================================ --}}
             {{-- PILIHAN GANDA & MULTI SELECT --}}
-            <div id="section-choices" class="space-y-3 mb-5">
-                <div class="flex items-center justify-between mb-2">
-                    <label class="text-sm font-semibold text-text-primary">Pilihan Jawaban <span class="text-danger">*</span></label>
-                    <button type="button" id="btn-add-choice" class="text-xs text-primary hover:text-primary-hover font-medium flex items-center gap-1">
-                        <i data-lucide="plus" class="w-3 h-3"></i> Tambah Pilihan
+            {{-- ============================================================ --}}
+            <div id="section-choices" class="space-y-3 pt-2">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                            Pilihan Jawaban & Kunci Jawaban <span class="text-rose-500">*</span>
+                        </label>
+                        <p class="text-[11px] text-[var(--text-muted)] mt-0.5">Pilih tombol radio/centang di sebelah kiri opsi untuk menandai kunci jawaban yang benar.</p>
+                    </div>
+                    <button type="button" id="btn-add-choice" class="text-xs font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary/5">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Tambah Opsi</span>
                     </button>
                 </div>
-                <div id="choices-container">
+
+                <div id="choices-container" class="space-y-2.5">
                     @php $labels = ['A','B','C','D','E','F','G','H']; @endphp
                     @if(in_array($currentTipe, ['pilihan_ganda', 'multi_select']) && $pilihanJawabans->isNotEmpty())
                         @foreach($pilihanJawabans as $idx => $p)
-                        <div class="flex items-center gap-3 choice-row" data-index="{{ $idx }}">
-                            <div class="correct-indicator shrink-0">
-                                <input type="radio" name="jawaban_benar" value="{{ $idx }}" class="pg-radio w-4 h-4 text-accent cursor-pointer {{ $currentTipe !== 'pilihan_ganda' ? 'hidden' : '' }}" {{ $p->is_correct && $currentTipe === 'pilihan_ganda' ? 'checked' : '' }}>
-                                <input type="checkbox" name="jawaban_benar[]" value="{{ $idx }}" class="ms-checkbox w-4 h-4 text-accent cursor-pointer {{ $currentTipe !== 'multi_select' ? 'hidden' : '' }}" {{ $p->is_correct && $currentTipe === 'multi_select' ? 'checked' : '' }}>
+                        <div class="flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all" data-index="{{ $idx }}">
+                            <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
+                                <input type="radio" name="jawaban_benar" value="{{ $idx }}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer {{ $currentTipe !== 'pilihan_ganda' ? 'hidden' : '' }}" {{ $p->is_correct && $currentTipe === 'pilihan_ganda' ? 'checked' : '' }} title="Tandai sebagai kunci benar">
+                                <input type="checkbox" name="jawaban_benar[]" value="{{ $idx }}" class="ms-checkbox w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer {{ $currentTipe !== 'multi_select' ? 'hidden' : '' }}" {{ $p->is_correct && $currentTipe === 'multi_select' ? 'checked' : '' }} title="Tandai sebagai kunci benar">
                             </div>
-                            <span class="w-6 h-6 rounded-full bg-secondary border border-border flex items-center justify-center text-xs font-bold text-text-secondary shrink-0">{{ $labels[$idx] ?? $idx+1 }}</span>
-                            <input type="text" name="pilihan[]" value="{{ old("pilihan.$idx", $p->teks) }}" placeholder="Teks pilihan"
-                                class="flex-1 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
+
+                            <span class="w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0">
+                                {{ $labels[$idx] ?? $idx+1 }}
+                            </span>
+
+                            <input type="text" name="pilihan[]" value="{{ old("pilihan.$idx", $p->teks) }}" placeholder="Teks pilihan" required
+                                class="flex-1 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs text-[var(--text-primary)] transition-all">
+
                             @if($idx >= 2)
-                            <button type="button" onclick="removeChoice(this)" class="p-1 text-text-secondary hover:text-danger transition-colors">
-                                <i data-lucide="x" class="w-4 h-4"></i>
-                            </button>
+                                <button type="button" onclick="removeChoice(this)" class="p-1.5 text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors" title="Hapus Opsi">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
                             @else
-                            <div class="w-6"></div>
+                                <div class="w-7"></div>
                             @endif
                         </div>
                         @endforeach
                     @else
                         @foreach(['A','B','C','D'] as $i => $label)
-                        <div class="flex items-center gap-3 choice-row" data-index="{{ $i }}">
-                            <div class="correct-indicator shrink-0">
-                                <input type="radio" name="jawaban_benar" value="{{ $i }}" class="pg-radio w-4 h-4 text-accent cursor-pointer" {{ $i === 0 ? 'checked' : '' }}>
-                                <input type="checkbox" name="jawaban_benar[]" value="{{ $i }}" class="ms-checkbox hidden w-4 h-4 text-accent cursor-pointer">
+                        <div class="flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all" data-index="{{ $i }}">
+                            <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
+                                <input type="radio" name="jawaban_benar" value="{{ $i }}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer" {{ $i === 0 ? 'checked' : '' }}>
+                                <input type="checkbox" name="jawaban_benar[]" value="{{ $i }}" class="ms-checkbox hidden w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer">
                             </div>
-                            <span class="w-6 h-6 rounded-full bg-secondary border border-border flex items-center justify-center text-xs font-bold text-text-secondary shrink-0">{{ $label }}</span>
+                            <span class="w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0">{{ $label }}</span>
                             <input type="text" name="pilihan[]" placeholder="Teks pilihan {{ $label }}"
-                                class="flex-1 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
+                                class="flex-1 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs text-[var(--text-primary)] transition-all">
                             @if($i >= 2)
-                            <button type="button" onclick="removeChoice(this)" class="p-1 text-text-secondary hover:text-danger transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="removeChoice(this)" class="p-1.5 text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
                             @else
-                            <div class="w-6"></div>
+                                <div class="w-7"></div>
                             @endif
                         </div>
                         @endforeach
                     @endif
                 </div>
-                <p class="text-xs text-text-secondary"><i data-lucide="info" class="w-3 h-3 inline mr-1"></i>Klik <strong>radio/centang</strong> di kiri untuk menandai jawaban yang benar.</p>
             </div>
 
+            {{-- ============================================================ --}}
             {{-- ISIAN SINGKAT --}}
-            <div id="section-isian" class="hidden mb-5">
-                <label class="block text-sm font-semibold text-text-primary mb-2">Kunci Jawaban <span class="text-danger">*</span></label>
-                <input type="text" name="jawaban_teks" placeholder="Masukkan jawaban yang benar..." value="{{ old('jawaban_teks', $isianTeks ?? '') }}"
-                    class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none text-sm">
-                <p class="text-xs text-text-secondary mt-1">Sistem akan mencocokkan jawaban peserta (tidak case-sensitive).</p>
+            {{-- ============================================================ --}}
+            <div id="section-isian" class="hidden space-y-2 pt-2">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                    Kunci Jawaban Isian <span class="text-rose-500">*</span>
+                </label>
+                <input type="text" name="jawaban_teks" placeholder="Masukkan teks jawaban yang dianggap tepat..." value="{{ old('jawaban_teks', $isianTeks ?? '') }}"
+                    class="w-full px-4 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                <p class="text-[11px] text-[var(--text-muted)]">Sistem akan mencocokkan teks jawaban peserta dengan kata kunci ini (tidak case-sensitive).</p>
             </div>
 
+            {{-- ============================================================ --}}
             {{-- ESSAY --}}
-            <div id="section-essay" class="hidden mb-5">
-                <div class="bg-[var(--card)] border border-border rounded-xl p-4 flex items-start gap-3">
-                    <i data-lucide="info" class="w-5 h-5 text-primary shrink-0 mt-0.5"></i>
+            {{-- ============================================================ --}}
+            <div id="section-essay" class="hidden pt-2">
+                <div class="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3 text-xs text-blue-900 dark:text-blue-200">
+                    <i data-lucide="info" class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5"></i>
                     <div>
-                        <p class="text-sm font-semibold text-text-primary">Jawaban Teks Bebas</p>
-                        <p class="text-xs text-text-secondary mt-1">Jawaban peserta akan direkam dan perlu dinilai secara manual oleh instruktur.</p>
+                        <p class="font-bold text-blue-700 dark:text-blue-300">Format Uraian / Esai Mandiri</p>
+                        <p class="mt-0.5 text-blue-800/80 dark:text-blue-300/80">Pertanyaan ini tidak memerlukan opsi jawaban. Jawaban peserta akan tersimpan untuk dinilai manual oleh instruktur.</p>
                     </div>
                 </div>
             </div>
 
+            {{-- ============================================================ --}}
             {{-- MENJODOHKAN --}}
-            <div id="section-matching" class="hidden mb-5">
-                <div class="flex items-center justify-between mb-3">
-                    <label class="text-sm font-semibold text-text-primary">Pasangan Jawaban <span class="text-danger">*</span></label>
-                    <button type="button" id="btn-add-pair" class="text-xs text-primary hover:text-primary-hover font-medium flex items-center gap-1">
-                        <i data-lucide="plus" class="w-3 h-3"></i> Tambah Pasangan
+            {{-- ============================================================ --}}
+            <div id="section-matching" class="hidden space-y-3 pt-2">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                            Pasangan Kolom Kiri & Kanan <span class="text-rose-500">*</span>
+                        </label>
+                        <p class="text-[11px] text-[var(--text-muted)] mt-0.5">Sistem akan mengacak urutan kolom kanan saat peserta mengerjakan kuis.</p>
+                    </div>
+                    <button type="button" id="btn-add-pair" class="text-xs font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary/5">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Tambah Pasangan</span>
                     </button>
                 </div>
-                <div class="grid grid-cols-11 gap-2 mb-2 text-xs font-semibold text-text-secondary px-1">
-                    <div class="col-span-5">Kolom Kiri</div>
-                    <div class="col-span-1 text-center">â†’</div>
-                    <div class="col-span-5">Kolom Kanan</div>
+
+                <div class="grid grid-cols-11 gap-2 text-[11px] font-bold uppercase tracking-wider text-[var(--text-secondary)] px-1">
+                    <div class="col-span-5">Kolom Kiri (Pernyataan)</div>
+                    <div class="col-span-1 text-center">&rarr;</div>
+                    <div class="col-span-5">Kolom Kanan (Pasangan Benar)</div>
                 </div>
+
                 <div id="pairs-container" class="space-y-2">
                     @if($currentTipe === 'menjodohkan' && !empty($pairs))
                         @foreach($pairs as $p)
-                        <div class="grid grid-cols-11 gap-2 pair-row">
-                            <input type="text" name="pasangan_kiri[]" value="{{ $p[0] ?? '' }}" required class="col-span-5 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
-                            <div class="col-span-1 flex items-center justify-center text-text-secondary">â†’</div>
-                            <input type="text" name="pasangan_kanan[]" value="{{ $p[1] ?? '' }}" required class="col-span-5 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
+                        <div class="grid grid-cols-11 gap-2 pair-row items-center">
+                            <input type="text" name="pasangan_kiri[]" value="{{ $p[0] ?? '' }}" required class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            <div class="col-span-1 flex items-center justify-center text-[var(--text-secondary)] font-bold">&rarr;</div>
+                            <input type="text" name="pasangan_kanan[]" value="{{ $p[1] ?? '' }}" required class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                         </div>
                         @endforeach
                     @else
                         @foreach(['1','2','3'] as $p)
-                        <div class="grid grid-cols-11 gap-2 pair-row">
-                            <input type="text" name="pasangan_kiri[]" placeholder="Item kiri {{ $p }}" required class="col-span-5 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
-                            <div class="col-span-1 flex items-center justify-center text-text-secondary">â†’</div>
-                            <input type="text" name="pasangan_kanan[]" placeholder="Pasangannya {{ $p }}" required class="col-span-5 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
+                        <div class="grid grid-cols-11 gap-2 pair-row items-center">
+                            <input type="text" name="pasangan_kiri[]" placeholder="Item kiri {{ $p }}" required class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            <div class="col-span-1 flex items-center justify-center text-[var(--text-secondary)] font-bold">&rarr;</div>
+                            <input type="text" name="pasangan_kanan[]" placeholder="Pasangan kanan {{ $p }}" required class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                         </div>
                         @endforeach
                     @endif
                 </div>
             </div>
 
-            <hr class="border-border my-5">
+            <hr class="border-[var(--border)]">
 
-            <div class="space-y-4 mb-6">
-                <div>
-                    <label for="pembahasan" class="block text-sm font-semibold text-text-primary mb-1">Pembahasan (Opsional)</label>
-                    <textarea id="pembahasan" name="pembahasan" rows="2"
-                        class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm resize-none">{{ old('pembahasan', $soal->pembahasan) }}</textarea>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
+            {{-- Parameter Nilai, Bobot & Pembahasan --}}
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="bobot" class="block text-sm font-semibold text-text-primary mb-1">Bobot Poin</label>
-                        <input type="number" id="bobot" name="bobot" value="{{ old('bobot', $soal->bobot) }}" min="1"
-                            class="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm">
+                        <label for="bobot" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+                            Bobot Poin Soal <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="number" id="bobot" name="bobot" value="{{ old('bobot', $soal->bobot) }}" min="1" required
+                            class="w-full px-4 py-2 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm font-bold text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                     </div>
-                    <div class="flex items-end pb-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" name="is_active" value="1" {{ $soal->is_active ? 'checked' : '' }} class="w-4 h-4 text-accent rounded border-border focus:ring-accent">
-                            <span class="text-sm font-semibold text-text-primary">Soal Aktif</span>
+
+                    <div class="flex items-center sm:pt-6">
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] hover:bg-[var(--muted)]/40 cursor-pointer w-full transition-colors">
+                            <input type="checkbox" name="is_active" value="1" {{ $soal->is_active ? 'checked' : '' }}
+                                class="w-4 h-4 rounded text-primary border-[var(--border)] focus:ring-primary cursor-pointer shrink-0">
+                            <div>
+                                <p class="text-xs font-bold text-[var(--text-primary)]">Soal Aktif</p>
+                                <p class="text-[10px] text-[var(--text-secondary)]">Akan dimuat saat peserta mengerjakan kuis.</p>
+                            </div>
                         </label>
                     </div>
                 </div>
+
                 @if($materi->is_pretest)
                 <div>
-                    <label for="topik_pelatihan_id" class="block text-sm font-semibold text-text-primary mb-1">Pilih Topik Penilaian (Untuk Pretest) <span class="text-danger">*</span></label>
-                    <select name="topik_pelatihan_id" id="topik_pelatihan_id" class="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm" required>
-                        <option value="">-- Pilih Topik --</option>
+                    <label for="topik_pelatihan_id" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+                        Topik Penilaian Diagnostik <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="topik_pelatihan_id" id="topik_pelatihan_id" required
+                        class="w-full px-4 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                        <option value="">-- Pilih Topik Indikator --</option>
                         @foreach($topiks as $topik)
                             <option value="{{ $topik->id }}" {{ old('topik_pelatihan_id', $soal->topik_pelatihan_id) == $topik->id ? 'selected' : '' }}>{{ $topik->nama_topik }}</option>
                         @endforeach
                     </select>
                 </div>
                 @endif
+
+                <div>
+                    <label for="pembahasan" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+                        Pembahasan / Penjelasan Jawaban <span class="text-[11px] font-normal text-[var(--text-muted)] lowercase">(opsional)</span>
+                    </label>
+                    <textarea id="pembahasan" name="pembahasan" rows="2" placeholder="Catatan pembahasan yang akan ditampilkan setelah kuis selesai..."
+                        class="w-full px-4 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none transition-all">{{ old('pembahasan', $soal->pembahasan) }}</textarea>
+                </div>
             </div>
 
-            <div class="flex justify-end gap-3 pt-4 border-t border-border">
+            {{-- Action Buttons --}}
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border)]">
                 @if($materi->is_pretest)
-                <a href="{{ route('admin.pretest.index') }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
+                    <a href="{{ route('admin.pretest.index') }}" class="btn btn-secondary text-xs font-semibold py-2.5 px-5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all">
+                        Batal
+                    </a>
                 @else
-                <a href="{{ route('admin.materi.edit', $materi->id) }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
+                    <a href="{{ route('admin.materi.edit', $materi->id) }}" class="btn btn-secondary text-xs font-semibold py-2.5 px-5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all">
+                        Batal
+                    </a>
                 @endif
-                <button type="submit" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
-                    Perbarui Soal
+                <button type="submit" class="btn btn-primary text-white text-xs font-semibold py-2.5 px-6 rounded-xl shadow-xs transition-all flex items-center gap-2">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    <span>Simpan Perubahan Soal</span>
                 </button>
             </div>
         </form>
@@ -258,6 +326,7 @@ function showSection(type) {
     allSections.forEach(s => document.getElementById(s)?.classList.add('hidden'));
     const target = sections[type];
     if (target) document.getElementById(target)?.classList.remove('hidden');
+
     const radios = document.querySelectorAll('.pg-radio');
     const checks = document.querySelectorAll('.ms-checkbox');
     if (type === 'multi_select') {
@@ -272,14 +341,16 @@ function showSection(type) {
 function updateTypeCards(activeType) {
     document.querySelectorAll('.type-card').forEach(card => {
         const inner = card.querySelector('.type-card-inner');
+        const icon = inner.querySelector('i');
+        const label = inner.querySelector('p');
         if (card.dataset.type === activeType) {
-            inner.classList.remove('border-border');
-            inner.classList.add('border-accent', 'bg-accent/5');
-            inner.querySelectorAll('i').forEach(el => { el.classList.remove('text-text-secondary'); el.classList.add('text-accent'); });
+            inner.className = 'type-card-inner border-2 border-primary bg-primary/5 rounded-xl p-3 text-center transition-all flex flex-col items-center justify-center min-h-[95px] shadow-2xs';
+            if (icon) icon.className = 'w-5 h-5 mb-1.5 text-primary transition-colors';
+            if (label) label.className = 'text-xs font-bold text-primary';
         } else {
-            inner.classList.add('border-border');
-            inner.classList.remove('border-accent', 'bg-accent/5');
-            inner.querySelectorAll('i').forEach(el => { el.classList.remove('text-accent'); el.classList.add('text-text-secondary'); });
+            inner.className = 'type-card-inner border-2 border-[var(--border)] rounded-xl p-3 text-center transition-all hover:border-primary/40 flex flex-col items-center justify-center min-h-[95px]';
+            if (icon) icon.className = 'w-5 h-5 mb-1.5 text-[var(--text-secondary)] transition-colors';
+            if (label) label.className = 'text-xs font-bold text-[var(--text-primary)]';
         }
     });
 }
@@ -288,14 +359,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const selected = document.querySelector('input[name="tipe"]:checked')?.value || 'pilihan_ganda';
     showSection(selected);
     updateTypeCards(selected);
-    lucide.createIcons();
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 });
 
 document.querySelectorAll('.type-card').forEach(card => {
     card.addEventListener('click', function() {
         const type = this.dataset.type;
         const radio = this.querySelector('input[type="radio"]');
-        radio.checked = true;
+        if (radio) radio.checked = true;
         showSection(type);
         updateTypeCards(type);
     });
@@ -310,25 +383,31 @@ document.getElementById('btn-add-choice')?.addEventListener('click', function() 
     const label = labels[index] || (index + 1);
     const container = document.getElementById('choices-container');
     const div = document.createElement('div');
-    div.className = 'flex items-center gap-3 choice-row';
+    div.className = 'flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all';
     div.dataset.index = index;
     const activeType = document.querySelector('input[name="tipe"]:checked')?.value;
     div.innerHTML = `
-        <div class="correct-indicator shrink-0">
-            <input type="radio" name="jawaban_benar" value="${index}" class="pg-radio w-4 h-4 text-accent cursor-pointer ${activeType === 'multi_select' ? 'hidden' : ''}">
-            <input type="checkbox" name="jawaban_benar[]" value="${index}" class="ms-checkbox w-4 h-4 text-accent cursor-pointer ${activeType !== 'multi_select' ? 'hidden' : ''}">
+        <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
+            <input type="radio" name="jawaban_benar" value="${index}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer ${activeType === 'multi_select' ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
+            <input type="checkbox" name="jawaban_benar[]" value="${index}" class="ms-checkbox w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer ${activeType !== 'multi_select' ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
         </div>
-        <span class="w-6 h-6 rounded-full bg-secondary border border-border flex items-center justify-center text-xs font-bold text-text-secondary shrink-0">${label}</span>
-        <input type="text" name="pilihan[]" placeholder="Teks pilihan ${label}" required class="flex-1 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
-        <button type="button" onclick="removeChoice(this)" class="p-1 text-text-secondary hover:text-danger transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+        <span class="w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0">${label}</span>
+        <input type="text" name="pilihan[]" placeholder="Teks pilihan ${label}" required
+            class="flex-1 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs text-[var(--text-primary)] transition-all">
+        <button type="button" onclick="removeChoice(this)" class="p-1.5 text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors" title="Hapus Opsi">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>`;
     container.appendChild(div);
     choiceCount++;
-    lucide.createIcons();
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 });
 
 function removeChoice(btn) {
+    const row = btn.closest('.choice-row');
     if (document.querySelectorAll('.choice-row').length <= 2) return alert('Minimal 2 pilihan jawaban.');
-    btn.closest('.choice-row').remove();
+    row.remove();
     choiceCount--;
 }
 
@@ -338,21 +417,27 @@ document.getElementById('btn-add-pair')?.addEventListener('click', function() {
     pairCount++;
     const container = document.getElementById('pairs-container');
     const div = document.createElement('div');
-    div.className = 'grid grid-cols-11 gap-2 pair-row';
+    div.className = 'grid grid-cols-11 gap-2 pair-row items-center';
     div.innerHTML = `
-        <input type="text" name="pasangan_kiri[]" placeholder="Item kiri ${pairCount}" required class="col-span-5 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
-        <div class="col-span-1 flex items-center justify-center text-text-secondary">â†’</div>
-        <input type="text" name="pasangan_kanan[]" placeholder="Pasangannya ${pairCount}" required class="col-span-4 px-3 py-2 border border-border rounded-lg focus:ring-1 focus:ring-accent focus:border-accent outline-none text-sm">
-        <button type="button" onclick="removePair(this)" class="col-span-1 flex items-center justify-center p-1 text-text-secondary hover:text-danger"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+        <input type="text" name="pasangan_kiri[]" placeholder="Item kiri ${pairCount}" required
+            class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+        <div class="col-span-1 flex items-center justify-center text-[var(--text-secondary)] font-bold">&rarr;</div>
+        <input type="text" name="pasangan_kanan[]" placeholder="Pasangan kanan ${pairCount}" required
+            class="col-span-4 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+        <button type="button" onclick="removePair(this)" class="col-span-1 flex items-center justify-center p-1.5 text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>`;
     container.appendChild(div);
-    lucide.createIcons();
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 });
 
 function removePair(btn) {
-    if (document.querySelectorAll('.pair-row').length <= 2) return alert('Minimal 2 pasangan.');
+    const rows = document.querySelectorAll('.pair-row');
+    if (rows.length <= 2) return alert('Minimal 2 pasangan.');
     btn.closest('.pair-row').remove();
     pairCount--;
 }
 </script>
 @endpush
-

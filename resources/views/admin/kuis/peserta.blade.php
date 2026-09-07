@@ -34,26 +34,26 @@
     $rataRata = $sesis->count() > 0 ? round($sesis->avg('skor'), 1) : 0;
 @endphp
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-xl p-5 text-center shadow-sm">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-5 text-center shadow-sm">
         <p class="text-3xl font-bold text-text-primary">{{ $sesis->count() }}</p>
         <p class="text-sm text-text-secondary mt-1">Total Peserta</p>
     </div>
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-xl p-5 text-center shadow-sm">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-5 text-center shadow-sm">
         <p class="text-3xl font-bold text-success">{{ $lulus }}</p>
         <p class="text-sm text-text-secondary mt-1">Lulus</p>
     </div>
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-xl p-5 text-center shadow-sm">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-5 text-center shadow-sm">
         <p class="text-3xl font-bold text-danger">{{ $gagal }}</p>
         <p class="text-sm text-text-secondary mt-1">Tidak Lulus</p>
     </div>
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-xl p-5 text-center shadow-sm">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-5 text-center shadow-sm">
         <p class="text-3xl font-bold text-accent">{{ $rataRata }}</p>
         <p class="text-sm text-text-secondary mt-1">Rata-rata Nilai</p>
     </div>
 </div>
 
 {{-- Table --}}
-<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl overflow-hidden">
     <div class="px-6 py-4 border-b border-border bg-secondary/30 flex items-center gap-2">
         <i data-lucide="list-checks" class="w-5 h-5 text-primary"></i>
         <h3 class="font-bold text-text-primary">Daftar Peserta</h3>

@@ -19,18 +19,34 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $input = $request->validate([
             'nip' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $loginInput = trim($input['nip']);
+        $password = $input['password'];
+
+        // Determine user by NIP, Email, or Shortcut
+        $user = null;
+        if ($loginInput === 'admin') {
+            $user = User::where('role', 'admin')->first();
+        } elseif ($loginInput === 'superadmin') {
+            $user = User::where('role', 'superadmin')->first();
+        } elseif (filter_var($loginInput, FILTER_VALIDATE_EMAIL)) {
+            $user = User::where('email', $loginInput)->first();
+        } else {
+            $user = User::where('nip', $loginInput)->first();
+        }
+
+        if ($user && Hash::check($password, $user->password)) {
+            Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
             return redirect()->intended(route('dashboard'));
         }
 
         return back()->withErrors([
-            'nip' => 'NIP atau password yang Anda masukkan salah.',
+            'nip' => 'NIP/Email atau password yang Anda masukkan tidak sesuai.',
         ])->onlyInput('nip');
     }
 

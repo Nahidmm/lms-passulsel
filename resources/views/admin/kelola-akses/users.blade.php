@@ -11,14 +11,14 @@
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
         <span class="text-text-primary font-medium">Assign Role ke Pengguna</span>
     </div>
-    <h1 class="text-2xl font-display font-bold text-primary flex items-center gap-2">
+    <h1 class="text-2xl font-sans font-bold text-primary flex items-center gap-2">
         <i data-lucide="user-cog" class="w-7 h-7"></i> Assign Role ke Pengguna
     </h1>
     <p class="text-text-secondary mt-1">Kelola role kustom yang dimiliki setiap pengguna sistem.</p>
 </div>
 
 {{-- Filter & Search --}}
-<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-4 mb-6">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-4 mb-6">
     <form method="GET" class="flex flex-col sm:flex-row gap-3">
         <div class="relative flex-1">
             <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary"></i>
@@ -26,7 +26,7 @@
                    placeholder="Cari nama atau NIP..."
                    class="w-full pl-9 pr-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
         </div>
-        <select name="base_role" class="px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm">
+        <select name="base_role" class="px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-xs">
             <option value="">Semua Role Dasar</option>
             <option value="admin" @selected(request('base_role') === 'admin')>Admin</option>
             <option value="peserta" @selected(request('base_role') === 'peserta')>Peserta</option>
@@ -43,9 +43,9 @@
 </div>
 
 {{-- Users Table --}}
-<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl overflow-hidden">
     <div class="p-4 border-b border-border bg-secondary/40 flex items-center justify-between">
-        <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
+        <h3 class="font-sans font-bold text-text-primary flex items-center gap-2">
             <i data-lucide="users" class="w-5 h-5 text-primary"></i> Daftar Pengguna
         </h3>
         <span class="text-xs text-text-secondary">{{ $users->total() }} pengguna ditemukan</span>
@@ -133,7 +133,7 @@
 {{-- Assign Role Modal --}}
 {{-- ============================== --}}
 <div id="assignModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {{-- Modal Header --}}
         <div class="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
@@ -180,7 +180,7 @@
             {{-- Modal Footer --}}
             <div class="px-6 py-4 bg-secondary/30 border-t border-border flex justify-end gap-2">
                 <button type="button" onclick="closeAssignModal()"
-                        class="px-4 py-2 text-sm font-semibold border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-sm hover:bg-secondary transition-colors">
+                        class="px-4 py-2 text-sm font-semibold border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-xs hover:bg-secondary transition-colors">
                     Batal
                 </button>
                 @if($customRoles->isNotEmpty())

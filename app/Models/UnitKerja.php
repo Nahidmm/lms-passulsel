@@ -10,4 +10,9 @@ class UnitKerja extends Model
     use HasFactory;
 
     protected $fillable = ['nama_unit'];
+
+    public function getNamaAttribute(): string
+    {
+        return $this->nama_unit ?? '';
+    }
 }

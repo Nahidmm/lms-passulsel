@@ -18,7 +18,7 @@
 {{-- Header --}}
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-        <h1 class="text-2xl font-display font-bold text-primary flex items-center gap-2">
+        <h1 class="text-2xl font-sans font-bold text-primary flex items-center gap-2">
             <i data-lucide="shield-check" class="w-7 h-7"></i> Kelola Akses Fitur
         </h1>
         <p class="text-text-secondary mt-1">Buat role kustom, atur permission, dan assign ke pengguna sistem.</p>
@@ -31,41 +31,41 @@
 
 {{-- Stats Cards --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border p-4 shadow-sm hover:border-primary transition-colors">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl border border-border p-4 shadow-sm hover:border-primary transition-colors">
         <div class="flex items-center gap-3 mb-1">
             <div class="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
                 <i data-lucide="shield" class="w-4 h-4"></i>
             </div>
             <span class="text-xs font-semibold text-text-secondary uppercase tracking-wide">Total Role</span>
         </div>
-        <p class="text-3xl font-display font-bold text-text-primary mt-2">{{ $stats['total_roles'] }}</p>
+        <p class="text-3xl font-sans font-bold text-text-primary mt-2">{{ $stats['total_roles'] }}</p>
     </div>
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border p-4 shadow-sm hover:border-accent transition-colors">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl border border-border p-4 shadow-sm hover:border-accent transition-colors">
         <div class="flex items-center gap-3 mb-1">
             <div class="w-9 h-9 bg-accent/10 rounded-lg flex items-center justify-center text-accent-hover">
                 <i data-lucide="key" class="w-4 h-4"></i>
             </div>
             <span class="text-xs font-semibold text-text-secondary uppercase tracking-wide">Permission</span>
         </div>
-        <p class="text-3xl font-display font-bold text-text-primary mt-2">{{ $stats['total_permissions'] }}</p>
+        <p class="text-3xl font-sans font-bold text-text-primary mt-2">{{ $stats['total_permissions'] }}</p>
     </div>
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border p-4 shadow-sm hover:border-success transition-colors">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl border border-border p-4 shadow-sm hover:border-success transition-colors">
         <div class="flex items-center gap-3 mb-1">
             <div class="w-9 h-9 bg-success/10 rounded-lg flex items-center justify-center text-success">
                 <i data-lucide="users" class="w-4 h-4"></i>
             </div>
             <span class="text-xs font-semibold text-text-secondary uppercase tracking-wide">Total User</span>
         </div>
-        <p class="text-3xl font-display font-bold text-text-primary mt-2">{{ $stats['total_users'] }}</p>
+        <p class="text-3xl font-sans font-bold text-text-primary mt-2">{{ $stats['total_users'] }}</p>
     </div>
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border p-4 shadow-sm hover:border-warning transition-colors">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl border border-border p-4 shadow-sm hover:border-warning transition-colors">
         <div class="flex items-center gap-3 mb-1">
             <div class="w-9 h-9 bg-warning/10 rounded-lg flex items-center justify-center text-warning">
                 <i data-lucide="user-check" class="w-4 h-4"></i>
             </div>
             <span class="text-xs font-semibold text-text-secondary uppercase tracking-wide">User Custom Role</span>
         </div>
-        <p class="text-3xl font-display font-bold text-text-primary mt-2">{{ $stats['users_with_custom'] }}</p>
+        <p class="text-3xl font-sans font-bold text-text-primary mt-2">{{ $stats['users_with_custom'] }}</p>
     </div>
 </div>
 
@@ -83,9 +83,9 @@
 {{-- Tab 1: Daftar Role --}}
 {{-- ============================== --}}
 <div id="content-roles">
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl overflow-hidden">
         <div class="p-4 border-b border-border bg-secondary/40 flex items-center justify-between">
-            <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
+            <h3 class="font-sans font-bold text-text-primary flex items-center gap-2">
                 <i data-lucide="shield" class="w-5 h-5 text-primary"></i> Semua Role
             </h3>
             <span class="text-xs text-text-secondary">{{ $roles->count() }} role terdaftar</span>
@@ -180,9 +180,9 @@
 {{-- Tab 2: Matrix Permission --}}
 {{-- ============================== --}}
 <div id="content-matrix" class="hidden">
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl overflow-hidden">
         <div class="p-4 border-b border-border bg-secondary/40">
-            <h3 class="font-display font-bold text-text-primary flex items-center gap-2">
+            <h3 class="font-sans font-bold text-text-primary flex items-center gap-2">
                 <i data-lucide="grid-3x3" class="w-5 h-5 text-primary"></i> Matrix Permission per Role
             </h3>
             <p class="text-xs text-text-secondary mt-1">Gambaran visual permission yang dimiliki setiap role.</p>

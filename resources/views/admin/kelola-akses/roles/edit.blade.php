@@ -11,7 +11,7 @@
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
         <span class="text-text-primary font-medium">Edit Role</span>
     </div>
-    <h1 class="text-2xl font-display font-bold text-primary flex items-center gap-2">
+    <h1 class="text-2xl font-sans font-bold text-primary flex items-center gap-2">
         <i data-lucide="shield-check" class="w-7 h-7"></i> Edit Role: {{ $role->nama }}
     </h1>
     <p class="text-text-secondary mt-1">Perbarui nama, deskripsi, dan permission untuk role ini.</p>
@@ -34,7 +34,7 @@
 
         {{-- Left: Role Info --}}
         <div class="lg:col-span-1 space-y-4">
-            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-5">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-5">
                 <h3 class="font-bold text-text-primary mb-4 flex items-center gap-2">
                     <i data-lucide="info" class="w-4 h-4 text-primary"></i> Informasi Role
                 </h3>
@@ -90,7 +90,7 @@
         <div class="lg:col-span-2 space-y-4">
 
             {{-- Select All --}}
-            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-4 flex items-center justify-between">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-4 flex items-center justify-between">
                 <p class="text-sm font-semibold text-text-primary">Permission yang Diizinkan</p>
                 <div class="flex gap-2">
                     <button type="button" onclick="selectAll()" class="text-xs font-semibold text-primary hover:underline px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors">Pilih Semua</button>
@@ -101,7 +101,7 @@
             @php $checkedIds = old('permissions', $rolePermissionIds); @endphp
 
             @foreach($permissions as $grup => $perms)
-            <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border overflow-hidden">
+            <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl overflow-hidden">
                 {{-- Group Header --}}
                 <div class="px-5 py-3 bg-secondary/50 border-b border-border flex items-center justify-between">
                     <h4 class="font-bold text-sm text-text-primary flex items-center gap-2">

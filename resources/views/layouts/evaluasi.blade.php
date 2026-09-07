@@ -1,46 +1,54 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluasi Berlangsung - SPEKTRA</title>
+    <title>@yield('title', 'Evaluasi Pembelajaran') - STRAPSUSPAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('logo/strapsuspas.png') }}">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     @vite('resources/css/app.css')
     @stack('styles')
 </head>
-<body class="game-shell font-sans antialiased min-h-screen flex flex-col overflow-x-hidden text-[var(--text-primary)] select-none">
+<body class="antialiased min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text-primary)] select-none">
 
-    <!-- Header Only (No Sidebar) -->
-    <header class="sticky top-0 z-50 backdrop-blur-xl bg-[#0d1117]/90 border-b border-[var(--border)] h-14 flex items-center justify-between px-4 lg:px-8">
+    <!-- Header (No Sidebar for focus mode) -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface)]/90 border-b border-[var(--border)] h-16 flex items-center justify-between px-4 lg:px-8 shadow-xs">
         <div class="flex items-center gap-3">
-            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-rose-600 to-orange-500 flex items-center justify-center">
-                <i data-lucide="skull" class="w-4 h-4 text-[var(--text-primary)]"></i>
-            </div>
+            <img src="{{ asset('logo/strapsuspas.png') }}" alt="STRAPSUSPAS" class="w-9 h-9 object-contain">
             <div>
-                <div class="font-display font-black text-[var(--text-primary)] text-sm leading-none">Boss Battle</div>
-                <div class="text-[9px] text-rose-400 font-black uppercase tracking-widest">Live</div>
+                <div class="font-bold text-[var(--text-primary)] text-sm leading-tight">Evaluasi Pembelajaran &bull; STRAPSUSPAS</div>
+                <div class="text-[11px] text-[var(--text-secondary)]">Kanwil Ditjenpas Sulsel</div>
             </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <div id="countdown-timer" class="flex items-center gap-2 bg-rose-500/15 text-rose-400 border border-rose-500/30 px-4 py-1.5 rounded-full font-black text-sm" style="box-shadow:0 0 15px rgba(239,68,68,0.2)">
+        <div class="flex items-center gap-3 md:gap-4">
+            <div id="header-timer-box" class="flex items-center gap-2 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 px-3.5 py-1.5 rounded-full font-bold text-xs shadow-xs">
                 <i data-lucide="timer" class="w-4 h-4"></i>
-                <span>--:--</span>
+                <span id="header-timer-val" class="font-mono text-sm">--:--</span>
             </div>
-            <div class="h-6 w-px bg-[var(--card)] border border-[var(--border)] shadow-sm"></div>
-            <div class="text-sm font-bold text-[var(--text-secondary)]">{{ Auth::user()->nama }}</div>
+            <div class="h-5 w-px bg-[var(--border)] hidden sm:block"></div>
+            <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]">
+                <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                <span>{{ Auth::user()->nama }}</span>
+            </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="p-4 md:p-6 lg:p-8 flex-1 max-w-7xl mx-auto w-full">
         @if(session('error'))
-            <div class="alert-error flex items-start gap-3 mb-6">
-                <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5 text-red-400"></i>
-                <div class="font-semibold">{{ session('error') }}</div>
+            <div class="alert alert-error mb-6">
+                <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+                <div class="font-semibold text-sm">{{ session('error') }}</div>
             </div>
         @endif
 
@@ -51,13 +59,12 @@
     <script>
         lucide.createIcons();
         
-        // Prevent right click & copy
+        // Prevent accidental right click & copy during exam
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('copy', event => {
-            event.clipboardData.setData('text/plain', 'Menyontek tidak diperbolehkan.');
+            event.clipboardData.setData('text/plain', 'Menyalin soal tidak diperkenankan.');
             event.preventDefault();
         });
     </script>
 </body>
 </html>
-

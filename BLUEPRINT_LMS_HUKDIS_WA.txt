@@ -1,0 +1,80 @@
+*🏛️ BLUEPRINT & RANCANGAN SISTEM LMS PEMBELAJARAN HUKDIS (HUKUMAN DISIPLIN)*
+_Transformasi LMS Berbasis Kompetensi, Penugasan/Sertifikat Eksternal, Diagnostik Kelemahan & CMS ala Moodle_
+
+---
+
+*🎯 TUJUAN TRANSFORMASI:*
+1. Mengubah LMS umum menjadi platform khusus pembelajaran Regulasi & Penegakan Disiplin Pegawai/ASN (PP 94/2021).
+2. CMS Pengelola mengadopsi struktur *Moodle Modern* (Section/Topic based, Add Activity/Resource Chooser, Grader Report, Turn Editing On) tapi dengan tampilan yang jauh lebih simpel, clean, dan cepat.
+3. Dilengkapi sistem *Diagnostik Titik Lemah* agar tahu materi disiplin mana yang belum dipahami peserta/unit kerja.
+
+---
+
+*👥 3 ROLE PENGGUNA:*
+1. *Peserta (Pegawai/Pejabat)*: Ikut Pretest -> Pelajari Materi -> Upload Tugas/Sertifikat Luar -> Quiz/Ujian -> Cek Progres & Nilai.
+2. *Instruktur/Penilai (Tim Disiplin/Widyaiswara)*: Kelola Topik Kursus -> Buat Aktivitas (Tugas, Kuis, Materi) -> Koreksi Tugas di Grader Report -> Berikan Feedback.
+3. *Admin/BKPSDM*: Kelola Master Data, Bank Soal per Kategori, Pantau Dashboard Statistik Interaktif & Ekspor Laporan.
+
+---
+
+*🌟 6 FITUR UTAMA SISTEM:*
+
+*1️⃣ UPLOAD TUGAS & SERTIFIKAT EKSTERNAL (STANDAR LMS)*
+• *Tugas Biasa*: Peserta mengunggah file resume, esai, tugas analisis, slide, atau lembar kerja (PDF/DOCX/JPG/ZIP).
+• *Upload Sertifikat Pembelajaran Luar*: Pengunggahan bukti sertifikat webinar/diklat eksternal (dilengkapi input nomor sertifikat & penyelenggara).
+• *Preview Dokumen Langsung*: Penilai dapat langsung membaca dokumen tugas atau melihat sertifikat di aplikasi tanpa perlu download manual.
+• *Fitur Penilaian*: Input nilai (0-100), catatan koreksi (feedback), dan tombol permintaan upload ulang/revisi.
+
+*2️⃣ QUIZ & UJIAN TETAP (POST-TEST)*
+• Kuis per modul untuk mengunci pemahaman materi per bab.
+• Ujian Akhir (Post-Test) menyeluruh dengan timer otomatis & pengacakan soal.
+• Pembahasan dan kunci jawaban otomatis setelah ujian selesai.
+
+*3️⃣ PRETEST DIAGNOSTIK & RADAR TITIK LEMAH (WEAKNESS MAPPING)*
+• Pretest wajib di awal sebelum materi terbuka.
+• Soal dikelompokkan ke indikator khusus:
+  - Kewajiban & Larangan ASN
+  - Klasifikasi Tingkat Hukuman (Ringan, Sedang, Berat)
+  - Pejabat yang Berwenang Menghukum (PBM)
+  - Tata Cara Pemeriksaan Disiplin
+  - Upaya Keberatan & Banding Administratif BAPEK
+• Menampilkan *Radar Chart* & memberi notifikasi: _"Titik Lemah Anda: Tata Cara Pemeriksaan (Akurasi: 30%)"_, langsung diarahkan ke modul terkait.
+
+*4️⃣ SISTEM PENILAIAN TERPADU*
+• Formula Nilai Akhir Otomatis:
+  - *Pretest*: 10%
+  - *Quiz Modul*: 20%
+  - *Tugas / Sertifikat Eksternal*: 35%
+  - *Post-Test Akhir*: 35%
+• Predikat Kelulusan: Sangat Kompeten (A), Kompeten (B), Cukup (C), Belum Kompeten (D/Remedial).
+
+*5️⃣ CEK PROGRES KINERJA & BELAJAR*
+• Progress Bar persentase penyelesaian kursus (0-100%).
+• Indikator Peningkatan Kinerja (Gap Analysis): Selisih nilai Post-Test vs Pretest.
+• Riwayat aktivitas dan estimasi waktu belajar peserta.
+
+*6️⃣ CMS PENGELOLA ALA MOODLE (MODERN MOODLE-STYLE CMS)*
+• *Turn Editing On / Mode Edit Toggle*: 1 tombol sakelar untuk mengaktifkan mode ubah urutan (drag & drop), edit inline, sembunyikan (hide/show mata), dan duplikasi materi.
+• *Modal "+ Add an Activity or Resource"*: Pop-up kartu visual untuk menambah:
+  - Aktivitas: Assignment (Penugasan/Sertifikat Luar), Quiz (Kuis/Ujian), Feedback/Survei.
+  - Sumber Belajar: Page (Halaman Teks Regulasi), File (PDF/PPT/DOCX), URL/Embed (Video YouTube).
+• *Moodle Grader Report (Buku Nilai Terpusat)*: Matriks tabel lengkap seluruh nilai peserta per topik/aktivitas + filter Unit Kerja.
+• *Question Bank & Random Questions*: Bank soal bertagging kategori indikator Hukdis dengan fitur pengacakan soal per topik.
+• *Activity Completion & Restrictions*: Otomatis mengunci topik berikutnya sebelum syarat pretest/tugas terpenuhi.
+
+---
+
+*📊 DASHBOARD STATISTIK & ANALITIK ADMIN (INTERAKTIF):*
+• *KPI Cards*: Total Peserta, Persentase Kelulusan, Tugas Menunggu Diperiksa, Rata-rata Skor.
+• *Radar Chart Kompetensi*: Memetakan topik hukdis yang paling sering salah dijawab se-instansi.
+• *Analisis Unit Kerja*: Mengetahui OPD/Unit Kerja mana yang paling patuh atau butuh sosialisasi hukdis tambahan.
+• *Ekspor Laporan*: Unduh rekap nilai & peta kelemahan ke Excel (.xlsx) dan PDF resmi.
+
+---
+
+*🚀 5 TAHAPAN IMPLEMENTASI:*
+1. *Tahap 1*: Setup Database (Tabel Course Section, Activities, Resources, Submissions & Gradebook).
+2. *Tahap 2*: CMS ala Moodle (Turn Editing On, Section/Topic View, Modal Add Activity/Resource).
+3. *Tahap 3*: Engine Pretest Diagnostik & Kalkulator Radar Kelemahan.
+4. *Tahap 4*: Portal Belajar Peserta, Upload Tugas & Moodle Grader Report.
+5. *Tahap 5*: Dashboard Visual Admin (Chart.js/ApexCharts), Filter Unit Kerja & Ekspor Laporan.

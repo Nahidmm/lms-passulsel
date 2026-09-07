@@ -86,6 +86,10 @@ Route::middleware(['auth'])->group(function () {
             // Pretest
             Route::get('/pretest/take', [\App\Http\Controllers\Peserta\PretestPesertaController::class, 'take'])->name('pretest.take');
 
+            // Penugasan & Upload Sertifikat Luar
+            Route::get('/tugas/{tugas}', [\App\Http\Controllers\Peserta\TugasPesertaController::class, 'show'])->name('tugas.show');
+            Route::post('/tugas/{tugas}/submit', [\App\Http\Controllers\Peserta\TugasPesertaController::class, 'submit'])->name('tugas.submit');
+
             // Statistik / Riwayat
             Route::get('/statistik', [StatistikController::class, 'indexPeserta'])->name('statistik.index');
         });
@@ -98,7 +102,18 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('pelatihan', \App\Http\Controllers\PelatihanController::class);
             Route::resource('pelatihan.materi', \App\Http\Controllers\MateriController::class)->shallow();
             Route::resource('materi.soal', \App\Http\Controllers\SoalController::class)->shallow();
-            Route::get('materi/{materi}/preview-quiz', [\App\Http\Controllers\MateriController::class, 'previewQuiz'])->name('materi.preview-quiz');
+            Route::match(['get', 'post'], 'materi/{materi}/preview-quiz', [\App\Http\Controllers\MateriController::class, 'previewQuiz'])->name('materi.preview-quiz');
+
+            // Penugasan & Upload Sertifikat (STRAPSUSPAS)
+            Route::resource('pelatihan.tugas', \App\Http\Controllers\Admin\TugasController::class)->parameters(['tugas' => 'tugas'])->shallow();
+            Route::get('tugas/{tugas}/submissions', [\App\Http\Controllers\Admin\TugasGradingController::class, 'index'])->name('tugas.submissions');
+            Route::post('tugas-submission/{submission}/nilai', [\App\Http\Controllers\Admin\TugasGradingController::class, 'grade'])->name('tugas.submission.nilai');
+
+            // Moodle-style Gradebook (Buku Nilai & Konfigurasi Bobot)
+            Route::get('gradebook', [\App\Http\Controllers\Admin\GradebookController::class, 'globalIndex'])->name('gradebook.index');
+            Route::get('pelatihan/{pelatihan}/gradebook', [\App\Http\Controllers\Admin\GradebookController::class, 'index'])->name('pelatihan.gradebook');
+            Route::post('pelatihan/{pelatihan}/gradebook/bobot', [\App\Http\Controllers\Admin\GradebookController::class, 'updateBobot'])->name('pelatihan.gradebook.bobot');
+            Route::get('pelatihan/{pelatihan}/gradebook/export', [\App\Http\Controllers\Admin\GradebookController::class, 'export'])->name('pelatihan.gradebook.export');
 
             // Kuis: Nilai & Review Peserta
             Route::get('kuis/{materi}/peserta', [\App\Http\Controllers\Admin\KuisReviewController::class, 'indexPeserta'])->name('kuis.peserta');
@@ -116,9 +131,11 @@ Route::middleware(['auth'])->group(function () {
             
             // Note: VideoController is deprecated since video is now a type of Materi
 
-            // Statistik / Rekap Peserta
-            Route::get('/statistik', [StatistikController::class, 'indexAdmin'])->name('statistik.index');
+            // Redirect legacy statistik & penilaian to unified Gradebook (Buku Nilai)
+            Route::get('/statistik', fn() => redirect()->route('admin.gradebook.index'))->name('statistik.index');
             Route::get('/statistik/export', [StatistikController::class, 'exportCsv'])->name('statistik.export');
+            Route::get('/penilaian', fn() => redirect()->route('admin.gradebook.index'))->name('penilaian.index');
+            Route::get('/penilaian/{user}', [\App\Http\Controllers\Admin\PenilaianController::class, 'show'])->name('penilaian.show');
 
             // Pretest Management
             Route::get('/pretest', [App\Http\Controllers\Admin\PretestController::class, 'index'])->name('pretest.index');
@@ -126,10 +143,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/pretest/topik', [App\Http\Controllers\Admin\PretestController::class, 'storeTopik'])->name('pretest.topik.store');
             Route::put('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'updateTopik'])->name('pretest.topik.update');
             Route::delete('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'destroyTopik'])->name('pretest.topik.destroy');
-
-            // Evaluasi Penilaian List
-            Route::get('/penilaian', [\App\Http\Controllers\Admin\PenilaianController::class, 'index'])->name('penilaian.index');
-            Route::get('/penilaian/{user}', [\App\Http\Controllers\Admin\PenilaianController::class, 'show'])->name('penilaian.show');
 
             // Kelola Jabatan
             Route::get('/jabatan', [JabatanController::class, 'index'])->name('jabatan.index');
@@ -140,6 +153,8 @@ Route::middleware(['auth'])->group(function () {
 
             // Manajemen Akun
             Route::get('/akun', [ManajemenAkunController::class, 'index'])->name('akun.index');
+            Route::post('/akun', [ManajemenAkunController::class, 'store'])->name('akun.store');
+            Route::put('/akun/{id}', [ManajemenAkunController::class, 'update'])->name('akun.update');
             Route::post('/akun/approve/{id}', [ManajemenAkunController::class, 'approve'])->name('akun.approve');
             Route::post('/akun/reject/{id}', [ManajemenAkunController::class, 'reject'])->name('akun.reject');
             Route::post('/akun/reset-password/{id}', [ManajemenAkunController::class, 'resetPassword'])->name('akun.reset-password');

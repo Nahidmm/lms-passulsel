@@ -94,6 +94,11 @@ class KuisReviewController extends Controller
             );
         }
 
+        // Recalculate composite gradebook
+        if ($materi->pelatihan_id) {
+            \App\Services\NilaiService::recalculate($sesi->user_id, $materi->pelatihan_id);
+        }
+
         return redirect()
             ->route('admin.kuis.jawaban', [$materi->id, $sesi->id])
             ->with('success', 'Penilaian manual berhasil disimpan. Nilai akhir diperbarui.');

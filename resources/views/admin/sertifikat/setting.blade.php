@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-2xl font-display font-bold text-text-primary">Konfigurasi Sertifikat</h1>
+    <h1 class="text-2xl font-sans font-bold text-text-primary">Konfigurasi Sertifikat</h1>
     <p class="text-text-secondary mt-1">Atur parameter dan desain sertifikat yang otomatis terbit untuk peserta.</p>
 </div>
 
@@ -21,7 +21,7 @@
     </div>
 @endif
 
-<form action="{{ route('admin.sertifikat-setting.update') }}" method="POST" enctype="multipart/form-data" class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-sm border border-border overflow-hidden">
+<form action="{{ route('admin.sertifikat-setting.update') }}" method="POST" enctype="multipart/form-data" class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-2xl overflow-hidden">
     @csrf
     @method('PUT')
     
@@ -80,11 +80,11 @@
         </div>
     </div>
     
-    <div class="px-6 md:px-8 py-5 bg-secondary/50 border-t border-border flex justify-end gap-3">
-                <a href="{{ route('admin.sertifikat-setting.preview') }}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-[var(--text-primary)] font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm flex items-center gap-2">
+    <div class="px-6 md:px-8 py-5 bg-[var(--muted)]/40 border-t border-[var(--border)] flex justify-end gap-3">
+        <a href="{{ route('admin.sertifikat-setting.preview') }}" target="_blank" class="btn bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-5 rounded-xl shadow-xs transition-all flex items-center gap-2">
             <i data-lucide="eye" class="w-4 h-4"></i> Preview Sertifikat
         </a>
-        <button type="submit" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm flex items-center gap-2">
+        <button type="submit" class="btn btn-primary text-white font-medium py-2.5 px-6 rounded-xl shadow-xs transition-all flex items-center gap-2">
             <i data-lucide="save" class="w-4 h-4"></i> Simpan Pengaturan
         </button>
     </div>

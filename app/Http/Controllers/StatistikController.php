@@ -35,7 +35,21 @@ class StatistikController extends Controller
             $chartData[] = $eval->skor;
         }
 
-        return view('peserta.statistik.index', compact('progresMateris', 'riwayatEvaluasi', 'chartLabels', 'chartData'));
+        // Rekap Nilai Peserta
+        $rekapNilais = \App\Models\RekapNilai::with('pelatihan')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        // Pretest Results & Pemetaan
+        $pretestResults = \App\Models\HasilPretestTopik::with('topik.pelatihan')
+            ->where('user_id', $user->id)
+            ->get();
+
+        return view('peserta.statistik.index', compact(
+            'progresMateris', 'riwayatEvaluasi', 'chartLabels', 'chartData',
+            'rekapNilais', 'pretestResults'
+        ));
     }
 
     public function indexAdmin(Request $request)

@@ -53,10 +53,19 @@ class PelatihanController extends Controller
 
     public function show(Pelatihan $pelatihan)
     {
-        $pelatihan->load(['materis' => function($q) {
-            $q->orderBy('urutan')->with('soals');
-        }]);
-        return view('admin.pelatihan.builder', compact('pelatihan'));
+        $pelatihan->load([
+            'materis' => function($q) {
+                $q->orderBy('urutan')->with('soals');
+            },
+            'tugas' => function($q) {
+                $q->orderBy('urutan')->withCount('submissions');
+            },
+            'bobotNilai'
+        ]);
+
+        $bobot = \App\Models\BobotNilai::getOrCreateDefault($pelatihan->id);
+
+        return view('admin.pelatihan.builder', compact('pelatihan', 'bobot'));
     }
 
     public function edit(Pelatihan $pelatihan)
@@ -248,6 +257,18 @@ class PelatihanController extends Controller
         $totalMateris = $materis->count();
         $persenProgress = $totalMateris > 0 ? floor(($completedCount / $totalMateris) * 100) : 0;
 
+        // Fetch assignments / tugas
+        $tugasList = $pelatihan->tugas()->where('is_active', true)->orderBy('urutan')->get();
+        $userSubmissions = \App\Models\TugasSubmission::where('user_id', $user->id)
+            ->whereIn('tugas_id', $tugasList->pluck('id'))
+            ->get()
+            ->keyBy('tugas_id');
+
+        // Fetch rekap nilai composite
+        $rekapNilai = \App\Models\RekapNilai::where('user_id', $user->id)
+            ->where('pelatihan_id', $pelatihan->id)
+            ->first();
+
         // Fetch certificate if pelatihan is completed
         $sertifikat = null;
         if ($progresPelatihan && $progresPelatihan->status === 'selesai') {
@@ -256,6 +277,9 @@ class PelatihanController extends Controller
                 ->first();
         }
 
-        return view('peserta.pelatihan.show', compact('pelatihan', 'materis', 'materiStatus', 'persenProgress', 'progresPelatihan', 'sertifikat'));
+        return view('peserta.pelatihan.show', compact(
+            'pelatihan', 'materis', 'materiStatus', 'persenProgress', 
+            'progresPelatihan', 'sertifikat', 'tugasList', 'userSubmissions', 'rekapNilai'
+        ));
     }
 }

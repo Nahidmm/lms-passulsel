@@ -6,17 +6,17 @@
 
 <div class="mb-6 flex items-center justify-between">
     <div>
-        <h1 class="text-2xl font-display font-bold text-text-primary">Kelola Jabatan</h1>
+        <h1 class="text-2xl font-sans font-bold text-text-primary">Kelola Jabatan</h1>
         <p class="text-text-secondary mt-1">Manajemen daftar jabatan yang digunakan dalam sistem.</p>
     </div>
     <button onclick="document.getElementById('modal-tambah').classList.remove('hidden')"
-            class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-5 rounded-xl shadow-sm transition-all text-sm">
+            class="btn btn-primary text-white font-medium py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-xs transition-all text-sm">
         <i data-lucide="plus" class="w-4 h-4"></i> Tambah Jabatan
     </button>
 </div>
 
 {{-- Table --}}
-<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm overflow-hidden">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
             <thead class="bg-secondary text-xs text-text-secondary uppercase border-b border-border">
@@ -91,9 +91,9 @@
 
 {{-- Modal Tambah --}}
 <div id="modal-tambah" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-xl w-full max-w-lg">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-2xl shadow-xl w-full max-w-lg">
         <div class="px-6 py-4 border-b border-border flex items-center justify-between">
-            <h3 class="font-display font-bold text-text-primary text-lg">Tambah Jabatan</h3>
+            <h3 class="font-sans font-bold text-text-primary text-lg">Tambah Jabatan</h3>
             <button onclick="document.getElementById('modal-tambah').classList.add('hidden')"
                     class="p-2 hover:bg-secondary rounded-xl transition-colors text-text-secondary">
                 <i data-lucide="x" class="w-5 h-5"></i>
@@ -121,7 +121,7 @@
                         class="px-5 py-2.5 text-sm font-bold text-text-secondary bg-secondary hover:bg-border rounded-xl transition-colors">
                     Batal
                 </button>
-                <button type="submit" class="px-5 py-2.5 text-sm font-bold text-[var(--text-primary)] bg-primary hover:bg-primary-hover rounded-xl transition-colors shadow-sm">
+                <button type="submit" class="btn btn-primary text-white font-medium px-5 py-2.5 rounded-xl shadow-xs transition-all text-sm">
                     Simpan Jabatan
                 </button>
             </div>
@@ -131,9 +131,9 @@
 
 {{-- Modal Edit --}}
 <div id="modal-edit" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-2xl shadow-xl w-full max-w-lg">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-2xl shadow-xl w-full max-w-lg">
         <div class="px-6 py-4 border-b border-border flex items-center justify-between">
-            <h3 class="font-display font-bold text-text-primary text-lg">Edit Jabatan</h3>
+            <h3 class="font-sans font-bold text-text-primary text-lg">Edit Jabatan</h3>
             <button onclick="document.getElementById('modal-edit').classList.add('hidden')"
                     class="p-2 hover:bg-secondary rounded-xl transition-colors text-text-secondary">
                 <i data-lucide="x" class="w-5 h-5"></i>
@@ -161,7 +161,7 @@
                         class="px-5 py-2.5 text-sm font-bold text-text-secondary bg-secondary hover:bg-border rounded-xl transition-colors">
                     Batal
                 </button>
-                <button type="submit" class="px-5 py-2.5 text-sm font-bold text-[var(--text-primary)] bg-primary hover:bg-primary-hover rounded-xl transition-colors shadow-sm">
+                <button type="submit" class="btn btn-primary text-white font-medium px-5 py-2.5 rounded-xl shadow-xs transition-all text-sm">
                     Simpan Perubahan
                 </button>
             </div>

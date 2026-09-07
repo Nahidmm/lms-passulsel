@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Materi extends Model
 {
     protected $fillable = [
-        'judul', 'deskripsi', 'jenis', 'is_pretest', 'file_path', 'url_link',
+        'judul', 'deskripsi', 'jenis', 'is_pretest', 'is_posttest', 'file_path', 'url_link',
         'modul_id', 'pelatihan_id', 'urutan', 'is_active', 'durasi_baca', 'poin',
         'prasyarat_materi_id', 'passing_grade', 'durasi_menit',
         'max_attempts', 'acak_soal', 'acak_jawaban',
@@ -20,6 +20,7 @@ class Materi extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'is_pretest' => 'boolean',
+        'is_posttest' => 'boolean',
         'acak_soal' => 'boolean',
         'acak_jawaban' => 'boolean',
         'tampilkan_feedback' => 'boolean',

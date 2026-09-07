@@ -3,20 +3,18 @@
 @section('title', 'Ubah Password Wajib')
 
 @section('content')
-
 <div class="text-center mb-6">
-    <div class="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
+    <div class="w-14 h-14 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
+        <i data-lucide="shield-alert" class="w-7 h-7"></i>
     </div>
-    <h2 class="text-xl font-bold text-text-primary mb-1">Ganti Password</h2>
-    <p class="text-sm text-text-secondary">Demi keamanan, Anda diwajibkan mengganti password bawaan sebelum melanjutkan.</p>
+    <h2 class="text-2xl font-bold tracking-tight text-[var(--text-primary)] mb-1.5">Ganti Password Bawaan</h2>
+    <p class="text-sm text-[var(--text-secondary)]">Demi keamanan data Anda, silakan perbarui password sebelum mengakses dashboard.</p>
 </div>
 
 @if($errors->any())
-    <div class="bg-danger/10 border border-danger/20 text-danger px-4 py-3 rounded-lg mb-6 text-sm">
-        <ul class="list-disc pl-5">
+    <div class="p-4 rounded-xl bg-danger/10 border border-danger/20 text-danger text-sm mb-6 flex items-start gap-3">
+        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+        <ul class="list-disc pl-4 space-y-1">
             @foreach($errors->all() as $error)
                 <li>{{ $error }}</li>
             @endforeach
@@ -28,32 +26,42 @@
     @csrf
     
     <div>
-        <label for="password" class="block text-sm font-medium text-text-primary mb-1">Password Baru</label>
-        <input type="password" id="password" name="password" required minlength="8" autofocus
-            class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-shadow"
-            placeholder="Min. 8 karakter">
+        <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Password Baru</label>
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+            </span>
+            <input type="password" id="password" name="password" required minlength="8" autofocus
+                class="w-full pl-10 pr-4 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-[var(--text-muted)]"
+                placeholder="Minimal 8 karakter">
+        </div>
     </div>
 
     <div>
-        <label for="password_confirmation" class="block text-sm font-medium text-text-primary mb-1">Ulangi Password Baru</label>
-        <input type="password" id="password_confirmation" name="password_confirmation" required minlength="8"
-            class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-shadow"
-            placeholder="Ketik ulang password">
+        <label for="password_confirmation" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Konfirmasi Password Baru</label>
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+            </span>
+            <input type="password" id="password_confirmation" name="password_confirmation" required minlength="8"
+                class="w-full pl-10 pr-4 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-[var(--text-muted)]"
+                placeholder="Ketik ulang password baru">
+        </div>
     </div>
 
-    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2.5 px-4 rounded-lg transition-colors mt-2">
-        Simpan & Lanjutkan
+    <button type="submit" class="w-full btn btn-primary text-white py-3 rounded-xl font-semibold shadow-md shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 mt-4">
+        <span>Simpan & Lanjutkan</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
     </button>
 </form>
 
 <div class="mt-6 text-center">
     <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button type="submit" class="text-sm text-text-secondary hover:text-danger font-medium transition-colors">
-            Keluar
+        <button type="submit" class="text-sm text-[var(--text-secondary)] hover:text-danger font-medium transition-colors inline-flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span>Keluar Sesi</span>
         </button>
     </form>
 </div>
-
 @endsection
-

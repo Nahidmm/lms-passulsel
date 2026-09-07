@@ -56,6 +56,7 @@ class MateriController extends Controller
         $materi = new Materi($validated);
         $materi->pelatihan_id = $pelatihan->id;
         $materi->is_active = $request->has('is_active');
+        $materi->is_posttest = $request->boolean('is_posttest');
         $materi->acak_soal = $request->has('acak_soal');
         $materi->acak_jawaban = $request->has('acak_jawaban');
         $materi->tampilkan_feedback = $request->has('tampilkan_feedback');
@@ -142,6 +143,7 @@ class MateriController extends Controller
 
         $materi->fill($validated);
         $materi->is_active = $request->has('is_active');
+        $materi->is_posttest = $request->boolean('is_posttest');
         $materi->acak_soal = $request->has('acak_soal');
         $materi->acak_jawaban = $request->has('acak_jawaban');
         $materi->tampilkan_feedback = $request->has('tampilkan_feedback');
@@ -259,9 +261,47 @@ class MateriController extends Controller
 
         return redirect()->route('peserta.pelatihan.show', $materi->pelatihan_id)->with('success', 'Materi berhasil diselesaikan!');
     } 
-    public function previewQuiz(Materi $materi)
+    public function previewQuiz(Request $request, Materi $materi)
     {
-        $soals = $materi->soals()->get();
+        if ($request->isMethod('post')) {
+            $jawaban = $request->input('jawaban', []);
+            $soals = $materi->soals()->with('pilihanJawaban')->where('is_active', true)->get();
+            $totalSoal = $soals->count();
+            $totalBenar = 0;
+
+            foreach ($soals as $soal) {
+                if ($soal->tipe === 'pilihan_ganda') {
+                    $selectedId = $jawaban[$soal->id] ?? null;
+                    if ($selectedId) {
+                        $pilihan = $soal->pilihanJawaban->firstWhere('id', $selectedId);
+                        if ($pilihan && $pilihan->is_correct) {
+                            $totalBenar++;
+                        }
+                    }
+                } elseif ($soal->tipe === 'multi_select') {
+                    $selectedIds = (array)($jawaban[$soal->id] ?? []);
+                    $correctIds = $soal->pilihanJawaban->where('is_correct', true)->pluck('id')->map(fn($id) => (string)$id)->toArray();
+                    $selectedIds = array_map('strval', $selectedIds);
+                    sort($selectedIds);
+                    sort($correctIds);
+                    if (!empty($selectedIds) && $selectedIds === $correctIds) {
+                        $totalBenar++;
+                    }
+                } elseif ($soal->tipe === 'isian_singkat') {
+                    $userText = trim(strtolower($jawaban[$soal->id] ?? ''));
+                    $correctOptions = $soal->pilihanJawaban->pluck('teks')->map(fn($t) => trim(strtolower($t)))->toArray();
+                    if ($userText !== '' && in_array($userText, $correctOptions)) {
+                        $totalBenar++;
+                    }
+                }
+            }
+
+            $skor = $totalSoal > 0 ? round(($totalBenar / $totalSoal) * 100, 1) : 0;
+            return redirect()->route('admin.materi.edit', $materi->id)
+                ->with('success', "Simulasi Pratinjau Kuis Selesai! Skor Anda: {$skor}/100 ({$totalBenar} dari {$totalSoal} soal benar). Seluruh alur pengerjaan kuis berfungsi dengan baik.");
+        }
+
+        $soals = $materi->soals()->with('pilihanJawaban')->get();
         $sesi = (object)[
             'id' => 'preview',
             'xp_earned' => 0,

@@ -290,6 +290,16 @@ class EvaluasiController extends Controller
             }
         }
 
+        // Recalculate composite gradebook for STRAPSUSPAS
+        if ($materi->pelatihan_id) {
+            \App\Services\NilaiService::recalculate($sesi->user_id, $materi->pelatihan_id);
+        } elseif ($materi->is_pretest) {
+            $pelatihanIds = \App\Models\Pelatihan::pluck('id');
+            foreach ($pelatihanIds as $pId) {
+                \App\Services\NilaiService::recalculate($sesi->user_id, $pId);
+            }
+        }
+
         return redirect()->route('peserta.evaluasi.hasil', ['sesi' => $sesi->id]);
     }
 

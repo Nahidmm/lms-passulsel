@@ -97,16 +97,16 @@ class SamplePretestSeeder extends Seeder
         // ==========================================
         $soal3 = Soal::create([
             'topik_pelatihan_id' => $topikUmum->id,
-            'pertanyaan' => "Ketik jawaban satu kata:\nSistem Pemasyarakatan di Indonesia secara resmi digagas pertama kali pada tahun 1964 oleh tokoh yang sering disebut sebagai Bapak Pemasyarakatan, yaitu Bapak Sahardjo. Institusi yang membawahi Pemasyarakatan adalah Kementerian Hukum dan...?",
+            'pertanyaan' => "Ketik jawaban satu kata:\nSistem Pemasyarakatan di Indonesia secara resmi digagas pertama kali pada tahun 1964 oleh tokoh yang sering disebut sebagai Bapak Pemasyarakatan, yaitu Bapak Sahardjo. Lembaga teknis utama yang menyelenggarakan dan mengelola sistem pemasyarakatan di Indonesia adalah Direktorat Jenderal...?",
             'tipe' => 'isian_singkat',
-            'pembahasan' => 'Kementerian Hukum dan HAM (atau Hak Asasi Manusia). Dalam struktur saat ini disebut Kemenimipas / Kemenkumham.',
+            'pembahasan' => 'Direktorat Jenderal Pemasyarakatan (Ditjenpas).',
             'bobot' => 20,
             'is_active' => true,
         ]);
         $pretest->soals()->attach($soal3->id);
         // Untuk isian singkat, teks pertama = kunci jawaban
         PilihanJawaban::insert([
-            ['soal_id' => $soal3->id, 'huruf' => '', 'teks' => 'HAM', 'is_correct' => true],
+            ['soal_id' => $soal3->id, 'huruf' => '', 'teks' => 'Pemasyarakatan', 'is_correct' => true],
         ]);
 
         // ==========================================

@@ -19,7 +19,7 @@
     $essaySoals = $hasilLatihans->filter(fn($h) => $h->soal && in_array($h->soal->tipe, ['essay', 'isian_singkat', 'free_text']));
 @endphp
 
-<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm p-6 mb-6">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6 mb-6">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div class="flex items-start gap-4">
             <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
@@ -78,7 +78,7 @@
             ];
             $tipeInfo = $tipeLabels[$soal->tipe ?? ''] ?? ['label' => ucfirst($soal->tipe ?? '-'), 'color' => 'bg-[#13161c] text-gray-300'];
         @endphp
-        <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border {{ $isEssay ? 'border-border' : ($isBenar ? 'border-success/30' : 'border-danger/30') }} shadow-sm overflow-hidden">
+        <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl border {{ $isEssay ? 'border-border' : ($isBenar ? 'border-success/30' : 'border-danger/30') }} shadow-sm overflow-hidden">
             {{-- Soal header --}}
             <div class="px-5 py-4 border-b border-border flex items-start justify-between gap-4 {{ $isEssay ? 'bg-secondary/20' : ($isBenar ? 'bg-success/5' : 'bg-danger/5') }}">
                 <div class="flex items-start gap-3 flex-1 min-w-0">
@@ -189,13 +189,13 @@
                                 <label class="block text-xs font-semibold text-text-primary mb-1.5">Nilai (0 â€“ {{ $soal->bobot }})</label>
                                 <input type="number" name="penilaian[{{ $hasil->id }}][skor]"
                                     value="{{ $hasil->skor }}" min="0" max="{{ $soal->bobot }}" step="0.5"
-                                    class="w-full px-4 py-2.5 border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-sm focus:ring-2 focus:ring-accent focus:border-accent outline-none text-center text-lg font-bold">
+                                    class="w-full px-4 py-2.5 border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-xs focus:ring-2 focus:ring-accent focus:border-accent outline-none text-center text-lg font-bold">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-text-primary mb-1.5">Catatan Admin (opsional)</label>
                                 <input type="text" name="penilaian[{{ $hasil->id }}][catatan]"
                                     value="{{ $hasil->catatan_admin }}" placeholder="Misal: Jawaban kurang lengkap"
-                                    class="w-full px-4 py-2.5 border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-sm focus:ring-2 focus:ring-accent focus:border-accent outline-none text-sm">
+                                    class="w-full px-4 py-2.5 border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-xs focus:ring-2 focus:ring-accent focus:border-accent outline-none text-sm">
                             </div>
                         </div>
                         @if($hasil->catatan_admin)
@@ -210,8 +210,8 @@
 
 @if($essaySoals->isNotEmpty())
     <div class="mt-6 flex justify-end">
-        <button type="submit" class="bg-accent hover:bg-accent-hover text-[var(--text-primary)] font-bold py-3 px-8 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
-            <i data-lucide="save" class="w-5 h-5"></i> Simpan Penilaian Manual
+        <button type="submit" class="btn btn-primary text-white font-medium py-2.5 px-6 rounded-xl transition-all shadow-xs flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i> Simpan Penilaian Manual
         </button>
     </div>
 </form>

@@ -1,6 +1,7 @@
-# LMS Pemasyarakatan Sulawesi Selatan (SPEKTRA)
+# STRAPSUSPAS — Kanwil Ditjenpas Sulsel
+**Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak**
 
-LMS SPEKTRA adalah sistem manajemen pembelajaran khusus untuk pegawai di lingkungan Kanwil Kemenkumham Sulawesi Selatan. Sistem ini dilengkapi dengan Kuis Interaktif (Cinematic Game Mode) dan Asisten AI berbasis Google Gemini.
+STRAPSUSPAS adalah platform pembelajaran dan evaluasi kepatuhan hukum disiplin khusus pegawai di lingkungan Kantor Wilayah Direktorat Jenderal Pemasyarakatan Sulawesi Selatan. Sistem ini dilengkapi dengan Kuis Interaktif, Penugasan Kasus, Pretest Diagnostik, dan Asisten AI berbasis Google Gemini.
 
 ## 🚀 Panduan Instalasi (Untuk Tim Pengembang / Kolaborasi)
 

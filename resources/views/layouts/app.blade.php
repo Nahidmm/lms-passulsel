@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0b0e13">
-    <meta name="description" content="SPEKTRA Ã¢â‚¬â€ Platform pembelajaran dan evaluasi berbasis cinematic experience.">
-    <title>@yield('title', 'Dashboard') - SPEKTRA</title>
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="STRAPSUSPAS - Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak | Kanwil Ditjenpas Sulsel.">
+    <title>@yield('title', 'Dashboard') - STRAPSUSPAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23c8891a'/><text y='24' x='4' font-size='22' font-family='serif'>Ã¢Å¡Â¡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('logo/strapsuspas.png') }}">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -20,15 +21,15 @@
     @vite('resources/css/app.css')
     @stack('styles')
 </head>
-<body class="game-shell antialiased overflow-x-hidden" id="app-body" style="--mx:0;--my:0;">
+<body class="antialiased min-h-screen text-[var(--text-primary)] bg-[var(--bg)]" id="app-body">
 
-    {{-- ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â MOBILE OVERLAY (backdrop when drawer open) ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â --}}
+    {{-- ── MOBILE OVERLAY (backdrop when drawer open) ── --}}
     <div id="mobile-overlay"
-         class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"
+         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"
          onclick="closeSidebar()">
     </div>
 
-    {{-- ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â LAYOUT WRAPPER ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â --}}
+    {{-- ── LAYOUT WRAPPER ── --}}
     <div class="app-layout">
 
         {{-- Sidebar (desktop: always visible | mobile: drawer) --}}
@@ -79,7 +80,7 @@
         </div>
     </div>
 
-    {{-- ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â MOBILE BOTTOM NAV BAR ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â --}}
+    {{-- ── MOBILE BOTTOM NAV BAR ── --}}
     <nav class="mobile-bottom-nav md:hidden" id="mobile-bottom-nav">
         <a href="{{ route('dashboard') }}"
            class="mobile-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -120,10 +121,10 @@
                     <span class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full text-[8px] font-black text-[var(--text-primary)] flex items-center justify-center">{{ $pc }}</span>
                 @endif
             </a>
-            <a href="{{ route('admin.statistik.index') }}"
-               class="mobile-nav-item {{ request()->routeIs('admin.statistik.*') ? 'active' : '' }}">
-                <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
-                <span>Statistik</span>
+            <a href="{{ route('admin.gradebook.index') }}"
+               class="mobile-nav-item {{ request()->routeIs('admin.gradebook.*', 'admin.pelatihan.gradebook', 'admin.penilaian.*') ? 'active' : '' }}">
+                <i data-lucide="award" class="w-5 h-5"></i>
+                <span>Buku Nilai</span>
             </a>
         @endif
 
@@ -146,13 +147,13 @@
         function updateThemeIcons() {
             if(!themeToggleBtn) return;
             if (document.documentElement.classList.contains('dark')) {
-                lightIcon.classList.remove('hidden');
-                darkIcon.classList.add('hidden');
-                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0b0e13');
+                lightIcon?.classList.remove('hidden');
+                darkIcon?.classList.add('hidden');
+                document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0f172a');
             } else {
-                darkIcon.classList.remove('hidden');
-                lightIcon.classList.add('hidden');
-                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fdf4e3');
+                darkIcon?.classList.remove('hidden');
+                lightIcon?.classList.add('hidden');
+                document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#ffffff');
             }
         }
         
@@ -170,52 +171,50 @@
             });
         }
 
-        // Ã¢â€â‚¬Ã¢â€â‚¬ Sidebar: mobile drawer Ã¢â€â‚¬Ã¢â€â‚¬
+        // ── Sidebar: mobile drawer ──
         function openSidebar() {
             const sidebar = document.getElementById('app-sidebar');
             const overlay = document.getElementById('mobile-overlay');
             const body    = document.getElementById('app-body');
-            sidebar.classList.add('sidebar-open');
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            overlay.classList.add('opacity-100');
-            body.style.overflow = 'hidden';
+            sidebar?.classList.add('sidebar-open');
+            overlay?.classList.remove('opacity-0', 'pointer-events-none');
+            overlay?.classList.add('opacity-100');
+            if (body) body.style.overflow = 'hidden';
         }
 
         function closeSidebar() {
             const sidebar = document.getElementById('app-sidebar');
             const overlay = document.getElementById('mobile-overlay');
             const body    = document.getElementById('app-body');
-            sidebar.classList.remove('sidebar-open');
-            overlay.classList.add('opacity-0', 'pointer-events-none');
-            overlay.classList.remove('opacity-100');
-            body.style.overflow = '';
+            sidebar?.classList.remove('sidebar-open');
+            overlay?.classList.add('opacity-0', 'pointer-events-none');
+            overlay?.classList.remove('opacity-100');
+            if (body) body.style.overflow = '';
         }
 
-        // Ã¢â€â‚¬Ã¢â€â‚¬ Sidebar toggle: collapse on desktop, drawer on mobile Ã¢â€â‚¬Ã¢â€â‚¬
+        // ── Sidebar toggle: collapse on desktop, drawer on mobile ──
         function toggleSidebar() {
             if (window.innerWidth >= 768) {
-                // Desktop: toggle icon-only collapse
                 const sidebar = document.getElementById('app-sidebar');
                 const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
                 localStorage.setItem('sb-collapsed', isCollapsed ? '1' : '0');
             } else {
-                // Mobile: open/close drawer
                 const sidebar = document.getElementById('app-sidebar');
-                if (sidebar.classList.contains('sidebar-open')) closeSidebar();
+                if (sidebar?.classList.contains('sidebar-open')) closeSidebar();
                 else openSidebar();
             }
         }
 
-        // Ã¢â€â‚¬Ã¢â€â‚¬ Restore sidebar state on load Ã¢â€â‚¬Ã¢â€â‚¬
+        // ── Restore sidebar state on load (Desktop defaults to expanded) ──
         (function() {
             const sidebar = document.getElementById('app-sidebar');
             if (!sidebar) return;
             if (window.innerWidth >= 768) {
-                // Default: collapsed unless user explicitly expanded
                 const saved = localStorage.getItem('sb-collapsed');
-                // null = first visit Ã¢â€ â€™ default collapsed
-                if (saved === null || saved === '1') {
+                if (saved === '1') {
                     sidebar.classList.add('sidebar-collapsed');
+                } else {
+                    sidebar.classList.remove('sidebar-collapsed');
                 }
             }
         })();
@@ -231,31 +230,6 @@
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 768) closeSidebar();
         });
-
-        // Ã¢â€â‚¬Ã¢â€â‚¬ Global pointer parallax for CSS vars --mx/--my Ã¢â€â‚¬Ã¢â€â‚¬
-        (function() {
-            const root = document.documentElement;
-            let txMX = 0, txMY = 0, mX = 0, mY = 0, raf = false;
-            const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
-            function lerp(a, b, t) { return a + (b - a) * t; }
-            function tick() {
-                raf = false;
-                mX = lerp(mX, txMX, 0.08);
-                mY = lerp(mY, txMY, 0.08);
-                if (!rm.matches) {
-                    root.style.setProperty('--mx', mX.toFixed(4));
-                    root.style.setProperty('--my', mY.toFixed(4));
-                }
-                if (Math.abs(mX - txMX) > 0.001 || Math.abs(mY - txMY) > 0.001) {
-                    raf = true; requestAnimationFrame(tick);
-                }
-            }
-            window.addEventListener('pointermove', function(e) {
-                txMX = e.clientX / window.innerWidth - 0.5;
-                txMY = e.clientY / window.innerHeight - 0.5;
-                if (!raf) { raf = true; requestAnimationFrame(tick); }
-            }, { passive: true });
-        })();
     </script>
 </body>
 </html>

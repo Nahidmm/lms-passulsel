@@ -60,6 +60,16 @@ class User extends Authenticatable
         return $this->hasMany(ProgresPelatihan::class);
     }
 
+    public function tugasSubmissions()
+    {
+        return $this->hasMany(TugasSubmission::class);
+    }
+
+    public function rekapNilais()
+    {
+        return $this->hasMany(RekapNilai::class);
+    }
+
     public function getActivePelatihan()
     {
         return $this->progresPelatihans()->where('status', 'aktif')->first();

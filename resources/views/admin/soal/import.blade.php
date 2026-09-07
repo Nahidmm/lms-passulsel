@@ -42,7 +42,7 @@
     @endif
 
     {{-- Download Template --}}
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm p-6">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6">
         <h3 class="text-lg font-bold text-text-primary mb-3 flex items-center gap-2">
             <i data-lucide="file-down" class="w-5 h-5 text-accent"></i> Langkah 1 â€“ Download Template CSV
         </h3>
@@ -56,7 +56,7 @@
     </div>
 
     {{-- Format Penjelasan --}}
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm p-6">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6">
         <h3 class="text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
             <i data-lucide="info" class="w-5 h-5 text-primary"></i> Langkah 2 â€“ Panduan Format CSV
         </h3>
@@ -72,7 +72,7 @@
                 <tbody class="divide-y divide-border">
                     <tr class="hover:bg-secondary/20">
                         <td class="px-3 py-2 border border-border font-medium">Pilihan Ganda</td>
-                        <td class="px-3 py-2 border border-border font-mono text-[#f0b429]">pilihan_ganda</td>
+                        <td class="px-3 py-2 border border-border font-mono text-indigo-600 dark:text-indigo-400">pilihan_ganda</td>
                         <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_aâ€“opsi_d, <strong>kunci_jawaban</strong> (isi A/B/C/D)</td>
                     </tr>
                     <tr class="hover:bg-secondary/20">
@@ -101,7 +101,7 @@
     </div>
 
     {{-- Upload Form --}}
-    <div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl border border-border shadow-sm p-6">
+    <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6">
         <h3 class="text-lg font-bold text-text-primary mb-5 flex items-center gap-2">
             <i data-lucide="upload" class="w-5 h-5 text-success"></i> Langkah 3 â€“ Upload File CSV
         </h3>
@@ -121,14 +121,14 @@
             <div>
                 <label class="block text-sm font-semibold text-text-primary mb-3">Mode Import <span class="text-danger">*</span></label>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <label class="group flex items-start gap-4 p-4 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-border rounded-xl cursor-pointer hover:border-primary hover:shadow-sm transition-all">
+                    <label class="group flex items-start gap-4 p-4 bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl cursor-pointer hover:border-primary hover:shadow-sm transition-all">
                         <input type="radio" name="mode_import" value="tambah" checked class="mt-1 w-5 h-5 text-primary border-border focus:ring-primary">
                         <div>
                             <p class="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">Tambahkan ke Soal Existing</p>
                             <p class="text-xs text-text-secondary mt-1 leading-relaxed">Soal dari CSV akan ditambahkan ke soal yang sudah ada.</p>
                         </div>
                     </label>
-                    <label class="group flex items-start gap-4 p-4 bg-[var(--card)] border border-[var(--border)] shadow-sm border border-danger/30 rounded-xl cursor-pointer hover:border-danger hover:shadow-sm transition-all">
+                    <label class="group flex items-start gap-4 p-4 bg-[var(--card)] border border-[var(--border)] shadow-xs border border-danger/30 rounded-xl cursor-pointer hover:border-danger hover:shadow-sm transition-all">
                         <input type="radio" name="mode_import" value="ganti" class="mt-1 w-5 h-5 text-danger border-border focus:ring-danger">
                         <div>
                             <p class="text-sm font-bold text-danger">Ganti Semua Soal</p>
@@ -139,8 +139,8 @@
             </div>
 
             <div class="flex justify-end pt-4 border-t border-border">
-                <button type="submit" id="submit-btn" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-3 px-8 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2">
-                    <i data-lucide="upload-cloud" class="w-5 h-5"></i> Import Soal
+                <button type="submit" id="submit-btn" class="btn btn-primary text-white font-medium py-2.5 px-6 rounded-xl transition-all shadow-xs flex items-center gap-2">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> Import Soal
                 </button>
             </div>
         </form>

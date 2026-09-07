@@ -10,9 +10,9 @@
     </a>
 </div>
 
-<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-6 md:p-8">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6 md:p-8">
     <div class="mb-6 pb-4 border-b border-border">
-        <h2 class="text-xl font-display font-bold text-text-primary">Edit Agenda</h2>
+        <h2 class="text-xl font-sans font-bold text-text-primary">Edit Agenda</h2>
     </div>
 
     @if($errors->any())
@@ -38,7 +38,7 @@
 
             <div>
                 <label for="type" class="block text-sm font-medium text-text-primary mb-1">Jenis Agenda <span class="text-danger">*</span></label>
-                <select id="type" name="type" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                <select id="type" name="type" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-xs">
                     <option value="libur" {{ old('type', $event->type) == 'libur' ? 'selected' : '' }}>Hari Libur Nasional</option>
                     <option value="evaluasi" {{ old('type', $event->type) == 'evaluasi' ? 'selected' : '' }}>Jadwal Evaluasi</option>
                     <option value="info" {{ old('type', $event->type) == 'info' ? 'selected' : '' }}>Informasi Umum</option>
@@ -67,7 +67,7 @@
 
         <div class="flex justify-end pt-6 border-t border-border gap-3 mt-8">
             <a href="{{ route('admin.kalender.index') }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
-            <button type="submit" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+            <button type="submit" class="btn btn-primary text-white font-medium py-2.5 px-6 rounded-xl transition-all shadow-xs">
                 Perbarui Agenda
             </button>
         </div>

@@ -10,9 +10,9 @@
     </a>
 </div>
 
-<div class="bg-[var(--card)] border border-[var(--border)] shadow-sm rounded-xl shadow-sm border border-border p-6 md:p-8 max-w-3xl">
+<div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6 md:p-8 max-w-3xl">
     <div class="mb-6 pb-4 border-b border-border">
-        <h2 class="text-xl font-display font-bold text-text-primary">Tambah Materi ke: {{ $pelatihan->judul }}</h2>
+        <h2 class="text-xl font-sans font-bold text-text-primary">Tambah Materi ke: {{ $pelatihan->judul }}</h2>
         <p class="text-text-secondary mt-1">Pilih jenis materi (Dokumen, Video, Link, atau Kuis) dan lengkapi informasinya.</p>
     </div>
 
@@ -38,7 +38,7 @@
 
             <div>
                 <label for="jenis" class="block text-sm font-medium text-text-primary mb-1">Jenis Konten <span class="text-danger">*</span></label>
-                <select id="jenis" name="jenis" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm" onchange="toggleContentInput(this.value)">
+                <select id="jenis" name="jenis" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-xs" onchange="toggleContentInput(this.value)">
                     <option value="pdf" {{ old('jenis') == 'pdf' ? 'selected' : '' }}>PDF Document</option>
                     <option value="ppt" {{ old('jenis') == 'ppt' ? 'selected' : '' }}>PowerPoint (PPT)</option>
                     <option value="pptx" {{ old('jenis') == 'pptx' ? 'selected' : '' }}>PowerPoint (PPTX)</option>
@@ -75,7 +75,7 @@
         <div id="file_input_container" class="{{ in_array(old('jenis'), ['link', 'video_embed']) ? 'hidden' : '' }}">
             <label for="file_upload" class="block text-sm font-medium text-text-primary mb-1">Unggah Dokumen (PDF/PPT/PPTX)</label>
             <input type="file" id="file_upload" name="file_upload" accept=".pdf,.ppt,.pptx"
-                class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-[var(--card)] border border-[var(--border)] shadow-xs">
             <p class="text-xs text-text-secondary mt-1">Maksimal ukuran file: 10MB.</p>
         </div>
 
@@ -89,11 +89,11 @@
             <input type="checkbox" id="is_active" name="is_active" checked class="w-4 h-4 text-primary rounded border-border focus:ring-primary">
             <label for="is_active" class="text-sm font-medium text-text-primary cursor-pointer">Materi Aktif</label>
         </div>
-
-        <div class="flex justify-end pt-4 gap-3">
-            <a href="{{ route('admin.pelatihan.show', $pelatihan->id) }}" class="px-6 py-2 border border-border rounded-lg text-text-secondary hover:bg-secondary font-medium transition-colors">Batal</a>
-            <button type="submit" class="bg-primary hover:bg-primary-hover text-[var(--text-primary)] font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
-                Simpan Materi
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border)] mt-6">
+            <a href="{{ route('admin.pelatihan.show', $pelatihan->id) }}" class="btn btn-secondary text-[var(--text-primary)] font-medium py-2.5 px-5 rounded-xl border border-[var(--border)] transition-all">Batal</a>
+            <button type="submit" class="btn btn-primary text-white font-medium py-2.5 px-6 rounded-xl shadow-xs transition-all flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                <span>Simpan Materi</span>
             </button>
         </div>
     </form>
