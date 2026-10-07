@@ -19,7 +19,7 @@
             <div class="flex-1 space-y-3">
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Modul Diklat Disiplin
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Modul
                     </span>
                     @if($persenProgress >= 100)
                         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
