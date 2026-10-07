@@ -55,6 +55,7 @@
     </button>
 </form>
 
+@if(!app()->environment('production'))
 <!-- Demo Account Quick Fill -->
 <div class="mt-6 pt-5 border-t border-white/10">
     <p class="text-[11px] font-semibold text-white/50 text-center uppercase tracking-wider mb-2.5">
@@ -72,6 +73,7 @@
         </button>
     </div>
 </div>
+@endif
 
 <div class="mt-6 text-center text-xs text-white/50 space-y-2">
     <div>
@@ -85,11 +87,13 @@
     </div>
 </div>
 
+@if(!app()->environment('production'))
 <script>
 function fillDemo(nip, pass) {
     document.getElementById('nip').value = nip;
     document.getElementById('password').value = pass;
 }
 </script>
+@endif
 
 @endsection
