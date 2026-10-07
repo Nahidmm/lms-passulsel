@@ -50,8 +50,9 @@
             @yield('content')
             
         </div>
-        <div class="bg-slate-900/90 py-3.5 px-6 text-center text-[11px] text-slate-500 border-t border-slate-800/80">
-            &copy; {{ date('Y') }} Kantor Wilayah Ditjen Pemasyarakatan Sulawesi Selatan
+        <div class="bg-slate-900/90 py-3.5 px-6 text-center text-[11px] text-slate-500 border-t border-slate-800/80 space-y-1">
+            <p>&copy; {{ date('Y') }} Kantor Wilayah Ditjen Pemasyarakatan Sulawesi Selatan</p>
+            <p class="text-[10px] text-slate-400 font-medium">Crafted with ❤️ by <span class="font-bold text-slate-200">IR & ANM</span></p>
         </div>
     </div>
 

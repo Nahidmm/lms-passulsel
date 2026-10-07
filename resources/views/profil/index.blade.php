@@ -35,12 +35,7 @@
                             {{ $user->role_label ?? ucfirst($user->role) }}
                         </span>
                     </div>
-                    @if($user->jabatan)
-                    <div class="flex items-center justify-between">
-                        <span class="text-[var(--text-secondary)]">Jabatan:</span>
-                        <span class="font-semibold text-[var(--text-primary)] truncate max-w-[150px]">{{ $user->jabatan->nama_jabatan }}</span>
-                    </div>
-                    @endif
+
                     @if($user->unitKerja)
                     <div class="flex items-center justify-between">
                         <span class="text-[var(--text-secondary)]">Unit Kerja:</span>

@@ -62,7 +62,7 @@
         @else
 
             <div class="nav-divider"></div>
-            <p class="nav-section-label">Manajemen Diklat</p>
+            <p class="nav-section-label">Manajemen Kursus Hukdis</p>
 
             <a href="{{ route('admin.pelatihan.index') }}"
                 class="nav-item {{ request()->routeIs('admin.pelatihan.*', 'admin.materi.*', 'admin.tugas.*') ? 'active' : '' }}"
@@ -99,13 +99,6 @@
                 @endif
             </a>
 
-            <a href="{{ route('admin.jabatan.index') }}"
-                class="nav-item {{ request()->routeIs('admin.jabatan.*') ? 'active' : '' }}"
-                title="Kelola Data Jabatan">
-                <i data-lucide="briefcase"></i>
-                <span>Kelola Jabatan</span>
-            </a>
-
             <a href="{{ route('admin.unit-kerja.index') }}"
                 class="nav-item {{ request()->routeIs('admin.unit-kerja.*') ? 'active' : '' }}"
                 title="Kelola Unit Kerja (UPT)">
@@ -115,9 +108,9 @@
 
             <a href="{{ route('admin.kalender.index') }}"
                 class="nav-item {{ request()->routeIs('admin.kalender.*') ? 'active' : '' }}"
-                title="Kalender Agenda Diklat">
+                title="Kalender Agenda Hukdis">
                 <i data-lucide="calendar"></i>
-                <span>Kalender Diklat</span>
+                <span>Kalender Agenda</span>
             </a>
 
             @if(Auth::user()->isSuperadmin())

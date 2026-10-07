@@ -52,8 +52,7 @@ class AuthController extends Controller
 
     public function showRegister()
     {
-        $jabatans = Jabatan::where('is_active', true)->get();
-        return view('auth.register', compact('jabatans'));
+        return view('auth.register');
     }
 
     public function register(Request $request)
@@ -63,7 +62,6 @@ class AuthController extends Controller
             'nama' => ['required', 'string', 'max:150'],
             'email' => ['nullable', 'email', 'max:150'],
             'golongan' => ['nullable', 'string', 'max:10'],
-            'jabatan_id' => ['required', 'exists:jabatans,id'],
             'pesan' => ['nullable', 'string'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -74,7 +72,6 @@ class AuthController extends Controller
             'nama' => $validated['nama'],
             'email' => $validated['email'] ?? null,
             'golongan' => $validated['golongan'] ?? null,
-            'jabatan_id' => $validated['jabatan_id'],
             'password' => Hash::make($validated['password']),
             'status_akun' => 'pending',
             'role' => 'peserta',
@@ -85,7 +82,6 @@ class AuthController extends Controller
             'nama' => $validated['nama'],
             'email' => $validated['email'] ?? null,
             'golongan' => $validated['golongan'] ?? null,
-            'jabatan_id' => $validated['jabatan_id'],
             'pesan' => $validated['pesan'] ?? null,
         ]);
 

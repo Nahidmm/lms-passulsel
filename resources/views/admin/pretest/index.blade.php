@@ -13,7 +13,7 @@
 
     <div>
         <h1 class="text-2xl font-extrabold text-[var(--text-primary)]">Kelola Pretest Awal & Diagnostik Topik</h1>
-        <p class="text-xs text-[var(--text-secondary)] mt-1">Konfigurasi asesmen awal, bank soal indikator, pemetaan topik kelemahan, dan rekomendasi diklat otomatis.</p>
+        <p class="text-xs text-[var(--text-secondary)] mt-1">Konfigurasi asesmen awal, bank soal indikator, pemetaan topik kelemahan, dan rekomendasi modul otomatis.</p>
     </div>
 
     {{-- TABS --}}
@@ -22,7 +22,7 @@
             Bank Soal Pretest ({{ $soals->count() }})
         </button>
         <button class="tab-btn px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] border-b-2 border-transparent hover:text-[var(--text-primary)] transition-colors" data-target="tab-topik">
-            Topik & Rekomendasi Diklat
+            Topik & Rekomendasi Modul
         </button>
         <button class="tab-btn px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] border-b-2 border-transparent hover:text-[var(--text-primary)] transition-colors" data-target="tab-pengaturan">
             Pengaturan Asesmen
@@ -165,7 +165,7 @@
                 <input type="checkbox" name="is_active" id="is_active_pretest" value="1" {{ $pretest->is_active ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 rounded border-[var(--border)] focus:ring-indigo-500">
                 <div>
                     <label for="is_active_pretest" class="text-xs font-bold text-[var(--text-primary)] block cursor-pointer">Pretest Aktif Wajib</label>
-                    <p class="text-[11px] text-[var(--text-secondary)]">Pengguna baru wajib menyelesaikan pretest ini sebelum mengakses modul diklat.</p>
+                    <p class="text-[11px] text-[var(--text-secondary)]">Pengguna baru wajib menyelesaikan pretest ini sebelum mengakses modul Hukdis.</p>
                 </div>
             </div>
             <div class="pt-4 border-t border-[var(--border)] flex justify-end">

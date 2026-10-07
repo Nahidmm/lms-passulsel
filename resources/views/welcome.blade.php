@@ -105,7 +105,7 @@
 
             <div class="flex items-center gap-5 sm:gap-7">
                 <a href="#about" class="nav-link text-xs font-semibold hidden sm:inline-block">Tentang</a>
-                <a href="#alur" class="nav-link text-xs font-semibold hidden sm:inline-block">Alur Diklat</a>
+                <a href="#alur" class="nav-link text-xs font-semibold hidden sm:inline-block">Alur Pembelajaran</a>
                 <a href="#features" class="nav-link text-xs font-semibold">Fasilitas</a>
                 
                 @auth
@@ -252,7 +252,7 @@
                     </div>
                     <h3 class="text-base font-bold text-white mb-2">Upload Tugas & Pengakuan Sertifikat</h3>
                     <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                        Dukung pengumpulan tugas studi kasus disiplin dan upload sertifikat diklat eksternal/webinar tanpa prosedur birokrasi berbelit.
+                        Dukung pengumpulan tugas studi kasus disiplin dan upload sertifikat pembelajaran eksternal/webinar tanpa prosedur birokrasi berbelit.
                     </p>
                     <ul class="text-xs text-slate-400 space-y-1.5">
                         <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-sky-400"></i> Dukungan PDF, DOCX, ZIP</li>
@@ -329,7 +329,7 @@
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <span>&copy; {{ date('Y') }} STRAPSUSPAS &bull; Kanwil Ditjenpas Sulawesi Selatan</span>
             <div class="flex items-center gap-4 text-slate-400 text-[11px]">
-                <span>PP No. 94/2021</span>
+                <span>Crafted with ❤️ by <span class="font-bold text-slate-200">IR & ANM</span></span>
                 <span>&bull;</span>
                 <a href="{{ route('login') }}" class="hover:text-white">Portal Masuk</a>
             </div>

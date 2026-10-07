@@ -61,18 +61,7 @@
         </div>
     </div>
 
-    <div>
-        <label for="jabatan_id" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Jabatan (Eselon V) <span class="text-danger">*</span></label>
-        <select id="jabatan_id" name="jabatan_id" required
-            class="w-full px-3.5 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
-            <option value="">-- Pilih Jabatan --</option>
-            @foreach($jabatans as $jabatan)
-                <option value="{{ $jabatan->id }}" {{ old('jabatan_id') == $jabatan->id ? 'selected' : '' }}>
-                    {{ $jabatan->nama_jabatan }}
-                </option>
-            @endforeach
-        </select>
-    </div>
+
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>

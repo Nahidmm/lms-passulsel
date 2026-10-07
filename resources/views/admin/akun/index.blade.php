@@ -56,7 +56,7 @@
                 <thead class="text-xs text-[var(--text-secondary)] uppercase bg-[var(--muted)]/50 border-b border-[var(--border)]">
                     <tr>
                         <th class="py-3.5 px-6">NIP / Nama</th>
-                        <th class="py-3.5 px-6">Jabatan & Golongan</th>
+                        <th class="py-3.5 px-6">Golongan</th>
                         <th class="py-3.5 px-6">Tanggal Daftar</th>
                         <th class="py-3.5 px-6 text-right">Aksi</th>
                     </tr>
@@ -68,9 +68,8 @@
                                 <p class="font-semibold text-[var(--text-primary)]">{{ $req->nama }}</p>
                                 <p class="text-xs text-[var(--text-secondary)] font-mono mt-0.5">{{ $req->nip }}</p>
                             </td>
-                            <td class="py-4 px-6">
-                                <p class="text-xs font-semibold text-[var(--text-primary)]">{{ $req->jabatan->nama_jabatan ?? '-' }}</p>
-                                <p class="text-xs text-[var(--text-secondary)] mt-0.5">Golongan: {{ $req->golongan ?? '-' }}</p>
+                            <td class="py-4 px-6 text-xs text-[var(--text-secondary)] font-medium">
+                                Golongan: {{ $req->golongan ?? '-' }}
                             </td>
                             <td class="py-4 px-6 text-xs text-[var(--text-secondary)]">{{ $req->created_at->format('d M Y, H:i') }}</td>
                             <td class="py-4 px-6 text-right">
@@ -159,7 +158,7 @@
                 <thead class="text-xs text-[var(--text-secondary)] uppercase bg-[var(--muted)]/50 border-b border-[var(--border)]">
                     <tr>
                         <th class="py-3.5 px-6">Pengguna</th>
-                        <th class="py-3.5 px-6">Unit Kerja & Jabatan</th>
+                        <th class="py-3.5 px-6">Unit Kerja</th>
                         <th class="py-3.5 px-6">Golongan / Kontak</th>
                         <th class="py-3.5 px-6">Peran</th>
                         <th class="py-3.5 px-6">Status</th>
@@ -186,10 +185,9 @@
                                 </div>
                             </td>
 
-                            {{-- Unit Kerja & Jabatan --}}
-                            <td class="py-4 px-6 text-xs">
-                                <p class="font-semibold text-[var(--text-primary)]">{{ $user->unitKerja->nama_unit ?? '-' }}</p>
-                                <p class="text-[var(--text-secondary)] mt-0.5">{{ $user->jabatan->nama_jabatan ?? '-' }}</p>
+                            {{-- Unit Kerja --}}
+                            <td class="py-4 px-6 text-xs font-semibold text-[var(--text-primary)]">
+                                {{ $user->unitKerja->nama_unit ?? '-' }}
                             </td>
 
                             {{-- Golongan & Kontak --}}
@@ -373,18 +371,7 @@
                     </select>
                 </div>
 
-                {{-- Jabatan --}}
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
-                        Jabatan
-                    </label>
-                    <select name="jabatan_id" class="w-full px-3.5 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
-                        <option value="">-- Pilih Jabatan --</option>
-                        @foreach($jabatans as $jb)
-                            <option value="{{ $jb->id }}">{{ $jb->nama_jabatan }}</option>
-                        @endforeach
-                    </select>
-                </div>
+
 
                 {{-- Role --}}
                 <div>
@@ -525,18 +512,7 @@
                     </select>
                 </div>
 
-                {{-- Jabatan --}}
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
-                        Jabatan
-                    </label>
-                    <select name="jabatan_id" id="edit_jabatan_id" class="w-full px-3.5 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
-                        <option value="">-- Pilih Jabatan --</option>
-                        @foreach($jabatans as $jb)
-                            <option value="{{ $jb->id }}">{{ $jb->nama_jabatan }}</option>
-                        @endforeach
-                    </select>
-                </div>
+
 
                 {{-- Role --}}
                 <div>
@@ -676,7 +652,7 @@ function openEditUserModal(user) {
     document.getElementById('edit_no_hp').value = user.no_hp || '';
     document.getElementById('edit_golongan').value = user.golongan || '';
     document.getElementById('edit_unit_kerja_id').value = user.unit_kerja_id || '';
-    document.getElementById('edit_jabatan_id').value = user.jabatan_id || '';
+
     document.getElementById('edit_role').value = user.role || 'peserta';
     document.getElementById('edit_status_akun').value = user.status_akun || 'approved';
     document.getElementById('edit_alamat').value = user.alamat || '';

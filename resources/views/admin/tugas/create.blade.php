@@ -28,8 +28,8 @@
                 <div>
                     <label for="tipe" class="block text-sm font-medium text-text-primary mb-1">Tipe Penugasan <span class="text-danger">*</span></label>
                     <select name="tipe" id="tipe" class="w-full px-4 py-2.5 rounded-lg border border-border bg-[var(--card)] text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" required>
-                        <option value="tugas_umum" {{ old('tipe') === 'tugas_umum' ? 'selected' : '' }}>📝 Tugas Biasa / Analisis Kasus (Upload Makalah, Dokumen Hukdis, Laporan)</option>
-                        <option value="upload_sertifikat" {{ old('tipe') === 'upload_sertifikat' ? 'selected' : '' }}>🎓 Upload Sertifikat Pembelajaran Eksternal (Diklat Luar, MOOC, Webinar)</option>
+                        <option value="tugas_umum" {{ old('tipe') === 'tugas_umum' ? 'selected' : '' }}>📝 Tugas Biasa / Analisis Kasus (Upload Makalah, Dokumen, Laporan)</option>
+                        <option value="upload_sertifikat" {{ old('tipe') === 'upload_sertifikat' ? 'selected' : '' }}>🎓 Upload Sertifikat Pembelajaran Eksternal (Pembelajaran Luar, MOOC, Webinar)</option>
                     </select>
                     <p class="text-xs text-text-secondary mt-1" id="tipe-keterangan">
                         Peserta akan mengunggah file hasil pengerjaan kasus atau tugas hukdis yang diberikan.

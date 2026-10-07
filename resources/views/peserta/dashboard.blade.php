@@ -12,7 +12,7 @@
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
                         <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                        Peserta Diklat Disiplin ASN
+                        Peserta Pembelajaran ASN
                     </span>
                     <span class="text-xs text-[var(--text-secondary)]">
                         NIP: <strong class="text-[var(--text-primary)] font-medium">{{ auth()->user()->nip ?? '-' }}</strong> &bull; {{ auth()->user()->unitKerja->nama ?? 'Kanwil Ditjenpas Sulsel' }}
@@ -23,7 +23,7 @@
                     Selamat Datang, {{ auth()->user()->nama }}
                 </h1>
                 <p class="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl">
-                    Lanjutkan pembelajaran mandiri hukum disiplin ASN dan selesaikan penugasan kasus Anda.
+                    Ambil napas dalam-dalam, bangkit, bersihkan diri, dan mulai dari awal lagi...
                 </p>
             </div>
 
@@ -66,7 +66,7 @@
         {{-- Card 2: Tugas Menunggu --}}
         <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4.5 sm:p-5 shadow-xs flex items-center justify-between gap-4">
             <div class="space-y-1">
-                <span class="text-xs font-medium text-[var(--text-secondary)]">Penugasan Kasus</span>
+                <span class="text-xs font-medium text-[var(--text-secondary)]">Penugasan</span>
                 <div class="text-2xl sm:text-3xl font-heading font-bold text-[var(--text-primary)] tracking-tight">
                     {{ $pendingTugasPeserta->count() }} <span class="text-xs font-normal text-[var(--text-muted)]">Menunggu</span>
                 </div>
@@ -264,7 +264,7 @@
                                 </h4>
                                 <div class="flex items-center justify-between pt-1">
                                     <span class="text-[11px] text-[var(--text-muted)] truncate max-w-[130px]">
-                                        {{ $t->pelatihan->judul ?? 'Diklat' }}
+                                        {{ $t->pelatihan->judul ?? 'Modul' }}
                                     </span>
                                     <a href="{{ route('peserta.tugas.show', $t->id) }}"
                                        class="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1">
