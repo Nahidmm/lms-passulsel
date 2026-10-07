@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\BobotNilai;
 use App\Models\Pelatihan;
 use App\Models\RekapNilai;
+use App\Models\SesiEvaluasi;
+use App\Models\TugasSubmission;
 use App\Models\User;
 use App\Services\NilaiService;
 use Illuminate\Http\Request;
