@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE soals MODIFY tipe VARCHAR(50) DEFAULT 'pilihan_ganda'");
+        Schema::table('soals', function (Blueprint $table) {
+            $table->string('tipe', 50)->default('pilihan_ganda')->change();
+        });
     }
 
     /**
@@ -20,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE soals MODIFY tipe ENUM('pilihan_ganda', 'multi_select', 'isian_singkat', 'essay') DEFAULT 'pilihan_ganda'");
+        Schema::table('soals', function (Blueprint $table) {
+            $table->enum('tipe', ['pilihan_ganda', 'multi_select', 'isian_singkat', 'essay'])->default('pilihan_ganda')->change();
+        });
     }
 };
