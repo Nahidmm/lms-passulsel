@@ -113,7 +113,7 @@ class DashboardController extends Controller
                 if ($completedMateri && $completedMateri->materi && $completedMateri->materi->pelatihan) {
                     $activePelatihan = $completedMateri->materi->pelatihan;
                 } else {
-                    $activePelatihan = \App\Models\Pelatihan::where('is_published', true)->first();
+                    $activePelatihan = \App\Models\Pelatihan::where('is_active', true)->first();
                 }
             }
         }
