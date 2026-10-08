@@ -138,7 +138,7 @@
                                 {{ $labels[$idx] ?? $idx+1 }}
                             </span>
 
-                            <input type="text" name="pilihan[]" value="{{ old("pilihan.$idx", $p->teks) }}" placeholder="Teks pilihan" required
+                            <input type="text" name="pilihan[]" value="{{ old("pilihan.$idx", $p->teks) }}" placeholder="Teks pilihan"
                                 class="flex-1 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs text-[var(--text-primary)] transition-all">
 
                             @if($idx >= 2)
@@ -223,17 +223,17 @@
                     @if($currentTipe === 'menjodohkan' && !empty($pairs))
                         @foreach($pairs as $p)
                         <div class="grid grid-cols-11 gap-2 pair-row items-center">
-                            <input type="text" name="pasangan_kiri[]" value="{{ $p[0] ?? '' }}" required class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            <input type="text" name="pasangan_kiri[]" value="{{ $p[0] ?? '' }}" class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             <div class="col-span-1 flex items-center justify-center text-[var(--text-secondary)] font-bold">&rarr;</div>
-                            <input type="text" name="pasangan_kanan[]" value="{{ $p[1] ?? '' }}" required class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            <input type="text" name="pasangan_kanan[]" value="{{ $p[1] ?? '' }}" class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                         </div>
                         @endforeach
                     @else
                         @foreach(['1','2','3'] as $p)
                         <div class="grid grid-cols-11 gap-2 pair-row items-center">
-                            <input type="text" name="pasangan_kiri[]" placeholder="Item kiri {{ $p }}" required class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            <input type="text" name="pasangan_kiri[]" placeholder="Item kiri {{ $p }}" class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             <div class="col-span-1 flex items-center justify-center text-[var(--text-secondary)] font-bold">&rarr;</div>
-                            <input type="text" name="pasangan_kanan[]" placeholder="Pasangan kanan {{ $p }}" required class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            <input type="text" name="pasangan_kanan[]" placeholder="Pasangan kanan {{ $p }}" class="col-span-5 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                         </div>
                         @endforeach
                     @endif
@@ -323,18 +323,47 @@ const sections = {
 const allSections = [...new Set(Object.values(sections))];
 
 function showSection(type) {
-    allSections.forEach(s => document.getElementById(s)?.classList.add('hidden'));
-    const target = sections[type];
-    if (target) document.getElementById(target)?.classList.remove('hidden');
+    allSections.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) {
+            el.classList.add('hidden');
+            el.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = true;
+                input.required = false;
+            });
+        }
+    });
 
-    const radios = document.querySelectorAll('.pg-radio');
-    const checks = document.querySelectorAll('.ms-checkbox');
-    if (type === 'multi_select') {
-        radios.forEach(r => r.classList.add('hidden'));
-        checks.forEach(c => c.classList.remove('hidden'));
-    } else {
-        radios.forEach(r => r.classList.remove('hidden'));
-        checks.forEach(c => c.classList.add('hidden'));
+    const targetId = sections[type];
+    if (targetId) {
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+            targetEl.classList.remove('hidden');
+            targetEl.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = false;
+            });
+        }
+    }
+
+    if (type === 'pilihan_ganda' || type === 'multi_select') {
+        document.querySelectorAll('#choices-container input[name="pilihan[]"]').forEach(input => {
+            input.required = true;
+        });
+        const radios = document.querySelectorAll('.pg-radio');
+        const checks = document.querySelectorAll('.ms-checkbox');
+        if (type === 'multi_select') {
+            radios.forEach(r => r.classList.add('hidden'));
+            checks.forEach(c => c.classList.remove('hidden'));
+        } else {
+            radios.forEach(r => r.classList.remove('hidden'));
+            checks.forEach(c => c.classList.add('hidden'));
+        }
+    } else if (type === 'isian_singkat') {
+        const isianInput = document.querySelector('input[name="jawaban_teks"]');
+        if (isianInput) isianInput.required = true;
+    } else if (type === 'menjodohkan') {
+        document.querySelectorAll('input[name="pasangan_kiri[]"]').forEach(i => i.required = true);
+        document.querySelectorAll('input[name="pasangan_kanan[]"]').forEach(i => i.required = true);
     }
 }
 
@@ -375,21 +404,22 @@ document.querySelectorAll('.type-card').forEach(card => {
 });
 
 const labels = ['A','B','C','D','E','F','G','H'];
-let choiceCount = document.querySelectorAll('.choice-row').length;
 
 document.getElementById('btn-add-choice')?.addEventListener('click', function() {
-    if (choiceCount >= 8) return alert('Maksimal 8 pilihan jawaban.');
-    const index = choiceCount;
+    const rows = document.querySelectorAll('#choices-container .choice-row');
+    if (rows.length >= 8) return alert('Maksimal 8 pilihan jawaban.');
+    const index = rows.length;
     const label = labels[index] || (index + 1);
     const container = document.getElementById('choices-container');
     const div = document.createElement('div');
     div.className = 'flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all';
     div.dataset.index = index;
-    const activeType = document.querySelector('input[name="tipe"]:checked')?.value;
+    const activeType = document.querySelector('input[name="tipe"]:checked')?.value || 'pilihan_ganda';
+    const isMulti = activeType === 'multi_select';
     div.innerHTML = `
         <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
-            <input type="radio" name="jawaban_benar" value="${index}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer ${activeType === 'multi_select' ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
-            <input type="checkbox" name="jawaban_benar[]" value="${index}" class="ms-checkbox w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer ${activeType !== 'multi_select' ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
+            <input type="radio" name="jawaban_benar" value="${index}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer ${isMulti ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
+            <input type="checkbox" name="jawaban_benar[]" value="${index}" class="ms-checkbox w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer ${!isMulti ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
         </div>
         <span class="w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0">${label}</span>
         <input type="text" name="pilihan[]" placeholder="Teks pilihan ${label}" required
@@ -398,7 +428,6 @@ document.getElementById('btn-add-choice')?.addEventListener('click', function() 
             <i data-lucide="x" class="w-4 h-4"></i>
         </button>`;
     container.appendChild(div);
-    choiceCount++;
     if (window.lucide) {
         window.lucide.createIcons();
     }
@@ -408,13 +437,28 @@ function removeChoice(btn) {
     const row = btn.closest('.choice-row');
     if (document.querySelectorAll('.choice-row').length <= 2) return alert('Minimal 2 pilihan jawaban.');
     row.remove();
-    choiceCount--;
+    reindexChoices();
 }
 
-let pairCount = document.querySelectorAll('.pair-row').length;
+function reindexChoices() {
+    const rows = document.querySelectorAll('#choices-container .choice-row');
+    rows.forEach((row, i) => {
+        const label = labels[i] || (i + 1);
+        row.dataset.index = i;
+        const radio = row.querySelector('.pg-radio');
+        const check = row.querySelector('.ms-checkbox');
+        const span = row.querySelector('span');
+        const input = row.querySelector('input[name="pilihan[]"]');
+        if (radio) radio.value = i;
+        if (check) check.value = i;
+        if (span) span.textContent = label;
+        if (input) input.placeholder = `Teks pilihan ${label}`;
+    });
+}
 
 document.getElementById('btn-add-pair')?.addEventListener('click', function() {
-    pairCount++;
+    const rows = document.querySelectorAll('#pairs-container .pair-row');
+    const pairCount = rows.length + 1;
     const container = document.getElementById('pairs-container');
     const div = document.createElement('div');
     div.className = 'grid grid-cols-11 gap-2 pair-row items-center';
@@ -434,10 +478,39 @@ document.getElementById('btn-add-pair')?.addEventListener('click', function() {
 });
 
 function removePair(btn) {
-    const rows = document.querySelectorAll('.pair-row');
+    const rows = document.querySelectorAll('#pairs-container .pair-row');
     if (rows.length <= 2) return alert('Minimal 2 pasangan.');
     btn.closest('.pair-row').remove();
-    pairCount--;
+    reindexPairs();
 }
+
+function reindexPairs() {
+    const rows = document.querySelectorAll('#pairs-container .pair-row');
+    rows.forEach((row, i) => {
+        const left = row.querySelector('input[name="pasangan_kiri[]"]');
+        const right = row.querySelector('input[name="pasangan_kanan[]"]');
+        if (left) left.placeholder = `Item kiri ${i + 1}`;
+        if (right) right.placeholder = `Pasangan kanan ${i + 1}`;
+    });
+}
+
+document.getElementById('soal-form')?.addEventListener('submit', function(e) {
+    const activeType = document.querySelector('input[name="tipe"]:checked')?.value || 'pilihan_ganda';
+    if (activeType === 'pilihan_ganda') {
+        const checked = document.querySelector('input[name="jawaban_benar"]:checked');
+        if (!checked) {
+            e.preventDefault();
+            alert('Silakan pilih salah satu opsi sebagai kunci jawaban benar.');
+            return false;
+        }
+    } else if (activeType === 'multi_select') {
+        const checked = document.querySelectorAll('input[name="jawaban_benar[]"]:checked');
+        if (checked.length === 0) {
+            e.preventDefault();
+            alert('Silakan pilih setidaknya satu opsi sebagai kunci jawaban benar.');
+            return false;
+        }
+    }
+});
 </script>
 @endpush
