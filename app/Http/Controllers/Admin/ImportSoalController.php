@@ -195,7 +195,7 @@ class ImportSoalController extends Controller
             PilihanJawaban::create([
                 'soal_id'    => $soal->id,
                 'teks'       => trim($teks),
-                'label'      => $label,
+                'huruf'      => $label,
                 'is_correct' => ($label === $kunci),
             ]);
         }
@@ -210,7 +210,7 @@ class ImportSoalController extends Controller
             PilihanJawaban::create([
                 'soal_id'    => $soal->id,
                 'teks'       => trim($teks),
-                'label'      => $label,
+                'huruf'      => $label,
                 'is_correct' => in_array($label, $kunciArr),
             ]);
         }
@@ -222,7 +222,7 @@ class ImportSoalController extends Controller
             PilihanJawaban::create([
                 'soal_id'    => $soal->id,
                 'teks'       => trim($jawabanContoh),
-                'label'      => 'ESSAY',
+                'huruf'      => 'A',
                 'is_correct' => true,
             ]);
         }
@@ -234,7 +234,7 @@ class ImportSoalController extends Controller
             PilihanJawaban::create([
                 'soal_id'    => $soal->id,
                 'teks'       => trim($kunciJawaban),
-                'label'      => 'ISIAN',
+                'huruf'      => 'A',
                 'is_correct' => true,
             ]);
         }
@@ -250,7 +250,7 @@ class ImportSoalController extends Controller
             PilihanJawaban::create([
                 'soal_id'    => $soal->id,
                 'teks'       => $itemKiri . '|||' . $itemKanan,
-                'label'      => 'PASANGAN_' . ($idx + 1),
+                'huruf'      => 'L' . ($idx + 1),
                 'is_correct' => true,
             ]);
         }

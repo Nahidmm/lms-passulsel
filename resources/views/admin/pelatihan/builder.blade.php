@@ -333,14 +333,19 @@
                         </div>
 
                         <div class="flex items-center gap-2 shrink-0">
-                            <a href="{{ route('admin.kuis.peserta', $quiz->id) }}" 
-                               class="btn btn-secondary text-xs font-semibold py-1.5 px-3 rounded-xl border border-[var(--border)] text-[var(--text-primary)] hover:border-purple-400 inline-flex items-center gap-1.5">
-                                <i data-lucide="users" class="w-3.5 h-3.5 text-purple-600"></i> Hasil Peserta
+                            <a href="{{ route('admin.materi.soal.create', $quiz->id) }}" 
+                               class="btn btn-secondary text-xs font-semibold py-1.5 px-3 rounded-xl border border-[var(--border)] text-primary hover:border-primary inline-flex items-center gap-1.5"
+                               title="Tambah Butir Soal">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Soal
                             </a>
                             <a href="{{ route('admin.materi.edit', $quiz->id) }}" 
-                               class="p-2 text-[var(--text-secondary)] hover:text-purple-600 hover:bg-purple-500/5 rounded-xl border border-transparent hover:border-purple-300 transition-all" 
-                               title="Kelola Soal & Pengaturan">
-                                <i data-lucide="settings" class="w-4 h-4"></i>
+                               class="btn btn-secondary text-xs font-semibold py-1.5 px-3 rounded-xl border border-[var(--border)] text-purple-600 hover:border-purple-400 inline-flex items-center gap-1.5" 
+                               title="Kelola Soal & Pengaturan Kuis">
+                                <i data-lucide="settings" class="w-3.5 h-3.5"></i> Kelola Kuis
+                            </a>
+                            <a href="{{ route('admin.kuis.peserta', $quiz->id) }}" 
+                               class="btn btn-secondary text-xs font-semibold py-1.5 px-3 rounded-xl border border-[var(--border)] text-[var(--text-primary)] hover:border-purple-400 inline-flex items-center gap-1.5">
+                                <i data-lucide="users" class="w-3.5 h-3.5 text-purple-600"></i> Hasil
                             </a>
                             <form action="{{ route('admin.materi.destroy', $quiz->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus kuis ini?');">
                                 @csrf
