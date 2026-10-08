@@ -329,7 +329,7 @@
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <span>&copy; {{ date('Y') }} STRAPSUSPAS &bull; Kanwil Ditjenpas Sulawesi Selatan</span>
             <div class="flex items-center gap-4 text-slate-400 text-[11px]">
-                <span>Crafted with ❤️ by <span class="font-bold text-slate-200">IR & ANM</span></span>
+                <span>Crafted by <span class="font-bold text-slate-200">IR & ANM</span></span>
                 <span>&bull;</span>
                 <a href="{{ route('login') }}" class="hover:text-white">Portal Masuk</a>
             </div>

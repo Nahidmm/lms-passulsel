@@ -78,7 +78,7 @@
                 <footer class="mt-12 pt-6 border-t border-[var(--border)] text-center text-xs text-[var(--text-muted)] flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p>&copy; {{ date('Y') }} STRAPSUSPAS &bull; Kanwil Ditjenpas Sulawesi Selatan</p>
                     <p class="flex items-center justify-center gap-1 font-medium text-[var(--text-secondary)]">
-                        Crafted with <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline-block"></i> by <span class="font-bold text-[var(--text-primary)]">IR & ANM</span>
+                        Crafted by <span class="font-bold text-[var(--text-primary)]">IR & ANM</span>
                     </p>
                 </footer>
 
