@@ -22,8 +22,6 @@ class User extends Authenticatable
         'force_change_password' => 'boolean',
     ];
 
-    // Use NIP for auth
-    public function getAuthIdentifierName(): string { return 'nip'; }
 
     public function jabatan()
     {
