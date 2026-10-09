@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Kinerja Pembelajaran HUKDIS')
+@section('title', 'Dashboard Pembinaan Pegawai Khusus')
 
 @section('content')
 <!-- Header Section -->
@@ -12,13 +12,13 @@
             </span>
             <span class="text-xs text-text-secondary">&bull; Terkini: {{ now()->translatedFormat('l, d F Y') }}</span>
         </div>
-        <h1 class="text-2xl font-bold text-text-primary">Dashboard Kinerja & Statistik LMS</h1>
+        <h1 class="text-2xl font-bold text-text-primary">Dashboard Pembinaan Pegawai dan Statistik LMS</h1>
         <p class="text-xs text-text-secondary mt-1">Pantau perkembangan pemahaman disiplin ASN, analisis kelemahan kompetensi, dan hasil penilaian.</p>
     </div>
 
     <div class="flex flex-wrap items-center gap-2">
         <a href="{{ route('admin.pelatihan.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-[var(--card)] hover:bg-secondary text-text-primary text-xs font-semibold shadow-sm transition-colors">
-            <i data-lucide="book-open" class="w-4 h-4 text-primary"></i> Kelola Kursus
+            <i data-lucide="book-open" class="w-4 h-4 text-primary"></i> Kelola Kegiatan
         </a>
         <a href="{{ route('admin.akun.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-[var(--card)] hover:bg-secondary text-text-primary text-xs font-semibold shadow-sm transition-colors">
             <i data-lucide="users" class="w-4 h-4 text-primary"></i> Pengguna ({{ $totalPengguna }})
@@ -35,7 +35,7 @@
         </div>
         <div>
             <h4 class="text-sm font-bold text-amber-900 dark:text-amber-300">Ada {{ $countPendingTugas }} Penugasan Menunggu Penilaian</h4>
-            <p class="text-xs text-amber-700 dark:text-amber-400">Peserta telah mengunggah telaah kasus hukdis atau sertifikat eksternal yang memerlukan review Anda.</p>
+            <p class="text-xs text-amber-700 dark:text-amber-400">Peserta telah mengunggah telaah kasus atau sertifikat eksternal yang memerlukan review Anda.</p>
         </div>
     </div>
     <a href="#tugas-pending-section" class="px-3.5 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors shrink-0">
@@ -122,7 +122,7 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-text-primary text-sm">Analisis Diagnostik Pretest (Indikator Kelemahan Peserta)</h3>
-                    <p class="text-[11px] text-text-secondary">Area materi disiplin dengan skor terendah yang membutuhkan atensi khusus</p>
+                    <p class="text-[11px] text-text-secondary">Area materi pembinaan dengan skor terendah yang membutuhkan atensi khusus</p>
                 </div>
             </div>
             <a href="{{ route('admin.pretest.index') }}" class="text-xs font-semibold text-primary hover:underline">
@@ -278,7 +278,7 @@
     <div class="lg:col-span-1 bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-5">
         <div class="flex items-center justify-between mb-4">
             <h3 class="font-bold text-text-primary text-sm flex items-center gap-2">
-                <i data-lucide="book-open" class="w-4 h-4 text-primary"></i> Kursus LMS Aktif
+                <i data-lucide="book-open" class="w-4 h-4 text-primary"></i> Aplikasi Pembinaan Aktif
             </h3>
             <a href="{{ route('admin.pelatihan.create') }}" class="text-xs font-semibold text-primary hover:underline">
                 + Baru
