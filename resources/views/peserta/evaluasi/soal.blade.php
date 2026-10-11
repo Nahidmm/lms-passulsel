@@ -312,7 +312,7 @@
 
                                             <div class="space-y-2 pt-3">
                                                 <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
-                                                    Catatan / Alasan Memilih Jawaban
+                                                    Catatan / Alasan Memilih Jawaban <span class="text-rose-500">*</span>
                                                 </label>
                                                 <textarea name="catatan[{{ $soal->id }}]" rows="3"
                                                           placeholder="Jelaskan alasan Anda memilih jawaban tersebut..."
@@ -896,7 +896,24 @@
     }
 
     // ── Submit Attempt Confirmation ──
+    function validateCatatan() {
+        const steps = document.querySelectorAll('.soal-step[data-tipe="jenis_lainnya"]');
+        for (const step of steps) {
+            const radio = step.querySelector('input[type="radio"]:checked');
+            if (!radio) continue; // belum dijawab -> ditangani peringatan soal belum dijawab
+            const catatan = step.querySelector('textarea[name^="catatan["]');
+            if (catatan && catatan.value.trim() === '') {
+                const no = parseInt(step.dataset.index, 10);
+                alert('Soal No. ' + no + ' (Jenis Lainnya): kolom "Catatan / Alasan Memilih Jawaban" wajib diisi.');
+                goToSoal(no);
+                return false;
+            }
+        }
+        return true;
+    }
+
     function confirmSubmit() {
+        if (!validateCatatan()) return;
         const totalAnswered = document.querySelectorAll('.moodle-nav-tile.is-answered').length;
         const unanswered = totalSoal - totalAnswered;
         const flaggedCount = document.querySelectorAll('.moodle-nav-tile.is-flagged').length;
