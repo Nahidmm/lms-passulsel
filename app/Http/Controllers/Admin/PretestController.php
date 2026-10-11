@@ -9,6 +9,7 @@ use App\Models\Materi;
 use App\Models\TopikPelatihan;
 use App\Models\Pelatihan;
 use App\Models\Soal;
+use App\Models\User;
 
 class PretestController extends Controller
 {
@@ -30,8 +31,9 @@ class PretestController extends Controller
         $topiks = TopikPelatihan::with('pelatihan')->get();
         $pelatihans = Pelatihan::all();
         $soals = $pretest->soals()->with('topik')->get();
+        $pesertas = User::where('role', 'peserta')->where('status_akun', 'approved')->orderBy('nama')->get();
 
-        return view('admin.pretest.index', compact('pretest', 'topiks', 'pelatihans', 'soals'));
+        return view('admin.pretest.index', compact('pretest', 'topiks', 'pelatihans', 'soals', 'pesertas'));
     }
 
     public function updateSetting(Request $request)
@@ -78,5 +80,23 @@ class PretestController extends Controller
     {
         $topik->delete();
         return back()->with('success', 'Topik berhasil dihapus.');
+    }
+
+    public function resetPeserta(User $user)
+    {
+        $pretest = Materi::where('is_pretest', true)->first();
+
+        $user->update(['has_taken_pretest' => false]);
+        \App\Models\HasilPretestTopik::where('user_id', $user->id)->delete();
+
+        if ($pretest) {
+            $sesiIds = \App\Models\SesiEvaluasi::where('user_id', $user->id)
+                ->where('materi_id', $pretest->id)
+                ->pluck('id');
+            \App\Models\HasilLatihan::whereIn('sesi_evaluasi_id', $sesiIds)->delete();
+            \App\Models\SesiEvaluasi::whereIn('id', $sesiIds)->delete();
+        }
+
+        return back()->with('success', "Status pretest {$user->nama} berhasil di-reset. Peserta wajib mengerjakan pretest kembali.");
     }
 }

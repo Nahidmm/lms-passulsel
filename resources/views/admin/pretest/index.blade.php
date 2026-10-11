@@ -27,6 +27,9 @@
         <button class="tab-btn px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] border-b-2 border-transparent hover:text-[var(--text-primary)] transition-colors" data-target="tab-pengaturan">
             Pengaturan Asesmen
         </button>
+        <button class="tab-btn px-4 py-2.5 text-xs font-bold text-[var(--text-secondary)] border-b-2 border-transparent hover:text-[var(--text-primary)] transition-colors" data-target="tab-peserta">
+            Peserta & Status Pretest ({{ $pesertas->count() }})
+        </button>
     </div>
 
     {{-- TAB 1: DAFTAR SOAL --}}
@@ -172,6 +175,59 @@
                 <button type="submit" class="btn btn-primary text-xs px-5 py-2.5">Simpan Pengaturan Pretest</button>
             </div>
         </form>
+    </div>
+
+    {{-- TAB 4: PESERTA & RESET PRETEST --}}
+    <div id="tab-peserta" class="tab-content hidden space-y-4">
+        <div>
+            <h2 class="text-sm font-bold text-[var(--text-primary)]">Daftar Peserta & Status Pretest</h2>
+            <p class="text-xs text-[var(--text-secondary)]">Reset peserta agar wajib mengerjakan ulang pretest (status kembali "Belum").</p>
+        </div>
+
+        <div class="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-xs">
+            <table class="w-full text-left">
+                <thead class="border-b border-[var(--border)] bg-slate-50/50 dark:bg-slate-900/50">
+                    <tr>
+                        <th class="p-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Peserta</th>
+                        <th class="p-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] text-center">Status Pretest</th>
+                        <th class="p-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--border)]">
+                    @forelse($pesertas as $peserta)
+                    <tr class="hover:bg-[var(--card-hover)] transition-colors">
+                        <td class="p-4">
+                            <p class="text-xs font-bold text-[var(--text-primary)]">{{ $peserta->nama }}</p>
+                            <p class="text-[11px] text-[var(--text-secondary)]">NIP: {{ $peserta->nip }}</p>
+                        </td>
+                        <td class="p-4 text-center">
+                            @if($peserta->has_taken_pretest)
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <i data-lucide="check-circle" class="w-3 h-3"></i> Sudah Pretest
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                                    <i data-lucide="clock" class="w-3 h-3"></i> Belum Pretest
+                                </span>
+                            @endif
+                        </td>
+                        <td class="p-4 text-right">
+                            <form action="{{ route('admin.pretest.reset', $peserta->id) }}" method="POST" class="inline" onsubmit="return confirm('Reset pretest untuk {{ addslashes($peserta->nama) }}? Peserta akan wajib mengerjakan pretest kembali.');">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-lg border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors" title="Reset Pretest">
+                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reset Pretest
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="p-8 text-center text-xs text-[var(--text-muted)]">Belum ada peserta terdaftar.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>

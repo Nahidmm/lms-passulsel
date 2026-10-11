@@ -143,6 +143,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/pretest/topik', [App\Http\Controllers\Admin\PretestController::class, 'storeTopik'])->name('pretest.topik.store');
             Route::put('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'updateTopik'])->name('pretest.topik.update');
             Route::delete('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'destroyTopik'])->name('pretest.topik.destroy');
+            Route::post('/pretest/reset/{user}', [App\Http\Controllers\Admin\PretestController::class, 'resetPeserta'])->name('pretest.reset');
 
             // Kelola Jabatan
             Route::get('/jabatan', [JabatanController::class, 'index'])->name('jabatan.index');
