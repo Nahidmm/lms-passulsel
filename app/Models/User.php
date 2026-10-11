@@ -12,7 +12,7 @@ class User extends Authenticatable
     protected $fillable = [
         'nip', 'nama', 'email', 'golongan', 'jabatan_id', 'role',
         'status_akun', 'password', 'avatar', 'force_change_password', 'has_taken_pretest',
-        'pretest_exempt', 'unit_kerja_id', 'alamat', 'no_hp'
+        'pretest_exempt', 'unit_kerja_id', 'alamat', 'no_hp', 'tim', 'anggota_tim'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -133,6 +133,7 @@ class User extends Authenticatable
     public function isSuperadmin(): bool { return $this->role === 'superadmin'; }
     public function isAdmin(): bool { return in_array($this->role, ['admin', 'superadmin']); }
     public function isPeserta(): bool { return $this->role === 'peserta'; }
+    public function isTim(): bool { return $this->role === 'tim'; }
     public function isApproved(): bool { return $this->status_akun === 'approved'; }
 
     public function hasActiveSesiEvaluasi(): bool

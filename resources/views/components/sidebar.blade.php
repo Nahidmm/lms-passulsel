@@ -59,6 +59,18 @@
                 </a>
             @endif
 
+        @elseif(Auth::user()->isTim())
+
+            <div class="nav-divider"></div>
+            <p class="nav-section-label">Tim Pembinaan</p>
+
+            <a href="{{ route('tim.dashboard') }}"
+                class="nav-item {{ request()->routeIs('tim.dashboard') ? 'active' : '' }}"
+                title="Dashboard Tim">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard Tim</span>
+            </a>
+
         @else
 
             <div class="nav-divider"></div>
@@ -111,6 +123,13 @@
                 title="Kelola Unit Kerja (UPT)">
                 <i data-lucide="building-2"></i>
                 <span>Kelola Unit Kerja</span>
+            </a>
+
+            <a href="{{ route('admin.tim.index') }}"
+                class="nav-item {{ request()->routeIs('admin.tim.*') ? 'active' : '' }}"
+                title="Kelola Tim Pembinaan">
+                <i data-lucide="shield-check"></i>
+                <span>Kelola Tim Pembinaan</span>
             </a>
 
             <a href="{{ route('admin.kalender.index') }}"

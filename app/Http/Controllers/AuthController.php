@@ -42,6 +42,11 @@ class AuthController extends Controller
         if ($user && Hash::check($password, $user->password)) {
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
+
+            if ($user->isTim()) {
+                return redirect()->route('tim.dashboard');
+            }
+
             return redirect()->intended(route('dashboard'));
         }
 

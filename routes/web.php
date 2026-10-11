@@ -176,6 +176,12 @@ Route::middleware(['auth'])->group(function () {
             // Unit Kerja
             Route::resource('unit-kerja', \App\Http\Controllers\Admin\UnitKerjaController::class)->except(['create', 'show', 'edit']);
 
+            // Kelola Tim Pembinaan (4 Tim)
+            Route::get('/tim', [\App\Http\Controllers\Admin\TimController::class, 'index'])->name('tim.index');
+            Route::post('/tim', [\App\Http\Controllers\Admin\TimController::class, 'store'])->name('tim.store');
+            Route::get('/tim/penilaian', [\App\Http\Controllers\Admin\TimController::class, 'rekapPenilaian'])->name('tim.penilaian');
+            Route::delete('/tim/{user}', [\App\Http\Controllers\Admin\TimController::class, 'destroy'])->name('tim.destroy');
+
             // Kalender Akademik
             Route::resource('kalender', KalenderController::class);
 
@@ -211,6 +217,14 @@ Route::get('/sertifikat-setting', [\App\Http\Controllers\SertifikatSettingContro
                 Route::post('/dokumen-ai', [\App\Http\Controllers\Admin\DokumenAiController::class, 'store'])->name('dokumen-ai.store');
                 Route::delete('/dokumen-ai/{dokumen_ai}', [\App\Http\Controllers\Admin\DokumenAiController::class, 'destroy'])->name('dokumen-ai.destroy');
             });
+        });
+
+        // ==========================================
+        // ROLE: TIM PEMBINAAN (mental, fisik, akhlak, kompetensi)
+        // ==========================================
+        Route::middleware(['role:tim'])->prefix('tim')->name('tim.')->group(function () {
+            Route::get('/dashboard', [\App\Http\Controllers\Tim\DashboardTimController::class, 'dashboard'])->name('dashboard');
+            Route::post('/penilaian', [\App\Http\Controllers\Tim\DashboardTimController::class, 'storePenilaian'])->name('penilaian.store');
         });
     });
 });
