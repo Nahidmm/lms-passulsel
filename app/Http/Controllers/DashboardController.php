@@ -100,35 +100,27 @@ class DashboardController extends Controller
             ->get();
             
         $rekomendasi = collect();
-        // Active Pelatihan & Enrolled Courses
-        $activeProgres = $user->getActivePelatihan();
-        $activePelatihan = $activeProgres ? $activeProgres->pelatihan : null;
-        if (!$activePelatihan) {
-            $latestProgres = $user->progresPelatihans()->with('pelatihan')->latest('updated_at')->first();
-            if ($latestProgres && $latestProgres->pelatihan) {
-                $activePelatihan = $latestProgres->pelatihan;
-                $activeProgres = $latestProgres;
-            } else {
-                $completedMateri = $user->progresMateri()->with('materi.pelatihan')->first();
-                if ($completedMateri && $completedMateri->materi && $completedMateri->materi->pelatihan) {
-                    $activePelatihan = $completedMateri->materi->pelatihan;
-                } else {
-                    $activePelatihan = \App\Models\Pelatihan::where('is_active', true)->first();
-                }
-            }
-        }
 
-        $activePelatihanMateriCount = $activePelatihan ? $activePelatihan->materis()->where('is_active', true)->count() : 0;
-        $activePelatihanMateriSelesai = 0;
-        $activePelatihanPersen = 0;
-        if ($activePelatihan && $activePelatihanMateriCount > 0) {
-            $materiIds = $activePelatihan->materis()->where('is_active', true)->pluck('id');
-            $activePelatihanMateriSelesai = $user->progresMateri()
-                ->whereIn('materi_id', $materiIds)
-                ->where('status', 'selesai')
-                ->count();
-            $activePelatihanPersen = min(100, (int) round(($activePelatihanMateriSelesai / $activePelatihanMateriCount) * 100));
-        }
+        // Semua pelatihan yang sedang diikuti (aktif & pelatihan aktif)
+        $pelatihanDiikuti = \App\Models\ProgresPelatihan::with('pelatihan')
+            ->where('user_id', $user->id)
+            ->where('status', 'aktif')
+            ->whereHas('pelatihan', fn($q) => $q->where('is_active', true))
+            ->get()
+            ->map(function ($progres) use ($user) {
+                $pelatihan = $progres->pelatihan;
+                $materiIds = $pelatihan->materis()->where('is_active', true)->pluck('id');
+                $total = $materiIds->count();
+                $selesai = $user->progresMateri()
+                    ->whereIn('materi_id', $materiIds)
+                    ->where('status', 'selesai')
+                    ->count();
+                $pelatihan->materi_count = $total;
+                $pelatihan->materi_selesai = $selesai;
+                $pelatihan->persen = $total > 0 ? (int) round(($selesai / $total) * 100) : 0;
+                $pelatihan->tugas_count = $pelatihan->tugas()->count();
+                return $pelatihan;
+            });
 
         // Pending Tasks for User
         $pendingTugasPeserta = \App\Models\Tugas::where('is_active', true)
@@ -137,7 +129,6 @@ class DashboardController extends Controller
             })
             ->with('pelatihan')
             ->orderBy('deadline', 'asc')
-            ->take(4)
             ->get();
 
         // Rekap Nilai Peserta
@@ -148,9 +139,7 @@ class DashboardController extends Controller
 
         return view('peserta.dashboard', compact(
             'materiSelesai', 'totalMateri', 'rataNilai', 'progres',
-            'pretestResults', 'rekomendasi',
-            'activeProgres', 'activePelatihan', 'activePelatihanMateriCount',
-            'activePelatihanMateriSelesai', 'activePelatihanPersen',
+            'pretestResults', 'rekomendasi', 'pelatihanDiikuti',
             'pendingTugasPeserta', 'rekapNilais'
         ));
     }

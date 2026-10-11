@@ -127,26 +127,23 @@
                             </h2>
                         </div>
 
-                        @if($activePelatihan)
+                        @if($pelatihanDiikuti->isNotEmpty())
                             <span
                                 class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                Aktif
+                                {{ $pelatihanDiikuti->count() }} Aktif
                             </span>
                         @endif
                     </div>
 
-                    @if($activePelatihan)
-                        <div class="space-y-4">
+                    @forelse($pelatihanDiikuti as $p)
+                        <div class="space-y-4 border-b border-[var(--border)] last:border-0 pb-5 last:pb-0">
                             <div>
-                                <span class="text-xs font-semibold text-primary uppercase tracking-wide">
-                                    {{ $activePelatihan->kategori ?? 'Hukum Disiplin Pegawai' }}
-                                </span>
                                 <h3 class="text-lg font-heading font-bold text-[var(--text-primary)] mt-1">
-                                    {{ $activePelatihan->judul }}
+                                    {{ $p->judul }}
                                 </h3>
-                                @if($activePelatihan->deskripsi)
+                                @if($p->deskripsi)
                                     <p class="text-xs text-[var(--text-secondary)] line-clamp-2 mt-1 leading-relaxed">
-                                        {{ $activePelatihan->deskripsi }}
+                                        {{ $p->deskripsi }}
                                     </p>
                                 @endif
                             </div>
@@ -156,13 +153,13 @@
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="font-medium text-[var(--text-secondary)]">Kemajuan Modul</span>
                                     <span class="font-bold text-[var(--text-primary)]">
-                                        {{ $activePelatihanMateriSelesai }} dari {{ $activePelatihanMateriCount }} Modul
-                                        ({{ $activePelatihanPersen }}%)
+                                        {{ $p->materi_selesai }} dari {{ $p->materi_count }} Modul
+                                        ({{ $p->persen }}%)
                                     </span>
                                 </div>
                                 <div class="w-full bg-[var(--muted)] rounded-full h-2 overflow-hidden">
                                     <div class="bg-primary h-full rounded-full transition-all duration-500"
-                                        style="width: {{ $activePelatihanPersen }}%"></div>
+                                        style="width: {{ $p->persen }}%"></div>
                                 </div>
                             </div>
 
@@ -170,22 +167,22 @@
                                 <div class="text-xs text-[var(--text-secondary)] flex items-center gap-3">
                                     <span class="inline-flex items-center gap-1">
                                         <i data-lucide="book" class="w-3.5 h-3.5 text-primary"></i>
-                                        {{ $activePelatihanMateriCount }} Modul
+                                        {{ $p->materi_count }} Modul
                                     </span>
                                     <span class="inline-flex items-center gap-1">
                                         <i data-lucide="clipboard" class="w-3.5 h-3.5 text-purple-600"></i>
-                                        {{ $activePelatihan->tugas->count() }} Tugas
+                                        {{ $p->tugas_count }} Tugas
                                     </span>
                                 </div>
 
-                                <a href="{{ route('peserta.pelatihan.show', $activePelatihan->id) }}"
+                                <a href="{{ route('peserta.pelatihan.show', $p->id) }}"
                                     class="btn btn-primary text-white text-xs font-semibold py-2.5 px-5 rounded-xl shadow-xs transition-all inline-flex items-center gap-2">
                                     <span>Lanjutkan Belajar</span>
                                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                                 </a>
                             </div>
                         </div>
-                    @else
+                    @empty
                         <div class="text-center py-8 space-y-3">
                             <div
                                 class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
@@ -206,7 +203,7 @@
                                 </a>
                             </div>
                         </div>
-                    @endif
+                    @endforelse
                 </div>
 
                 {{-- PROMPT PRETEST DIAGNOSTIK (HANYA MUNCUL JIKA BELUM MENGERJAKAN) --}}
@@ -247,7 +244,7 @@
                                 <i data-lucide="clock" class="w-4 h-4"></i>
                             </div>
                             <h3 class="text-sm font-heading font-semibold text-[var(--text-primary)]">
-                                Penugasan Kasus
+                                Penugasan
                             </h3>
                         </div>
 
@@ -266,7 +263,7 @@
                             </div>
                             <p class="text-xs font-semibold text-[var(--text-primary)]">Semua Tugas Selesai</p>
                             <p class="text-[11px] text-[var(--text-secondary)]">
-                                Tidak ada penugasan kasus yang menunggu saat ini.
+                                Tidak ada penugasan yang menunggu saat ini.
                             </p>
                         </div>
                     @else

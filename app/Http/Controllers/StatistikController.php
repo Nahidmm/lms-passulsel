@@ -16,6 +16,9 @@ class StatistikController extends Controller
         
         $progresMateris = ProgresMateri::with('materi.pelatihan')
             ->where('user_id', $user->id)
+            ->whereHas('materi.pelatihan', function ($q) {
+                $q->where('is_active', true);
+            })
             ->get();
             
         $riwayatEvaluasi = SesiEvaluasi::with('materi')

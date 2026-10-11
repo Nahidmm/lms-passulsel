@@ -141,6 +141,10 @@
                         <th class="px-4 py-3 text-center border-r border-border">Rata2 Kuis<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_quiz }}%)</span></th>
                         <th class="px-4 py-3 text-center border-r border-border">Rata2 Tugas<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_tugas }}%)</span></th>
                         <th class="px-4 py-3 text-center border-r border-border">Posttest<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_posttest }}%)</span></th>
+                        @foreach(\App\Models\PenilaianTim::TEAMS as $timKey => $timLabel)
+                            <th class="px-4 py-3 text-center border-r border-border">{{ str_replace('Tim Pembinaan ', '', $timLabel) }}</th>
+                        @endforeach
+                        <th class="px-4 py-3 text-center border-r border-border">Rata2 Tim</th>
                         <th class="px-4 py-3 text-center border-r border-border bg-primary/5">Nilai Akhir</th>
                         <th class="px-4 py-3 text-center border-r border-border">Predikat</th>
                         <th class="px-4 py-3 text-center border-r border-border">Status</th>
@@ -149,9 +153,11 @@
                 </thead>
                 <tbody class="divide-y divide-border">
                     @foreach($gradebookData as $item)
-                    @php 
+                    @php
                         $u = $item['user'];
                         $r = $item['rekap'];
+                        $validTim = array_filter($item['timAverages'] ?? [], fn($v) => $v !== null);
+                        $avgTim = !empty($validTim) ? array_sum($validTim) / count($validTim) : null;
                     @endphp
                     <tr class="hover:bg-secondary/20 transition-colors">
                         <td class="px-4 py-3 sticky left-0 bg-[var(--card)] z-10 border-r border-border font-medium text-text-primary">
@@ -185,6 +191,22 @@
                         <td class="px-4 py-3 text-center border-r border-border font-medium">
                             @if($r->nilai_posttest !== null)
                                 <span class="font-bold text-emerald-600">{{ number_format($r->nilai_posttest, 1) }}</span>
+                            @else
+                                <span class="text-text-secondary opacity-40">-</span>
+                            @endif
+                        </td>
+                        @foreach(\App\Models\PenilaianTim::TEAMS as $timKey => $timLabel)
+                            <td class="px-4 py-3 text-center border-r border-border font-medium">
+                                @if(($item['timAverages'][$timKey] ?? null) !== null)
+                                    <span class="font-bold text-sky-600">{{ number_format($item['timAverages'][$timKey], 1) }}</span>
+                                @else
+                                    <span class="text-text-secondary opacity-40">-</span>
+                                @endif
+                            </td>
+                        @endforeach
+                        <td class="px-4 py-3 text-center border-r border-border font-medium">
+                            @if($avgTim !== null)
+                                <span class="font-bold text-teal-600">{{ number_format($avgTim, 1) }}</span>
                             @else
                                 <span class="text-text-secondary opacity-40">-</span>
                             @endif

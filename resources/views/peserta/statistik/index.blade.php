@@ -150,64 +150,6 @@
     </div>
     @endif
 
-    {{-- Rekapitulasi Nilai & Status Kelulusan --}}
-    @if(isset($rekapNilais) && $rekapNilais->isNotEmpty())
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-xs overflow-hidden">
-        <div class="p-5 border-b border-[var(--border)] flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                <i data-lucide="award" class="w-4 h-4"></i>
-            </div>
-            <div>
-                <h3 class="font-bold text-sm text-[var(--text-primary)]">Rekapitulasi Nilai & Status Kelulusan</h3>
-                <p class="text-xs text-[var(--text-secondary)]">Nilai akhir dan predikat kelulusan pelatihan yang telah Anda ikuti</p>
-            </div>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-[var(--muted)]/40 text-[var(--text-secondary)] uppercase text-[10px] font-bold tracking-wider border-b border-[var(--border)]">
-                    <tr>
-                        <th class="px-5 py-3.5">Pelatihan</th>
-                        <th class="px-5 py-3.5 text-center">Pretest</th>
-                        <th class="px-5 py-3.5 text-center">Kuis</th>
-                        <th class="px-5 py-3.5 text-center">Tugas</th>
-                        <th class="px-5 py-3.5 text-center">Posttest</th>
-                        <th class="px-5 py-3.5 text-center font-bold text-primary">Nilai Akhir</th>
-                        <th class="px-5 py-3.5 text-center">Predikat</th>
-                        <th class="px-5 py-3.5 text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-[var(--border)]">
-                    @foreach($rekapNilais as $rn)
-                    <tr class="hover:bg-[var(--muted)]/20 transition-colors">
-                        <td class="px-5 py-4 font-semibold text-[var(--text-primary)]">
-                            {{ $rn->pelatihan->judul ?? '-' }}
-                        </td>
-                        <td class="px-5 py-4 text-center font-medium">{{ $rn->nilai_pretest !== null ? number_format($rn->nilai_pretest, 1) : '-' }}</td>
-                        <td class="px-5 py-4 text-center font-medium">{{ $rn->nilai_quiz !== null ? number_format($rn->nilai_quiz, 1) : '-' }}</td>
-                        <td class="px-5 py-4 text-center font-medium">{{ $rn->nilai_tugas !== null ? number_format($rn->nilai_tugas, 1) : '-' }}</td>
-                        <td class="px-5 py-4 text-center font-medium">{{ $rn->nilai_posttest !== null ? number_format($rn->nilai_posttest, 1) : '-' }}</td>
-                        <td class="px-5 py-4 text-center font-bold text-primary text-sm">{{ $rn->nilai_akhir !== null ? number_format($rn->nilai_akhir, 1) : '-' }}</td>
-                        <td class="px-5 py-4 text-center">
-                            <span class="inline-block px-2.5 py-0.5 rounded text-xs font-bold {{ $rn->predikat_color }}">
-                                {{ $rn->predikat ?? '-' }}
-                            </span>
-                        </td>
-                        <td class="px-5 py-4 text-center">
-                            @if($rn->status_lulus)
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">LULUS</span>
-                            @else
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">BELUM</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-    @endif
-
 </div>
 
 @push('scripts')

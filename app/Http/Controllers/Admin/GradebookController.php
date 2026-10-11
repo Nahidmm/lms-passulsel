@@ -100,11 +100,20 @@ class GradebookController extends Controller
                 ];
             }
 
+            // Nilai per Tim Pembinaan (rata-rata)
+            $timAverages = [];
+            foreach (array_keys(\App\Models\PenilaianTim::TEAMS) as $timKey) {
+                $timAverages[$timKey] = \App\Models\PenilaianTim::where('user_id', $user->id)
+                    ->where('tim', $timKey)
+                    ->avg('nilai');
+            }
+
             $gradebookData[] = [
                 'user' => $user,
                 'rekap' => $rekap,
                 'quizDetails' => $quizDetails,
                 'tugasDetails' => $tugasDetails,
+                'timAverages' => $timAverages,
             ];
         }
 
