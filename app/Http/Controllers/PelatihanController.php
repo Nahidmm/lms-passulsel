@@ -131,11 +131,6 @@ class PelatihanController extends Controller
                     ->first();
                 
                 $currentStatus = $progres ? $progres->status : 'belum';
-                
-                // Active pelatihan might be marked as 'aktif' but another course is locked
-                if ($currentStatus === 'belum' && $activePelatihan && $activePelatihan->pelatihan_id !== $pelatihan->id) {
-                    $currentStatus = 'terkunci';
-                }
 
                 return $currentStatus === $status;
             });
@@ -162,12 +157,6 @@ class PelatihanController extends Controller
         }
 
         $user = auth()->user();
-
-        // Check if user already has an active pelatihan
-        $active = $user->getActivePelatihan();
-        if ($active && $active->pelatihan_id !== $pelatihan->id) {
-            return back()->with('error', 'Anda harus menyelesaikan pelatihan yang sedang aktif terlebih dahulu.');
-        }
 
         // Check if already enrolled or completed
         $progres = \App\Models\ProgresPelatihan::where('user_id', $user->id)
@@ -199,15 +188,6 @@ class PelatihanController extends Controller
         $progresPelatihan = \App\Models\ProgresPelatihan::where('user_id', $user->id)
             ->where('pelatihan_id', $pelatihan->id)
             ->first();
-
-        // Lock check: if user has an active pelatihan and it's NOT this one, 
-        // they can only access this course if they have ALREADY finished it.
-        $active = $user->getActivePelatihan();
-        if ($active && $active->pelatihan_id !== $pelatihan->id) {
-            if (!$progresPelatihan || $progresPelatihan->status !== 'selesai') {
-                return redirect()->route('peserta.pelatihan.index')->with('error', 'Akses dikunci. Harap selesaikan pelatihan aktif Anda terlebih dahulu.');
-            }
-        }
 
         // If user is not enrolled yet, auto-enroll them now
         if (!$progresPelatihan) {

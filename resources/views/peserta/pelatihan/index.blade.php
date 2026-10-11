@@ -28,7 +28,6 @@
                     <option value="belum"   {{ ($status ?? '') === 'belum'    ? 'selected' : '' }}>Belum Mulai</option>
                     <option value="aktif"   {{ ($status ?? '') === 'aktif'    ? 'selected' : '' }}>Sedang Dikerjakan</option>
                     <option value="selesai" {{ ($status ?? '') === 'selesai'  ? 'selected' : '' }}>Selesai</option>
-                    <option value="terkunci"{{ ($status ?? '') === 'terkunci' ? 'selected' : '' }}>Terkunci</option>
                 </select>
                 <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--text-muted)] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             </div>
@@ -46,7 +45,7 @@
             @php
                 $progres  = \App\Models\ProgresPelatihan::where('user_id', auth()->user()->id)->where('pelatihan_id', $pelatihan->id)->first();
                 $status   = $progres ? $progres->status : 'belum';
-                $isLocked = $activePelatihan && $activePelatihan->pelatihan_id !== $pelatihan->id && $status !== 'selesai';
+                $isLocked = false; // semua pelatihan dapat diakses tanpa menyelesaikan satu per satu
             @endphp
 
             <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-xs hover:border-primary/40 transition-all flex flex-col h-full group {{ $isLocked ? 'opacity-65' : '' }}">
