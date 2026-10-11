@@ -32,6 +32,8 @@ class PelatihanController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        $validated['is_active'] = $request->boolean('is_active');
+
         $pelatihan = Pelatihan::create($validated);
 
         if ($pelatihan->is_active) {
@@ -80,6 +82,8 @@ class PelatihanController extends Controller
             'deskripsi' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
+
+        $validated['is_active'] = $request->boolean('is_active');
 
         $pelatihan->update($validated);
         return redirect()->route('admin.pelatihan.index')->with('success', 'Pelatihan berhasil diperbarui.');
