@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>STRAPSUS PAS - Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak</title>
-    <meta name="description" content="STRAPSUS PAS - Platform Pembelajaran & Pengukuran Pemahaman Hukum Disiplin Pegawai Pemasyarakatan Sulawesi Selatan berbasis PP No. 94 Tahun 2021.">
+    <meta name="description" content="STRAPSUS PAS - Platform Pembelajaran Dalam Pembinaan Petugas Khusus Pemasyarakatan Sulawesi Selatan .">
     <link rel="icon" type="image/png" href="{{ asset('logo/strapsuspas.png') }}">
 
     <!-- Google Fonts -->
@@ -132,7 +132,7 @@
             <!-- Top Tagline -->
             <div class="relative z-20 flex flex-wrap items-center gap-3 mb-6">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                    <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> PP No. 94 Tahun 2021
+                    <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> 
                 </span>
                 <span class="text-xs text-slate-400 font-medium">
                     Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak
@@ -143,10 +143,10 @@
             <div class="relative z-20 my-auto py-8">
                 <h1 class="hero-title font-extrabold text-white leading-none">
                     STRAPSUS PAS<br>
-                    <span class="font-instrument italic font-normal text-sky-400 tracking-normal">Petugas Paten, Pemasyarakatan Berdampak.</span>
+                    <span class="font-instrument italic font-normal text-sky-400 tracking-normal">Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak.</span>
                 </h1>
                 <p class="mt-6 text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl font-normal leading-relaxed">
-                    Platform pembelajaran mandiri dan evaluasi kepatuhan hukum disiplin petugas pemasyarakatan berbasis digital di lingkungan Kantor Wilayah Direktorat Jenderal Pemasyarakatan Sulawesi Selatan.
+                    Platform pembelajaran mandiri dan evaluasi pembinaan khusus petugas pemasyarakatan berbasis digital di lingkungan Kantor Wilayah Direktorat Jenderal Pemasyarakatan Sulawesi Selatan.
                 </p>
             </div>
 
@@ -190,7 +190,7 @@
             <div class="text-center max-w-2xl mx-auto mb-16">
                 <span class="text-sky-400 text-xs font-bold uppercase tracking-widest mb-2 block">Metodologi Terukur</span>
                 <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">Alur Pembelajaran Disiplin Berstandar</h2>
-                <p class="text-slate-400 text-xs sm:text-sm mt-3">Dirancang untuk memastikan setiap aparatur memahami batasan kewenangan, jenis pelanggaran, serta prosedur penjatuhan hukuman disiplin.</p>
+                <p class="text-slate-400 text-xs sm:text-sm mt-3">Dirancang untuk memastikan setiap aparatur memahami kode etik, larangan dan kewajiban ASN Petugas Pemasyarakatan.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -200,7 +200,7 @@
                         01
                     </div>
                     <h3 class="text-base font-bold text-white mb-2">Pretest Diagnostik</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Uji kinerja awal untuk mengidentifikasi topik mana dari regulasi disiplin yang paling lemah dan memerlukan pendalaman.</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">Uji kinerja awal untuk mengidentifikasi aspek mana yang kurang dari pegawai.</p>
                 </div>
 
                 <!-- Tahap 2 -->
@@ -209,7 +209,7 @@
                         02
                     </div>
                     <h3 class="text-base font-bold text-white mb-2">Modul & Video Interaktif</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Pelajari bahan materi resmi, simulasi kasus penegakan disiplin, dan video pembelajaran secara berurutan.</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">Pelajari bahan materi, dan video pembelajaran.</p>
                 </div>
 
                 <!-- Tahap 3 -->
@@ -218,7 +218,7 @@
                         03
                     </div>
                     <h3 class="text-base font-bold text-white mb-2">Penugasan & Praktik Kasus</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Unggah telaah analisis kasus pelanggaran atau sertifikat pelatihan eksternal untuk diverifikasi dan dinilai instruktur.</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">Unggah tugas atau sertifikat pelatihan eksternal untuk diverifikasi dan dinilai instruktur.</p>
                 </div>
 
                 <!-- Tahap 4 -->
@@ -227,7 +227,7 @@
                         04
                     </div>
                     <h3 class="text-base font-bold text-white mb-2">Posttest & Buku Nilai</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Ujian akhir kelulusan. Sistem otomatis mengkalkulasi nilai komposit dan menerbitkan sertifikat digital jika lulus.</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">Ujian akhir. Sistem otomatis mengkalkulasi nilai keseluruhan dari rangkaian pembelajaran yang diberikan.</p>
                 </div>
             </div>
         </div>
@@ -329,7 +329,7 @@
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <span>&copy; {{ date('Y') }} STRAPSUS PAS &bull; Kanwil Ditjenpas Sulawesi Selatan</span>
             <div class="flex items-center gap-4 text-slate-400 text-[11px]">
-                <span>Crafted by <span class="font-bold text-slate-200">IR & ANM</span></span>
+                <span class="text-[10px]">Crafted by <span class="text-slate-400">IR & ANM</span></span>
                 <span>&bull;</span>
                 <a href="{{ route('login') }}" class="hover:text-white">Portal Masuk</a>
             </div>

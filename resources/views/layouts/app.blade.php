@@ -77,8 +77,8 @@
                 {{-- ── FOOTER ── --}}
                 <footer class="mt-12 pt-6 border-t border-[var(--border)] text-center text-xs text-[var(--text-muted)] flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p>&copy; {{ date('Y') }} STRAPSUS PAS &bull; Kanwil Ditjenpas Sulawesi Selatan</p>
-                    <p class="flex items-center justify-center gap-1 font-medium text-[var(--text-secondary)]">
-                        Crafted by <span class="font-bold text-[var(--text-primary)]">IR & ANM</span>
+                    <p class="flex items-center justify-center gap-1 text-[10px] text-[var(--text-muted)]">
+                        Crafted by <span class="text-[var(--text-secondary)]">IR & ANM</span>
                     </p>
                 </footer>
 
