@@ -114,6 +114,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('pelatihan/{pelatihan}/gradebook', [\App\Http\Controllers\Admin\GradebookController::class, 'index'])->name('pelatihan.gradebook');
             Route::post('pelatihan/{pelatihan}/gradebook/bobot', [\App\Http\Controllers\Admin\GradebookController::class, 'updateBobot'])->name('pelatihan.gradebook.bobot');
             Route::get('pelatihan/{pelatihan}/gradebook/export', [\App\Http\Controllers\Admin\GradebookController::class, 'export'])->name('pelatihan.gradebook.export');
+            Route::get('gradebook/pretest', [\App\Http\Controllers\Admin\GradebookController::class, 'pretest'])->name('gradebook.pretest');
+            Route::get('gradebook/pretest/pdf', [\App\Http\Controllers\Admin\GradebookController::class, 'exportPretestPdf'])->name('gradebook.pretest.pdf');
+            Route::get('gradebook/pretest/{user}', [\App\Http\Controllers\Admin\GradebookController::class, 'pretestDetail'])->name('gradebook.pretest.detail');
+            Route::get('gradebook/pretest/{user}/pdf', [\App\Http\Controllers\Admin\GradebookController::class, 'exportPretestDetailPdf'])->name('gradebook.pretest.detail.pdf');
 
             // Kuis: Nilai & Review Peserta
             Route::get('kuis/{materi}/peserta', [\App\Http\Controllers\Admin\KuisReviewController::class, 'indexPeserta'])->name('kuis.peserta');

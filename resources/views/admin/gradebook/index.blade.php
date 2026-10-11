@@ -21,6 +21,9 @@
         <button onclick="document.getElementById('bobotModal').classList.remove('hidden')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-[var(--card)] hover:bg-secondary text-text-primary text-xs font-semibold shadow-sm transition-colors">
             <i data-lucide="sliders" class="w-4 h-4 text-primary"></i> Atur Bobot Nilai
         </button>
+        <a href="{{ route('admin.gradebook.pretest') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-[var(--card)] hover:bg-secondary text-text-primary text-xs font-semibold shadow-sm transition-colors">
+            <i data-lucide="clipboard-check" class="w-4 h-4 text-primary"></i> Rekap Pretest
+        </a>
         <a href="{{ route('admin.pelatihan.gradebook.export', $pelatihan->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-semibold shadow-sm transition-colors">
             <i data-lucide="download" class="w-4 h-4"></i> Export CSV / Excel
         </a>

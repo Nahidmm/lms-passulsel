@@ -10,6 +10,7 @@ use App\Models\SesiEvaluasi;
 use App\Models\TugasSubmission;
 use App\Models\User;
 use App\Services\NilaiService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class GradebookController extends Controller
@@ -203,5 +204,102 @@ class GradebookController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Rekap hasil pretest seluruh peserta.
+     */
+    public function pretest()
+    {
+        return view('admin.gradebook.pretest', $this->pretestData());
+    }
+
+    /**
+     * Export rekap hasil pretest ke PDF.
+     */
+    public function exportPretestPdf()
+    {
+        $data = $this->pretestData();
+        $pdf = Pdf::loadView('pdf.pretest', $data)->setPaper('a4', 'portrait');
+
+        return $pdf->download('Rekap-Hasil-Pretest-' . date('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Data peserta + nilai pretest (skor terbaik dari sesi pretest global).
+     */
+    private function pretestData(): array
+    {
+        $pretest = \App\Models\Materi::where('is_pretest', true)->first();
+
+        $pesertas = User::where('role', 'peserta')
+            ->where('status_akun', 'approved')
+            ->with('unitKerja')
+            ->orderBy('nama')
+            ->get();
+
+        $rows = [];
+        foreach ($pesertas as $peserta) {
+            $nilaiPretest = null;
+            if ($pretest) {
+                $nilaiPretest = SesiEvaluasi::where('user_id', $peserta->id)
+                    ->where('materi_id', $pretest->id)
+                    ->where('status', 'selesai')
+                    ->max('skor');
+            }
+
+            $rows[] = [
+                'user' => $peserta,
+                'nilai_pretest' => $nilaiPretest !== null ? (float) $nilaiPretest : null,
+            ];
+        }
+
+        return [
+            'pretest' => $pretest,
+            'rows' => $rows,
+        ];
+    }
+
+    /**
+     * Detail hasil pretest seorang peserta (mirip koreksi jawaban).
+     */
+    public function pretestDetail(User $user)
+    {
+        return view('admin.gradebook.pretest-detail', $this->pretestDetailData($user));
+    }
+
+    /**
+     * Export detail hasil pretest seorang peserta ke PDF.
+     */
+    public function exportPretestDetailPdf(User $user)
+    {
+        $data = $this->pretestDetailData($user);
+        $pdf = Pdf::loadView('pdf.pretest-detail', $data)->setPaper('a4', 'portrait');
+
+        return $pdf->download('Hasil-Pretest-' . $user->nip . '.pdf');
+    }
+
+    /**
+     * Data detail pretest peserta: sesi terbaik + rincian jawaban per soal.
+     */
+    private function pretestDetailData(User $user): array
+    {
+        $pretest = \App\Models\Materi::where('is_pretest', true)->first();
+        $sesi = null;
+        $hasilLatihans = collect();
+
+        if ($pretest) {
+            $sesi = SesiEvaluasi::where('user_id', $user->id)
+                ->where('materi_id', $pretest->id)
+                ->where('status', 'selesai')
+                ->orderByDesc('skor')
+                ->first();
+
+            if ($sesi) {
+                $hasilLatihans = $sesi->hasilLatihan()->with(['soal.pilihanJawaban', 'pilihan'])->get();
+            }
+        }
+
+        return compact('user', 'pretest', 'sesi', 'hasilLatihans');
     }
 }
