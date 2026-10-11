@@ -96,7 +96,7 @@
     <div class="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-[100] transition-transform duration-300 w-[92%] max-w-2xl">
         <nav class="bg-[#090d16]/90 backdrop-blur-md rounded-full px-5 py-2.5 md:px-7 md:py-3 flex items-center justify-between shadow-2xl border border-white/10">
             <a href="#" class="flex items-center gap-2.5">
-                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-8 h-8 object-contain">
+                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-24 h-24 object-contain">
                 <div class="leading-none">
                     <span class="text-xs font-black tracking-wider text-white block">STRAPSUS PAS</span>
                     <span class="text-[9px] font-bold text-sky-400 tracking-wider uppercase">Kanwil Ditjenpas Sulsel</span>
@@ -297,7 +297,7 @@
     <section id="about" class="py-20 px-4 md:px-6 relative bg-[#06090e]">
         <div class="max-w-4xl mx-auto rounded-3xl p-8 sm:p-12 bg-gradient-to-br from-[#0c1527] to-[#080d18] border border-white/10 text-center relative overflow-hidden">
             <div class="mb-6">
-                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-16 h-16 object-contain mx-auto drop-shadow-lg">
+                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-48 h-48 object-contain mx-auto drop-shadow-lg">
             </div>
 
             <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">

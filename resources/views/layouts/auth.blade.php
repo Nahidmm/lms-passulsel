@@ -38,7 +38,7 @@
             {{-- Brand Header --}}
             <div class="text-center mb-7">
                 <div class="inline-flex items-center justify-center mb-3">
-                    <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-20 h-auto drop-shadow-lg object-contain">
+                    <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-60 h-auto drop-shadow-lg object-contain">
                 </div>
                 <h1 class="text-2xl font-black text-white tracking-wider">STRAPSUS PAS</h1>
                 <p class="text-[11px] text-sky-400 mt-1 font-semibold tracking-wide uppercase">Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak</p>

@@ -4,7 +4,7 @@
     {{-- Brand Logo Header --}}
     <div class="sidebar-logo">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 min-w-0" title="STRAPSUS PAS - Kanwil Ditjenpas Sulsel">
-            <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-9 h-9 object-contain shrink-0">
+            <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-16 h-16 object-contain shrink-0">
             <div class="leading-tight min-w-0">
                 <p class="text-sm font-bold tracking-tight text-[var(--text-primary)] truncate">STRAPSUS PAS</p>
                 <p class="text-[10px] font-medium text-[var(--text-muted)] truncate">Kanwil Ditjenpas Sulsel</p>

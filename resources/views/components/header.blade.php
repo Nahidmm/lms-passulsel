@@ -12,7 +12,7 @@
 
         {{-- Mobile Brand --}}
         <div class="md:hidden flex items-center gap-2 min-w-0">
-            <img src="{{ asset('logo/strapsuspas.png') }}" alt="STRAPSUS PAS" class="w-7 h-7 object-contain shrink-0">
+            <img src="{{ asset('logo/strapsuspas.png') }}" alt="STRAPSUS PAS" class="w-14 h-14 object-contain shrink-0">
             <span class="font-bold text-[var(--text-primary)] text-sm tracking-tight truncate">STRAPSUS PAS</span>
         </div>
 

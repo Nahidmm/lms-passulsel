@@ -23,7 +23,7 @@
     <!-- Header (No Sidebar for focus mode) -->
     <header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface)]/90 border-b border-[var(--border)] h-16 flex items-center justify-between px-4 lg:px-8 shadow-xs">
         <div class="flex items-center gap-3">
-            <img src="{{ asset('logo/strapsuspas.png') }}" alt="STRAPSUS PAS" class="w-9 h-9 object-contain">
+            <img src="{{ asset('logo/strapsuspas.png') }}" alt="STRAPSUS PAS" class="w-16 h-16 object-contain">
             <div>
                 <div class="font-bold text-[var(--text-primary)] text-sm leading-tight">Evaluasi Pembelajaran &bull; STRAPSUS PAS</div>
                 <div class="text-[11px] text-[var(--text-secondary)]">Kanwil Ditjenpas Sulsel</div>

@@ -16,7 +16,7 @@
     <div class="bg-white max-w-lg w-full rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
         <div class="bg-slate-900 px-6 py-7 text-center text-white">
             <div class="mb-3">
-                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-14 h-14 object-contain mx-auto drop-shadow-md">
+                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-28 h-28 object-contain mx-auto drop-shadow-md">
             </div>
             <h1 class="text-xl font-extrabold tracking-tight">Verifikasi Sertifikat Digital</h1>
             <p class="text-slate-400 mt-1 text-xs">STRAPSUS PAS &bull; Kantor Wilayah Ditjen Pemasyarakatan Sulawesi Selatan</p>
