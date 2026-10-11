@@ -36,7 +36,7 @@
 </head>
 <body>
     <div class="header">
-        <p class="brand">STRAPSUSPAS &bull; Kanwil Ditjenpas Sulawesi Selatan</p>
+        <p class="brand">STRAPSUS PAS &bull; Kanwil Ditjenpas Sulawesi Selatan</p>
         <h1>Detail Hasil Pretest</h1>
         <p class="meta">{{ $user->nama }} &bull; NIP: {{ $user->nip }} &bull; {{ $user->unitKerja?->nama_unit ?? '-' }} &bull; Dicetak: {{ now()->format('d M Y H:i') }}</p>
     </div>
@@ -97,6 +97,6 @@
         @endforeach
     @endif
 
-    <p class="footer">Dicetak otomatis dari sistem LMS STRAPSUSPAS &bull; {{ now()->format('d-m-Y H:i') }}</p>
+    <p class="footer">Dicetak otomatis dari sistem LMS STRAPSUS PAS &bull; {{ now()->format('d-m-Y H:i') }}</p>
 </body>
 </html>

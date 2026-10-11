@@ -224,7 +224,7 @@
             <img src="{{ public_path('storage/'.$setting->logo_instansi) }}" style="max-width: 140px; max-height: 140px;">
         @else
             <div style="width:120px; height:120px; border:3px solid #9ca3af; border-radius:60px; text-align:center; padding-top:45px; font-weight:bold; color:#9ca3af; font-family:Arial; font-size:12px; margin-top:10px;">
-                STRAPSUSPAS<br>PAS SULSEL
+                STRAPSUS PAS<br>PAS SULSEL
             </div>
         @endif
     </div>
@@ -238,7 +238,7 @@
         @else
             <!-- Fallback Logo Box -->
             <div style="height:40px; margin-bottom:10px; font-family:Georgia; font-size:24px; font-weight:bold; color:#1e3a8a; letter-spacing:2px;">
-                STRAPSUSPAS
+                STRAPSUS PAS
             </div>
         @endif
 

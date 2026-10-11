@@ -1,7 +1,7 @@
-# STRAPSUSPAS — Kanwil Ditjenpas Sulsel
+# STRAPSUS PAS — Kanwil Ditjenpas Sulsel
 **Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak**
 
-STRAPSUSPAS adalah platform pembelajaran dan evaluasi kepatuhan hukum disiplin khusus pegawai di lingkungan Kantor Wilayah Direktorat Jenderal Pemasyarakatan Sulawesi Selatan. Sistem ini dilengkapi dengan Kuis Interaktif, Penugasan Kasus, Pretest Diagnostik, dan Asisten AI berbasis Google Gemini.
+STRAPSUS PAS adalah platform pembelajaran dan evaluasi kepatuhan hukum disiplin khusus pegawai di lingkungan Kantor Wilayah Direktorat Jenderal Pemasyarakatan Sulawesi Selatan. Sistem ini dilengkapi dengan Kuis Interaktif, Penugasan Kasus, Pretest Diagnostik, dan Asisten AI berbasis Google Gemini.
 
 ## 🚀 Panduan Instalasi (Untuk Tim Pengembang / Kolaborasi)
 

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'STRAPSUSPAS'),
+    'name' => env('APP_NAME', 'STRAPSUS PAS'),
 
     /*
     |--------------------------------------------------------------------------

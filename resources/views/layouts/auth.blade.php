@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Login') - STRAPSUSPAS</title>
+    <title>@yield('title', 'Login') - STRAPSUS PAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -38,9 +38,9 @@
             {{-- Brand Header --}}
             <div class="text-center mb-7">
                 <div class="inline-flex items-center justify-center mb-3">
-                    <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUSPAS" class="w-20 h-auto drop-shadow-lg object-contain">
+                    <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-20 h-auto drop-shadow-lg object-contain">
                 </div>
-                <h1 class="text-2xl font-black text-white tracking-wider">STRAPSUSPAS</h1>
+                <h1 class="text-2xl font-black text-white tracking-wider">STRAPSUS PAS</h1>
                 <p class="text-[11px] text-sky-400 mt-1 font-semibold tracking-wide uppercase">Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak</p>
                 <div class="inline-block mt-2 px-3 py-0.5 rounded-full bg-slate-800 border border-slate-700/60 text-[10px] text-slate-300 font-medium">
                     Kanwil Ditjenpas Sulsel

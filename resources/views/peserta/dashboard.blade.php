@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Pembelajaran - STRAPSUSPAS')
+@section('title', 'Dashboard Pembelajaran - STRAPSUS PAS')
 
 @section('content')
     <div class="space-y-6 max-w-7xl mx-auto">

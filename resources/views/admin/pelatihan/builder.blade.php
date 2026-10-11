@@ -21,7 +21,7 @@
                         {{ $pelatihan->is_active ? 'Published / Aktif' : 'Draft' }}
                     </span>
                     <span class="text-xs text-[var(--text-muted)]">•</span>
-                    <span class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">STRAPSUSPAS</span>
+                    <span class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">STRAPSUS PAS</span>
                 </div>
 
                 <h1 class="text-2xl font-bold tracking-tight text-[var(--text-primary)]">{{ $pelatihan->judul }}</h1>

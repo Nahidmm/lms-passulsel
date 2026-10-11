@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'AI Tutor Disiplin - STRAPSUSPAS')
+@section('title', 'AI Tutor Disiplin - STRAPSUS PAS')
 
 @section('content')
 
@@ -35,7 +35,7 @@
             </div>
             <div class="flex-1 bg-secondary rounded-2xl rounded-tl-none p-4 shadow-sm border border-border max-w-[85%] md:max-w-[75%]">
                 <p class="text-text-primary text-sm leading-relaxed">
-                    Halo, {{ explode(' ', Auth::user()->nama)[0] }}! Saya Asisten Virtual AI Tutor STRAPSUSPAS Kanwil Ditjenpas Sulsel. Ada yang bisa saya bantu terkait regulasi disiplin ASN (PP No. 94 Tahun 2021), tata cara pemeriksaan pelanggaran disiplin, atau penyusunan telaah kasus hari ini?
+                    Halo, {{ explode(' ', Auth::user()->nama)[0] }}! Saya Asisten Virtual AI Tutor STRAPSUS PAS Kanwil Ditjenpas Sulsel. Ada yang bisa saya bantu terkait regulasi disiplin ASN (PP No. 94 Tahun 2021), tata cara pemeriksaan pelanggaran disiplin, atau penyusunan telaah kasus hari ini?
                 </p>
             </div>
         </div>

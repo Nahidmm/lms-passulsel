@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
-    <meta name="description" content="STRAPSUSPAS - Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak | Kanwil Ditjenpas Sulsel.">
-    <title>@yield('title', 'Dashboard') - STRAPSUSPAS</title>
+    <meta name="description" content="STRAPSUS PAS - Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak | Kanwil Ditjenpas Sulsel.">
+    <title>@yield('title', 'Dashboard') - STRAPSUS PAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -76,7 +76,7 @@
 
                 {{-- ── FOOTER ── --}}
                 <footer class="mt-12 pt-6 border-t border-[var(--border)] text-center text-xs text-[var(--text-muted)] flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <p>&copy; {{ date('Y') }} STRAPSUSPAS &bull; Kanwil Ditjenpas Sulawesi Selatan</p>
+                    <p>&copy; {{ date('Y') }} STRAPSUS PAS &bull; Kanwil Ditjenpas Sulawesi Selatan</p>
                     <p class="flex items-center justify-center gap-1 font-medium text-[var(--text-secondary)]">
                         Crafted by <span class="font-bold text-[var(--text-primary)]">IR & ANM</span>
                     </p>

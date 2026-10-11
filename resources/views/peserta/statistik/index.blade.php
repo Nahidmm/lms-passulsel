@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Statistik Belajar - STRAPSUSPAS')
+@section('title', 'Statistik Belajar - STRAPSUS PAS')
 
 @section('content')
 <div class="space-y-6 py-2">

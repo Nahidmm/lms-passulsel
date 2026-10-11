@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>403 - Akses Ditolak | STRAPSUSPAS</title>
+    <title>403 - Akses Ditolak | STRAPSUS PAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -60,7 +60,7 @@
         </div>
 
         <div class="mt-8 pt-6 border-t border-slate-800/80 text-xs text-slate-500">
-            STRAPSUSPAS &bull; Kanwil Ditjen Pemasyarakatan Sulawesi Selatan
+            STRAPSUS PAS &bull; Kanwil Ditjen Pemasyarakatan Sulawesi Selatan
         </div>
     </div>
 

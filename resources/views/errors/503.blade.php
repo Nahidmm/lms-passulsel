@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>503 - Pemeliharaan Sistem | STRAPSUSPAS</title>
+    <title>503 - Pemeliharaan Sistem | STRAPSUS PAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@
         <h1 class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 mb-2">503</h1>
         <h2 class="text-xl font-bold text-white mb-3">Sistem Dalam Pemeliharaan</h2>
         <p class="text-sm text-slate-400 max-w-md mx-auto mb-8 leading-relaxed">
-            Layanan STRAPSUSPAS sedang dalam pemeliharaan berkala untuk peningkatan kinerja dan keamanan. Kami akan kembali secepatnya.
+            Layanan STRAPSUS PAS sedang dalam pemeliharaan berkala untuk peningkatan kinerja dan keamanan. Kami akan kembali secepatnya.
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -49,7 +49,7 @@
         </div>
 
         <div class="mt-8 pt-6 border-t border-slate-800/80 text-xs text-slate-500">
-            STRAPSUSPAS &bull; Kanwil Ditjen Pemasyarakatan Sulawesi Selatan
+            STRAPSUS PAS &bull; Kanwil Ditjen Pemasyarakatan Sulawesi Selatan
         </div>
     </div>
 

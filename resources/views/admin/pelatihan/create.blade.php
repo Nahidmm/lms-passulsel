@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Tambah Pelatihan Baru - STRAPSUSPAS')
+@section('title', 'Tambah Pelatihan Baru - STRAPSUS PAS')
 
 @section('content')
 <div class="space-y-6 py-2 max-w-3xl mx-auto">
@@ -17,7 +17,7 @@
                 <p class="text-xs text-[var(--text-secondary)]">Buat kurikulum pelatihan disiplin ASN baru</p>
             </div>
             <span class="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950 px-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-800">
-                STRAPSUSPAS
+                STRAPSUS PAS
             </span>
         </div>
         

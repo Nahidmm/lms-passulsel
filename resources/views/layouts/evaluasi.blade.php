@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Evaluasi Pembelajaran') - STRAPSUSPAS</title>
+    <title>@yield('title', 'Evaluasi Pembelajaran') - STRAPSUS PAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/png" href="{{ asset('logo/strapsuspas.png') }}">
@@ -23,9 +23,9 @@
     <!-- Header (No Sidebar for focus mode) -->
     <header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface)]/90 border-b border-[var(--border)] h-16 flex items-center justify-between px-4 lg:px-8 shadow-xs">
         <div class="flex items-center gap-3">
-            <img src="{{ asset('logo/strapsuspas.png') }}" alt="STRAPSUSPAS" class="w-9 h-9 object-contain">
+            <img src="{{ asset('logo/strapsuspas.png') }}" alt="STRAPSUS PAS" class="w-9 h-9 object-contain">
             <div>
-                <div class="font-bold text-[var(--text-primary)] text-sm leading-tight">Evaluasi Pembelajaran &bull; STRAPSUSPAS</div>
+                <div class="font-bold text-[var(--text-primary)] text-sm leading-tight">Evaluasi Pembelajaran &bull; STRAPSUS PAS</div>
                 <div class="text-[11px] text-[var(--text-secondary)]">Kanwil Ditjenpas Sulsel</div>
             </div>
         </div>

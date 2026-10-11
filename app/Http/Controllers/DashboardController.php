@@ -29,7 +29,7 @@ class DashboardController extends Controller
         $penggunaAktif = SesiEvaluasi::where('status', 'berlangsung')->count();
         $pendingRequests = AccountRequest::where('status', 'menunggu')->count();
 
-        // Rata-rata Komponen Pembelajaran STRAPSUSPAS
+        // Rata-rata Komponen Pembelajaran STRAPSUS PAS
         $rataPretest = round(\App\Models\RekapNilai::whereNotNull('nilai_pretest')->avg('nilai_pretest') ?? 0, 1);
         $rataQuiz = round(\App\Models\RekapNilai::whereNotNull('nilai_quiz_rata')->avg('nilai_quiz_rata') ?? 0, 1);
         $rataTugas = round(\App\Models\RekapNilai::whereNotNull('nilai_tugas')->avg('nilai_tugas') ?? 0, 1);

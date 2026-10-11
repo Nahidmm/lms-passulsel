@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>STRAPSUSPAS - Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak</title>
-    <meta name="description" content="STRAPSUSPAS - Platform Pembelajaran & Pengukuran Pemahaman Hukum Disiplin Pegawai Pemasyarakatan Sulawesi Selatan berbasis PP No. 94 Tahun 2021.">
+    <title>STRAPSUS PAS - Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak</title>
+    <meta name="description" content="STRAPSUS PAS - Platform Pembelajaran & Pengukuran Pemahaman Hukum Disiplin Pegawai Pemasyarakatan Sulawesi Selatan berbasis PP No. 94 Tahun 2021.">
     <link rel="icon" type="image/png" href="{{ asset('logo/strapsuspas.png') }}">
 
     <!-- Google Fonts -->
@@ -96,9 +96,9 @@
     <div class="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-[100] transition-transform duration-300 w-[92%] max-w-2xl">
         <nav class="bg-[#090d16]/90 backdrop-blur-md rounded-full px-5 py-2.5 md:px-7 md:py-3 flex items-center justify-between shadow-2xl border border-white/10">
             <a href="#" class="flex items-center gap-2.5">
-                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUSPAS" class="w-8 h-8 object-contain">
+                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-8 h-8 object-contain">
                 <div class="leading-none">
-                    <span class="text-xs font-black tracking-wider text-white block">STRAPSUSPAS</span>
+                    <span class="text-xs font-black tracking-wider text-white block">STRAPSUS PAS</span>
                     <span class="text-[9px] font-bold text-sky-400 tracking-wider uppercase">Kanwil Ditjenpas Sulsel</span>
                 </div>
             </a>
@@ -142,7 +142,7 @@
             <!-- Main Heading & Title -->
             <div class="relative z-20 my-auto py-8">
                 <h1 class="hero-title font-extrabold text-white leading-none">
-                    STRAPSUSPAS<br>
+                    STRAPSUS PAS<br>
                     <span class="font-instrument italic font-normal text-sky-400 tracking-normal">Petugas Paten, Pemasyarakatan Berdampak.</span>
                 </h1>
                 <p class="mt-6 text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl font-normal leading-relaxed">
@@ -172,7 +172,7 @@
                 <div class="flex items-center gap-6 text-xs text-slate-400">
                     <div>
                         <div class="text-white font-extrabold text-base">4 Pilar</div>
-                        <span class="text-[11px]">Pretest &bull; Kuis &bull; Kasus &bull; Ujian</span>
+                        <span class="text-[11px]">Akhlak, Kompetensi, Mental, dan Fisik</span>
                     </div>
                     <div class="w-px h-8 bg-white/10"></div>
                     <div>
@@ -239,7 +239,7 @@
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
                 <div>
                     <span class="text-sky-400 text-xs font-bold uppercase tracking-widest mb-2 block">Fitur Unggulan</span>
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">Ekosistem STRAPSUSPAS Terpadu</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">Ekosistem STRAPSUS PAS Terpadu</h2>
                 </div>
                 <p class="text-xs text-slate-400 max-w-md">Menggabungkan kemudahan pembelajaran mandiri modern dengan visual intuitif bagi instruktur maupun aparatur peserta pemasyarakatan.</p>
             </div>
@@ -297,7 +297,7 @@
     <section id="about" class="py-20 px-4 md:px-6 relative bg-[#06090e]">
         <div class="max-w-4xl mx-auto rounded-3xl p-8 sm:p-12 bg-gradient-to-br from-[#0c1527] to-[#080d18] border border-white/10 text-center relative overflow-hidden">
             <div class="mb-6">
-                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUSPAS" class="w-16 h-16 object-contain mx-auto drop-shadow-lg">
+                <img src="{{ asset('logo/strapsuspas.png') }}" alt="Logo STRAPSUS PAS" class="w-16 h-16 object-contain mx-auto drop-shadow-lg">
             </div>
 
             <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">
@@ -327,7 +327,7 @@
     <!-- FOOTER -->
     <footer class="py-8 text-center text-xs text-slate-500 border-t border-white/5 bg-[#04060a]">
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span>&copy; {{ date('Y') }} STRAPSUSPAS &bull; Kanwil Ditjenpas Sulawesi Selatan</span>
+            <span>&copy; {{ date('Y') }} STRAPSUS PAS &bull; Kanwil Ditjenpas Sulawesi Selatan</span>
             <div class="flex items-center gap-4 text-slate-400 text-[11px]">
                 <span>Crafted by <span class="font-bold text-slate-200">IR & ANM</span></span>
                 <span>&bull;</span>

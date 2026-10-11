@@ -104,7 +104,7 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('materi.soal', \App\Http\Controllers\SoalController::class)->shallow();
             Route::match(['get', 'post'], 'materi/{materi}/preview-quiz', [\App\Http\Controllers\MateriController::class, 'previewQuiz'])->name('materi.preview-quiz');
 
-            // Penugasan & Upload Sertifikat (STRAPSUSPAS)
+            // Penugasan & Upload Sertifikat (STRAPSUS PAS)
             Route::resource('pelatihan.tugas', \App\Http\Controllers\Admin\TugasController::class)->parameters(['tugas' => 'tugas'])->shallow();
             Route::get('tugas/{tugas}/submissions', [\App\Http\Controllers\Admin\TugasGradingController::class, 'index'])->name('tugas.submissions');
             Route::post('tugas-submission/{submission}/nilai', [\App\Http\Controllers\Admin\TugasGradingController::class, 'grade'])->name('tugas.submission.nilai');

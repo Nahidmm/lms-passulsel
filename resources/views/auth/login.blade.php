@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Login - STRAPSUSPAS')
+@section('title', 'Login - STRAPSUS PAS')
 
 @section('content')
 

@@ -31,7 +31,7 @@ class AccountRejectedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pendaftaran Akun STRAPSUSPAS Ditolak',
+            subject: 'Pendaftaran Akun STRAPSUS PAS Ditolak',
         );
     }
 

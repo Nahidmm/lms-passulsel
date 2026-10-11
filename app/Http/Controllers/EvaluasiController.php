@@ -292,7 +292,7 @@ class EvaluasiController extends Controller
             }
         }
 
-        // Recalculate composite gradebook for STRAPSUSPAS
+        // Recalculate composite gradebook for STRAPSUS PAS
         if ($materi->pelatihan_id) {
             \App\Services\NilaiService::recalculate($sesi->user_id, $materi->pelatihan_id);
         } elseif ($materi->is_pretest) {
