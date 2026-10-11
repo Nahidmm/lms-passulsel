@@ -71,7 +71,10 @@ class User extends Authenticatable
 
     public function getActivePelatihan()
     {
-        return $this->progresPelatihans()->where('status', 'aktif')->first();
+        return $this->progresPelatihans()
+            ->where('status', 'aktif')
+            ->whereHas('pelatihan', fn($q) => $q->where('is_active', true))
+            ->first();
     }
 
     public function hasilPretestTopiks()

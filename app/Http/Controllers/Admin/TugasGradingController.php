@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\Tugas;
 use App\Models\TugasSubmission;
 use App\Services\NilaiService;
@@ -42,6 +43,28 @@ class TugasGradingController extends Controller
             'dinilai_oleh' => auth()->id(),
             'dinilai_at' => now(),
         ]);
+
+        // Kirim notifikasi ke peserta
+        $tugas = $submission->tugas;
+        if ($validated['status'] === 'graded') {
+            Notification::kirim(
+                $submission->user_id,
+                'Tugas Telah Diverifikasi',
+                "Tugas \"{$tugas->judul}\" Anda telah selesai dinilai dengan nilai {$validated['nilai']}.",
+                'success',
+                'check-circle',
+                route('peserta.tugas.show', $tugas->id)
+            );
+        } else {
+            Notification::kirim(
+                $submission->user_id,
+                'Tugas Perlu Revisi',
+                "Tugas \"{$tugas->judul}\" Anda perlu diperbaiki. Baca catatan instruktur di halaman tugas.",
+                'warning',
+                'alert-circle',
+                route('peserta.tugas.show', $tugas->id)
+            );
+        }
 
         // Recalculate composite grade
         NilaiService::recalculate($submission->user_id, $submission->tugas->pelatihan_id);
