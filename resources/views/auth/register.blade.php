@@ -54,14 +54,23 @@
                 placeholder="nama@ditjenpas.go.id">
         </div>
         <div>
-            <label for="golongan" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Golongan <span class="text-[var(--text-muted)] text-[10px] lowercase">(opsional)</span></label>
-            <input type="text" id="golongan" name="golongan" value="{{ old('golongan') }}"
+            <label for="golongan" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Golongan <span class="text-danger">*</span></label>
+            <input type="text" id="golongan" name="golongan" value="{{ old('golongan') }}" required list="golongan-list"
                 class="w-full px-3.5 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-[var(--text-muted)]"
-                placeholder="Contoh: III/a">
+                placeholder="Pilih atau ketik golongan...">
         </div>
     </div>
 
-
+    <div>
+        <label for="unit_kerja_id" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Unit Kerja <span class="text-danger">*</span></label>
+        <select id="unit_kerja_id" name="unit_kerja_id" required
+            class="w-full px-3.5 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+            <option value="">-- Pilih Unit Kerja --</option>
+            @foreach($unitKerjas as $uk)
+                <option value="{{ $uk->id }}" {{ old('unit_kerja_id') == $uk->id ? 'selected' : '' }}>{{ $uk->nama_unit }}</option>
+            @endforeach
+        </select>
+    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -87,4 +96,26 @@
 <div class="mt-6 pt-6 border-t border-[var(--border)] text-center text-sm text-[var(--text-secondary)]">
     Sudah memiliki akun terdaftar? <a href="{{ route('login') }}" class="text-primary hover:underline font-semibold">Masuk di sini</a>
 </div>
+
+<datalist id="golongan-list">
+    <option value="I/a (Juru Muda)">
+    <option value="I/b (Juru Muda Tk. I)">
+    <option value="I/c (Juru)">
+    <option value="I/d (Juru Tk. I)">
+    <option value="II/a (Pengatur Muda)">
+    <option value="II/b (Pengatur Muda Tk. I)">
+    <option value="II/c (Pengatur)">
+    <option value="II/d (Pengatur Tk. I)">
+    <option value="III/a (Penata Muda)">
+    <option value="III/b (Penata Muda Tk. I)">
+    <option value="III/c (Penata)">
+    <option value="III/d (Penata Tk. I)">
+    <option value="IV/a (Pembina)">
+    <option value="IV/b (Pembina Tk. I)">
+    <option value="IV/c (Pembina Utama Muda)">
+    <option value="IV/d (Pembina Utama Madya)">
+    <option value="IV/e (Pembina Utama)">
+    <option value="PPPK">
+    <option value="Non-ASN">
+</datalist>
 @endsection

@@ -52,7 +52,8 @@ class AuthController extends Controller
 
     public function showRegister()
     {
-        return view('auth.register');
+        $unitKerjas = \App\Models\UnitKerja::orderBy('nama_unit')->get();
+        return view('auth.register', compact('unitKerjas'));
     }
 
     public function register(Request $request)
@@ -61,7 +62,8 @@ class AuthController extends Controller
             'nip' => ['required', 'string', 'max:30', 'unique:users,nip', 'unique:account_requests,nip'],
             'nama' => ['required', 'string', 'max:150'],
             'email' => ['nullable', 'email', 'max:150'],
-            'golongan' => ['nullable', 'string', 'max:10'],
+            'golongan' => ['required', 'string', 'max:50'],
+            'unit_kerja_id' => ['required', 'exists:unit_kerjas,id'],
             'pesan' => ['nullable', 'string'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -72,6 +74,7 @@ class AuthController extends Controller
             'nama' => $validated['nama'],
             'email' => $validated['email'] ?? null,
             'golongan' => $validated['golongan'] ?? null,
+            'unit_kerja_id' => $validated['unit_kerja_id'],
             'password' => Hash::make($validated['password']),
             'status_akun' => 'pending',
             'role' => 'peserta',
