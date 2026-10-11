@@ -118,6 +118,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('gradebook/pretest/pdf', [\App\Http\Controllers\Admin\GradebookController::class, 'exportPretestPdf'])->name('gradebook.pretest.pdf');
             Route::get('gradebook/pretest/{user}', [\App\Http\Controllers\Admin\GradebookController::class, 'pretestDetail'])->name('gradebook.pretest.detail');
             Route::get('gradebook/pretest/{user}/pdf', [\App\Http\Controllers\Admin\GradebookController::class, 'exportPretestDetailPdf'])->name('gradebook.pretest.detail.pdf');
+            Route::get('berkas-arsip', [\App\Http\Controllers\Admin\BerkasArsipController::class, 'index'])->name('berkas.index');
+            Route::get('berkas-arsip/pdf', [\App\Http\Controllers\Admin\BerkasArsipController::class, 'exportPdf'])->name('berkas.pdf');
 
             // Kuis: Nilai & Review Peserta
             Route::get('kuis/{materi}/peserta', [\App\Http\Controllers\Admin\KuisReviewController::class, 'indexPeserta'])->name('kuis.peserta');
@@ -148,6 +150,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'updateTopik'])->name('pretest.topik.update');
             Route::delete('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'destroyTopik'])->name('pretest.topik.destroy');
             Route::post('/pretest/reset/{user}', [App\Http\Controllers\Admin\PretestController::class, 'resetPeserta'])->name('pretest.reset');
+            Route::post('/pretest/exempt/{user}', [App\Http\Controllers\Admin\PretestController::class, 'exemptPeserta'])->name('pretest.exempt');
 
             // Kelola Jabatan
             Route::get('/jabatan', [JabatanController::class, 'index'])->name('jabatan.index');

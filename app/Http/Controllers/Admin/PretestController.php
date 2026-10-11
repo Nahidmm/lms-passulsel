@@ -86,7 +86,7 @@ class PretestController extends Controller
     {
         $pretest = Materi::where('is_pretest', true)->first();
 
-        $user->update(['has_taken_pretest' => false]);
+        $user->update(['has_taken_pretest' => false, 'pretest_exempt' => false]);
         \App\Models\HasilPretestTopik::where('user_id', $user->id)->delete();
 
         if ($pretest) {
@@ -98,5 +98,16 @@ class PretestController extends Controller
         }
 
         return back()->with('success', "Status pretest {$user->nama} berhasil di-reset. Peserta wajib mengerjakan pretest kembali.");
+    }
+
+    public function exemptPeserta(User $user)
+    {
+        if (!auth()->user()->isSuperadmin()) {
+            abort(403, 'Hanya Superadmin yang dapat menandai peserta tidak perlu pretest.');
+        }
+
+        $user->update(['pretest_exempt' => true]);
+
+        return back()->with('success', "{$user->nama} ditandai tidak perlu mengerjakan pretest.");
     }
 }

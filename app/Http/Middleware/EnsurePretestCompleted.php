@@ -22,8 +22,8 @@ class EnsurePretestCompleted
             return $next($request);
         }
 
-        // Skip if already taken
-        if ($user->has_taken_pretest) {
+        // Skip if already taken or explicitly exempted
+        if ($user->has_taken_pretest || $user->pretest_exempt) {
             return $next($request);
         }
 

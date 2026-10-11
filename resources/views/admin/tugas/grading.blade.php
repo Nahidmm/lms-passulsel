@@ -74,10 +74,15 @@
                         </td>
                         <td class="px-6 py-4">
                             @if($sub->file_path)
-                                <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank" class="inline-flex items-center gap-1.5 text-primary hover:underline font-medium text-xs bg-primary/5 px-2.5 py-1.5 rounded-lg border border-primary/20">
-                                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                                    {{ Str::limit($sub->file_nama_asli ?? 'Berkas Tugas', 25) }}
-                                </a>
+                                <div class="flex flex-col gap-1.5">
+                                    <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank" class="inline-flex items-center gap-1.5 text-primary hover:underline font-medium text-xs bg-primary/5 px-2.5 py-1.5 rounded-lg border border-primary/20 w-fit">
+                                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                        {{ Str::limit($sub->file_nama_asli ?? 'Berkas Tugas', 25) }}
+                                    </a>
+                                    <button type="button" onclick="openPreview('{{ asset('storage/' . $sub->file_path) }}', '{{ $sub->file_nama_asli ?? '' }}')" class="inline-flex items-center gap-1 text-primary hover:underline font-medium text-xs w-fit">
+                                        <i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview
+                                    </button>
+                                </div>
                             @else
                                 <span class="text-xs text-text-secondary italic">Tidak ada file</span>
                             @endif
@@ -183,6 +188,30 @@
     </div>
 </div>
 
+<!-- Modal Preview File -->
+<div id="previewModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-border">
+            <h3 class="font-bold text-text-primary text-sm">Preview File</h3>
+            <button type="button" onclick="closePreview()" class="text-text-secondary hover:text-text-primary">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-auto p-4 bg-slate-100 dark:bg-slate-900">
+            <img id="previewImage" class="hidden max-w-full mx-auto rounded-lg" alt="Preview gambar">
+            <iframe id="previewPdf" class="hidden w-full h-[70vh] rounded-lg border-0" title="Preview PDF"></iframe>
+            <div id="previewUnsupported" class="hidden text-center py-12">
+                <i data-lucide="file-text" class="w-12 h-12 text-text-muted mx-auto mb-3"></i>
+                <p class="text-sm text-text-primary font-medium">File tidak dapat dipreview langsung</p>
+                <p class="text-xs text-text-secondary mt-1 mb-4">Unduh file untuk melihat isinya.</p>
+                <a id="previewDownloadLink" href="#" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-xs font-semibold">
+                    <i data-lucide="download" class="w-4 h-4"></i> Unduh File
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function openGradingModal(submissionId, pesertaNama, currentNilai, currentFeedback, currentStatus) {
     const form = document.getElementById('gradingForm');
@@ -198,6 +227,41 @@ function openGradingModal(submissionId, pesertaNama, currentNilai, currentFeedba
 
 function closeGradingModal() {
     document.getElementById('gradingModal').classList.add('hidden');
+}
+
+function openPreview(url, filename) {
+    const ext = (filename.split('.').pop() || '').toLowerCase();
+    const imgTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+    const img = document.getElementById('previewImage');
+    const pdf = document.getElementById('previewPdf');
+    const unsupported = document.getElementById('previewUnsupported');
+    const dl = document.getElementById('previewDownloadLink');
+
+    img.classList.add('hidden');
+    pdf.classList.add('hidden');
+    unsupported.classList.add('hidden');
+    img.removeAttribute('src');
+    pdf.removeAttribute('src');
+
+    if (imgTypes.includes(ext)) {
+        img.src = url;
+        img.classList.remove('hidden');
+    } else if (ext === 'pdf') {
+        pdf.src = url;
+        pdf.classList.remove('hidden');
+    } else {
+        dl.href = url;
+        unsupported.classList.remove('hidden');
+    }
+
+    document.getElementById('previewModal').classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+}
+
+function closePreview() {
+    document.getElementById('previewModal').classList.add('hidden');
+    const pdf = document.getElementById('previewPdf');
+    pdf.removeAttribute('src');
 }
 </script>
 @endsection

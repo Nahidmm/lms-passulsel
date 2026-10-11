@@ -201,7 +201,11 @@
                             <p class="text-[11px] text-[var(--text-secondary)]">NIP: {{ $peserta->nip }}</p>
                         </td>
                         <td class="p-4 text-center">
-                            @if($peserta->has_taken_pretest)
+                            @if($peserta->pretest_exempt)
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
+                                    <i data-lucide="shield-check" class="w-3 h-3"></i> Dikecualikan
+                                </span>
+                            @elseif($peserta->has_taken_pretest)
                                 <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     <i data-lucide="check-circle" class="w-3 h-3"></i> Sudah Pretest
                                 </span>
@@ -212,12 +216,22 @@
                             @endif
                         </td>
                         <td class="p-4 text-right">
-                            <form action="{{ route('admin.pretest.reset', $peserta->id) }}" method="POST" class="inline" onsubmit="return confirm('Reset pretest untuk {{ addslashes($peserta->nama) }}? Peserta akan wajib mengerjakan pretest kembali.');">
-                                @csrf
-                                <button type="submit" class="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-lg border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors" title="Reset Pretest">
-                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reset Pretest
-                                </button>
-                            </form>
+                            <div class="flex items-center justify-end gap-1.5">
+                                @if(auth()->user()->isSuperadmin() && !$peserta->pretest_exempt)
+                                <form action="{{ route('admin.pretest.exempt', $peserta->id) }}" method="POST" class="inline" onsubmit="return confirm('Tandai {{ addslashes($peserta->nama) }} sebagai TIDAK PERLU pretest?');">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors" title="Tandai Tidak Perlu Pretest">
+                                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Tidak Perlu
+                                    </button>
+                                </form>
+                                @endif
+                                <form action="{{ route('admin.pretest.reset', $peserta->id) }}" method="POST" class="inline" onsubmit="return confirm('Reset pretest untuk {{ addslashes($peserta->nama) }}? Peserta akan wajib mengerjakan pretest kembali.');">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-lg border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors" title="Reset Pretest">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reset Pretest
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty

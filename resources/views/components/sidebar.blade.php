@@ -85,6 +85,13 @@
                 <span>Buku Nilai (Gradebook)</span>
             </a>
 
+            <a href="{{ route('admin.berkas.index') }}"
+                class="nav-item {{ request()->routeIs('admin.berkas.*') ? 'active' : '' }}"
+                title="Arsip Berkas Peserta">
+                <i data-lucide="folder-archive"></i>
+                <span>Arsip Berkas</span>
+            </a>
+
             <div class="nav-divider"></div>
             <p class="nav-section-label">Kepegawaian</p>
 
