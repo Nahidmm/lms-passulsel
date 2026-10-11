@@ -230,7 +230,7 @@ function closeGradingModal() {
 }
 
 function openPreview(url, filename) {
-    const ext = (filename.split('.').pop() || '').toLowerCase();
+    const ext = (url.split('.').pop() || '').toLowerCase().split('?')[0];
     const imgTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
     const img = document.getElementById('previewImage');
     const pdf = document.getElementById('previewPdf');
