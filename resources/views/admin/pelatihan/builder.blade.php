@@ -368,7 +368,7 @@
         <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
                 <i data-lucide="file-check-2" class="w-4 h-4 text-amber-500"></i>
-                <span>Penugasan & Praktik Kasus HUKDIS</span>
+                <span>Penugasan & Praktik Kasus</span>
                 <span class="text-xs text-[var(--text-secondary)] font-normal">({{ $tugasItems->count() }} tugas)</span>
             </h3>
             <a href="{{ route('admin.pelatihan.tugas.create', $pelatihan->id) }}" class="text-xs font-medium text-amber-600 hover:underline inline-flex items-center gap-1">

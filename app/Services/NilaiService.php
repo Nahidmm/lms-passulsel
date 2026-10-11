@@ -90,7 +90,7 @@ class NilaiService
             }
         }
 
-        // 4. Nilai Tugas (studi kasus hukdis & upload sertifikat)
+        // 4. Nilai Tugas (studi kasus & upload sertifikat)
         $tugasList = Tugas::where('pelatihan_id', $pelatihanId)
             ->where('is_active', true)
             ->get();

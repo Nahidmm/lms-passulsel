@@ -165,7 +165,7 @@
                 <input type="checkbox" name="is_active" id="is_active_pretest" value="1" {{ $pretest->is_active ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 rounded border-[var(--border)] focus:ring-indigo-500">
                 <div>
                     <label for="is_active_pretest" class="text-xs font-bold text-[var(--text-primary)] block cursor-pointer">Pretest Aktif Wajib</label>
-                    <p class="text-[11px] text-[var(--text-secondary)]">Pengguna baru wajib menyelesaikan pretest ini sebelum mengakses modul Hukdis.</p>
+                    <p class="text-[11px] text-[var(--text-secondary)]">Pengguna baru wajib menyelesaikan pretest ini sebelum mengakses modul.</p>
                 </div>
             </div>
             <div class="pt-4 border-t border-[var(--border)] flex justify-end">

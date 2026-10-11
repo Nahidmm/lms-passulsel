@@ -76,7 +76,7 @@
                         Judul Kuis / Ujian <span class="text-danger">*</span>
                     </label>
                     <input type="text" id="judul" name="judul" value="{{ old('judul') }}" required
-                        placeholder="Contoh: Evaluasi Pemahaman Modul 1 / Ujian Post-Test HUKDIS"
+                        placeholder="Contoh: Evaluasi Pemahaman Modul 1 / Ujian Post-Test"
                         class="w-full px-4 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                 </div>
 

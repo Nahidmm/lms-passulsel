@@ -206,7 +206,7 @@
         @endif
     </div>
 
-    {{-- Penugasan & Praktik Kasus HUKDIS --}}
+    {{-- Penugasan & Praktik Kasus --}}
     @if(isset($tugasList) && $tugasList->isNotEmpty())
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-xs">
         <div class="p-5 border-b border-[var(--border)] bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between">

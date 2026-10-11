@@ -32,7 +32,7 @@
                         <option value="upload_sertifikat" {{ old('tipe') === 'upload_sertifikat' ? 'selected' : '' }}>🎓 Upload Sertifikat Pembelajaran Eksternal (Pembelajaran Luar, MOOC, Webinar)</option>
                     </select>
                     <p class="text-xs text-text-secondary mt-1" id="tipe-keterangan">
-                        Peserta akan mengunggah file hasil pengerjaan kasus atau tugas hukdis yang diberikan.
+                        Peserta akan mengunggah file hasil pengerjaan kasus atau tugas yang diberikan.
                     </p>
                 </div>
 
@@ -105,7 +105,7 @@
         if (this.value === 'upload_sertifikat') {
             ket.textContent = 'Peserta diminta melampirkan sertifikat/bukti pembelajaran dari lembaga lain atau webinar terkait untuk diakui.';
         } else {
-            ket.textContent = 'Peserta akan mengunggah file hasil pengerjaan kasus atau tugas hukdis yang diberikan.';
+            ket.textContent = 'Peserta akan mengunggah file hasil pengerjaan kasus atau tugas yang diberikan.';
         }
     });
 </script>

@@ -8,7 +8,7 @@
     <div>
         <div class="flex items-center gap-2 mb-1">
             <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                Monitoring & Evaluasi HUKDIS
+                Monitoring & Evaluasi
             </span>
             <span class="text-xs text-text-secondary">&bull; Terkini: {{ now()->translatedFormat('l, d F Y') }}</span>
         </div>

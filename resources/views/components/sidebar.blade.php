@@ -62,7 +62,7 @@
         @else
 
             <div class="nav-divider"></div>
-            <p class="nav-section-label">Manajemen Kursus Hukdis</p>
+            <p class="nav-section-label">Manajemen Kursus</p>
 
             <a href="{{ route('admin.pelatihan.index') }}"
                 class="nav-item {{ request()->routeIs('admin.pelatihan.*', 'admin.materi.*', 'admin.tugas.*') ? 'active' : '' }}"
@@ -108,7 +108,7 @@
 
             <a href="{{ route('admin.kalender.index') }}"
                 class="nav-item {{ request()->routeIs('admin.kalender.*') ? 'active' : '' }}"
-                title="Kalender Agenda Hukdis">
+                title="Kalender Agenda">
                 <i data-lucide="calendar"></i>
                 <span>Kalender Agenda</span>
             </a>
