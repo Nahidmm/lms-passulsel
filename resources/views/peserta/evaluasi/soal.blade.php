@@ -285,6 +285,40 @@
                                                 </button>
                                             </div>
 
+                                        {{-- 1b. JENIS LAINNYA (Pilihan + Alasan) --}}
+                                        @elseif($soal->tipe === 'jenis_lainnya')
+                                            <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                                                Pilih salah satu:
+                                            </p>
+                                            <div class="space-y-2.5">
+                                                @foreach($soal->pilihanJawaban as $pilihan)
+                                                    <label class="moodle-option flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 cursor-pointer shadow-2xs"
+                                                           id="opt-label-{{ $pilihan->id }}">
+                                                        <input type="radio"
+                                                               name="jawaban[{{ $soal->id }}]"
+                                                               value="{{ $pilihan->id }}"
+                                                               onchange="onRadioChanged({{ $no }}, {{ $soal->id }}, this)"
+                                                               data-correct="{{ $pilihan->is_correct ? 'true' : 'false' }}"
+                                                               class="mt-1 w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500 shrink-0">
+                                                        <div class="flex-1 text-sm md:text-base text-[var(--text-primary)] leading-normal">
+                                                            @if(!empty($pilihan->huruf))
+                                                                <span class="font-bold text-slate-700 dark:text-slate-300 mr-1.5">{{ $pilihan->huruf }}.</span>
+                                                            @endif
+                                                            <span>{{ $pilihan->teks }}</span>
+                                                        </div>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+
+                                            <div class="space-y-2 pt-3">
+                                                <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+                                                    Catatan / Alasan Memilih Jawaban
+                                                </label>
+                                                <textarea name="catatan[{{ $soal->id }}]" rows="3"
+                                                          placeholder="Jelaskan alasan Anda memilih jawaban tersebut..."
+                                                          class="w-full p-4 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y transition-all"></textarea>
+                                            </div>
+
                                         {{-- 2. MULTI SELECT --}}
                                         @elseif($soal->tipe === 'multi_select')
                                             <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
@@ -764,7 +798,7 @@
                 const tipe = step.dataset.tipe;
                 let answered = false;
 
-                if (tipe === 'pilihan_ganda') {
+                if (tipe === 'pilihan_ganda' || tipe === 'jenis_lainnya') {
                     answered = step.querySelectorAll('input[type="radio"]:checked').length > 0;
                 } else if (tipe === 'multi_select') {
                     answered = step.querySelectorAll('input[type="checkbox"]:checked').length > 0;

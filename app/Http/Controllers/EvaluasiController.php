@@ -108,16 +108,17 @@ class EvaluasiController extends Controller
         }
 
         $jawaban = $request->input('jawaban', []);
+        $catatan = $request->input('catatan', []);
         $sesi->update([
             'jawaban_tersimpan' => $jawaban,
             'last_activity_at' => now(),
             'waktu_terakhir_aksi' => now(),
         ]);
 
-        return $this->processSubmit($sesi, $jawaban);
+        return $this->processSubmit($sesi, $jawaban, $catatan);
     }
 
-    private function processSubmit(SesiEvaluasi $sesi, array $jawaban)
+    private function processSubmit(SesiEvaluasi $sesi, array $jawaban, array $catatan = [])
     {
         $benar = 0;
         $totalSkor = 0;
@@ -134,7 +135,7 @@ class EvaluasiController extends Controller
             $isCorrect = false;
 
             if ($jawabanUser) {
-                if ($soal->tipe === 'pilihan_ganda') {
+                if (in_array($soal->tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
                     $pilihan = $soal->pilihanJawaban()->find($jawabanUser);
                     if ($pilihan && $pilihan->is_correct) {
                         $isCorrect = true;
@@ -188,7 +189,7 @@ class EvaluasiController extends Controller
             $pilihanId = null;
             $jawabanTeks = null;
 
-            if ($soal->tipe === 'pilihan_ganda' && $jawabanUser) {
+            if (in_array($soal->tipe, ['pilihan_ganda', 'jenis_lainnya']) && $jawabanUser) {
                 $pilihanId = $jawabanUser;
             } elseif (in_array($soal->tipe, ['isian_singkat', 'essay'])) {
                 $jawabanTeks = $jawabanUser;
@@ -202,6 +203,7 @@ class EvaluasiController extends Controller
                 'soal_id' => $soal->id,
                 'pilihan_id' => $pilihanId,
                 'jawaban_esai' => $jawabanTeks,
+                'catatan' => $catatan[$soal->id] ?? null,
                 'is_correct' => $isCorrect,
                 'skor' => $isCorrect ? $soal->bobot : 0,
             ]);

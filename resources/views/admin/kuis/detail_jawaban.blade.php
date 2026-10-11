@@ -75,6 +75,7 @@
                 'essay'         => ['label' => 'Essay',          'color' => 'bg-green-100 text-green-700'],
                 'isian_singkat' => ['label' => 'Isian Singkat',  'color' => 'bg-yellow-100 text-yellow-700'],
                 'menjodohkan'   => ['label' => 'Menjodohkan',    'color' => 'bg-orange-100 text-orange-700'],
+                'jenis_lainnya' => ['label' => 'Jenis Lainnya',  'color' => 'bg-teal-100 text-teal-700'],
             ];
             $tipeInfo = $tipeLabels[$soal->tipe ?? ''] ?? ['label' => ucfirst($soal->tipe ?? '-'), 'color' => 'bg-[#13161c] text-gray-300'];
         @endphp
@@ -108,7 +109,7 @@
 
             {{-- Body: pilihan jawaban atau jawaban teks --}}
             <div class="px-5 py-4">
-                @if($soal->tipe === 'pilihan_ganda' || $soal->tipe === 'multi_select')
+                @if($soal->tipe === 'pilihan_ganda' || $soal->tipe === 'multi_select' || $soal->tipe === 'jenis_lainnya')
                     <div class="space-y-2">
                         @foreach($soal->pilihanJawaban as $pilihan)
                             @php
@@ -158,6 +159,12 @@
                         <div class="mt-3 p-3 bg-secondary/30 rounded-lg">
                             <p class="text-xs font-bold text-text-secondary mb-1">Jawaban Peserta:</p>
                             <p class="text-sm text-text-primary">{{ $hasil->jawaban_esai }}</p>
+                        </div>
+                    @endif
+                    @if($hasil->catatan)
+                        <div class="mt-3 p-3 bg-accent/5 border border-accent/20 rounded-lg">
+                            <p class="text-xs font-bold text-text-secondary mb-1">Catatan / Alasan Peserta:</p>
+                            <p class="text-sm text-text-primary">{{ $hasil->catatan }}</p>
                         </div>
                     @endif
 

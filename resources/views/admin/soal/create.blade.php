@@ -59,7 +59,7 @@
                 <label for="tipe" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
                     Jenis Pertanyaan <span class="text-rose-500">*</span>
                 </label>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
                     @php
                         $types = [
                             ['value' => 'pilihan_ganda', 'label' => 'Multiple Choice', 'sub' => '1 jawaban benar', 'icon' => 'circle-dot'],
@@ -67,6 +67,7 @@
                             ['value' => 'essay',         'label' => 'Uraian / Essay',   'sub' => 'Jawaban bebas', 'icon' => 'align-left'],
                             ['value' => 'isian_singkat', 'label' => 'Isian Singkat',    'sub' => 'Teks kunci', 'icon' => 'underline'],
                             ['value' => 'menjodohkan',   'label' => 'Menjodohkan',      'sub' => 'Pasangan kolom', 'icon' => 'git-merge'],
+                            ['value' => 'jenis_lainnya', 'label' => 'Jenis Lainnya',    'sub' => 'Pilihan + Alasan', 'icon' => 'message-square'],
                         ];
                     @endphp
                     @foreach($types as $type)
@@ -281,6 +282,7 @@ const sections = {
     essay:         'section-essay',
     isian_singkat: 'section-isian',
     menjodohkan:   'section-matching',
+    jenis_lainnya: 'section-choices',
 };
 const allSections = [...new Set(Object.values(sections))];
 
@@ -307,7 +309,7 @@ function showSection(type) {
         }
     }
 
-    if (type === 'pilihan_ganda' || type === 'multi_select') {
+    if (type === 'pilihan_ganda' || type === 'multi_select' || type === 'jenis_lainnya') {
         document.querySelectorAll('#choices-container input[name="pilihan[]"]').forEach(input => {
             input.required = true;
         });
@@ -465,7 +467,7 @@ function reindexPairs() {
 // Validation prior to form submission
 document.getElementById('soal-form')?.addEventListener('submit', function(e) {
     const activeType = document.querySelector('input[name="tipe"]:checked')?.value || 'pilihan_ganda';
-    if (activeType === 'pilihan_ganda') {
+    if (activeType === 'pilihan_ganda' || activeType === 'jenis_lainnya') {
         const checked = document.querySelector('input[name="jawaban_benar"]:checked');
         if (!checked) {
             e.preventDefault();

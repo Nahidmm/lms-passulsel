@@ -270,7 +270,7 @@ class MateriController extends Controller
             $totalBenar = 0;
 
             foreach ($soals as $soal) {
-                if ($soal->tipe === 'pilihan_ganda') {
+                if (in_array($soal->tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
                     $selectedId = $jawaban[$soal->id] ?? null;
                     if ($selectedId) {
                         $pilihan = $soal->pilihanJawaban->firstWhere('id', $selectedId);

@@ -8,7 +8,7 @@ class HasilLatihan extends Model
 {
     protected $fillable = [
         'sesi_evaluasi_id', 'user_id', 'soal_id',
-        'pilihan_id', 'jawaban_esai', 'catatan_admin', 'is_correct', 'skor',
+        'pilihan_id', 'jawaban_esai', 'catatan', 'catatan_admin', 'is_correct', 'skor',
         'is_skipped', 'response_time_seconds', 'answer_order', 'feedback_shown'
     ];
 

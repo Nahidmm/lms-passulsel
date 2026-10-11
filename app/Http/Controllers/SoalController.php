@@ -25,12 +25,12 @@ class SoalController extends Controller
         $rules = [
             'pertanyaan' => 'required|string',
             'pembahasan' => 'nullable|string',
-            'tipe'       => 'required|in:pilihan_ganda,multi_select,essay,isian_singkat,menjodohkan',
+            'tipe'       => 'required|in:pilihan_ganda,multi_select,essay,isian_singkat,menjodohkan,jenis_lainnya',
             'bobot'      => 'nullable|integer|min:1',
         ];
 
         // Tipe-specific validation
-        if ($tipe === 'pilihan_ganda') {
+        if (in_array($tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
             $rules['pilihan']       = 'required|array|min:2';
             $rules['pilihan.*']     = 'required|string';
             $rules['jawaban_benar'] = 'required|integer|min:0';
@@ -93,7 +93,7 @@ class SoalController extends Controller
             'bobot'      => 'nullable|integer|min:1',
         ];
 
-        if ($tipe === 'pilihan_ganda') {
+        if (in_array($tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
             $rules['pilihan']       = 'required|array|min:2';
             $rules['pilihan.*']     = 'required|string';
             $rules['jawaban_benar'] = 'required|integer|min:0';
@@ -159,7 +159,7 @@ class SoalController extends Controller
     {
         $hurufs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
-        if ($tipe === 'pilihan_ganda') {
+        if (in_array($tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
             $jawabanBenar = (int) $request->input('jawaban_benar', 0);
             foreach ($request->input('pilihan', []) as $index => $teks) {
                 $soal->pilihanJawaban()->create([

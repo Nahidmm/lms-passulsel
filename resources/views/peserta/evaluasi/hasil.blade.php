@@ -93,8 +93,8 @@
             <div class="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-xs">
                 <div class="p-5 border-b border-[var(--border)] bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between">
                     <div>
-                        <h3 class="font-bold text-sm text-[var(--text-primary)]">Pembahasan Jawaban</h3>
-                        <p class="text-xs text-[var(--text-secondary)]">Koreksi lembar jawaban dan ulasan materi regulasi terkait</p>
+                        <h3 class="font-bold text-sm text-[var(--text-primary)]">Koreksi Jawaban</h3>
+                        <p class="text-xs text-[var(--text-secondary)]">Koreksi lembar jawaban Anda</p>
                     </div>
                     <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[var(--text-secondary)]">
                         {{ $hasilLatihans->count() }} Pertanyaan
@@ -163,16 +163,6 @@
                                         @endforeach
                                     </div>
 
-                                    @if($hasil->soal->pembahasan)
-                                        <div class="rounded-xl border border-indigo-200 dark:border-indigo-900 bg-indigo-50/50 dark:bg-indigo-950/20 p-3.5">
-                                            <p class="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 mb-1 flex items-center gap-1.5 uppercase tracking-wider">
-                                                <i data-lucide="info" class="w-3.5 h-3.5"></i> Pembahasan Regulasi
-                                            </p>
-                                            <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
-                                                {{ $hasil->soal->pembahasan }}
-                                            </p>
-                                        </div>
-                                    @endif
                                 </div>
                             </div>
                         </div>

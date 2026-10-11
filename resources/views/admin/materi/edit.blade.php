@@ -188,6 +188,7 @@
                 'essay'         => ['label' => 'Essay / Uraian', 'color' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'],
                 'isian_singkat' => ['label' => 'Isian Singkat', 'color' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'],
                 'menjodohkan'   => ['label' => 'Menjodohkan', 'color' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'],
+                'jenis_lainnya' => ['label' => 'Jenis Lainnya', 'color' => 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20'],
             ];
         @endphp
 
@@ -267,7 +268,7 @@
                         </div>
 
                         {{-- Options Preview by Question Type --}}
-                        @if(in_array($soal->tipe, ['pilihan_ganda', 'multi_select']) && $soal->pilihanJawaban->isNotEmpty())
+                        @if(in_array($soal->tipe, ['pilihan_ganda', 'multi_select', 'jenis_lainnya']) && $soal->pilihanJawaban->isNotEmpty())
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:pl-10 pt-1">
                                 @foreach($soal->pilihanJawaban as $pil)
                                     <div class="flex items-center gap-2.5 p-3 rounded-xl text-xs border transition-all {{ $pil->is_correct ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-900 dark:text-emerald-200 font-medium' : 'bg-[var(--card)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--text-muted)]' }}">
