@@ -64,7 +64,7 @@
     <div>
         <label for="unit_kerja_id" class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Unit Kerja <span class="text-danger">*</span></label>
         <select id="unit_kerja_id" name="unit_kerja_id" required
-            class="w-full px-3.5 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+            class="w-full px-3.5 py-2.5 bg-white text-gray-900 border border-[var(--border)] rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
             <option value="">-- Pilih Unit Kerja --</option>
             @foreach($unitKerjas as $uk)
                 <option value="{{ $uk->id }}" {{ old('unit_kerja_id') == $uk->id ? 'selected' : '' }}>{{ $uk->nama_unit }}</option>

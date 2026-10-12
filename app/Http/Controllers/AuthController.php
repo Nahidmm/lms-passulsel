@@ -64,7 +64,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'nip' => ['required', 'string', 'max:30', 'unique:users,nip', 'unique:account_requests,nip'],
+            'nip' => ['required', 'string', 'max:30'],
             'nama' => ['required', 'string', 'max:150'],
             'email' => ['nullable', 'email', 'max:150'],
             'golongan' => ['required', 'string', 'max:50'],
@@ -73,9 +73,13 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        // Instead of creating a direct user, we create an AccountRequest and a User with status 'pending'
-        $user = User::create([
-            'nip' => $validated['nip'],
+        // Izinkan daftar ulang jika pendaftaran sebelumnya ditolak
+        $existingUser = User::where('nip', $validated['nip'])->first();
+        if ($existingUser && $existingUser->status_akun !== 'rejected') {
+            return back()->withErrors(['nip' => 'NIP sudah terdaftar di sistem.'])->withInput();
+        }
+
+        $userData = [
             'nama' => $validated['nama'],
             'email' => $validated['email'] ?? null,
             'golongan' => $validated['golongan'] ?? null,
@@ -83,15 +87,34 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
             'status_akun' => 'pending',
             'role' => 'peserta',
-        ]);
+        ];
 
-        AccountRequest::create([
-            'nip' => $validated['nip'],
+        if ($existingUser) {
+            $existingUser->update($userData);
+            $user = $existingUser;
+        } else {
+            $user = User::create(['nip' => $validated['nip']] + $userData);
+        }
+
+        // AccountRequest: update yang sudah ada (jika ditolak) atau buat baru
+        $requestData = [
             'nama' => $validated['nama'],
             'email' => $validated['email'] ?? null,
             'golongan' => $validated['golongan'] ?? null,
             'pesan' => $validated['pesan'] ?? null,
-        ]);
+            'status' => 'menunggu',
+            'diproses_oleh' => null,
+            'alasan_tolak' => null,
+            'tanggal_proses' => null,
+        ];
+
+        $existingRequest = AccountRequest::where('nip', $validated['nip'])->first();
+        if ($existingRequest) {
+            $existingRequest->update($requestData);
+        } else {
+            $requestData['nip'] = $validated['nip'];
+            AccountRequest::create($requestData);
+        }
 
         // Notify all admins about new pending account
         Notification::kirimKeAdmin(

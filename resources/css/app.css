@@ -408,6 +408,16 @@ a { text-decoration: none; }
   transform: translateY(0);
 }
 
+.notif-dropdown::before,
+.user-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
 .notif-dropdown { width: min(340px, calc(100vw - 1.5rem)); }
 .user-dropdown  { width: min(240px, calc(100vw - 1.5rem)); }
 

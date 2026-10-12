@@ -363,7 +363,7 @@
                     <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
                         Unit Kerja
                     </label>
-                    <select name="unit_kerja_id" class="w-full px-3.5 py-2.5 bg-[var(--input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                    <select name="unit_kerja_id" class="w-full px-3.5 py-2.5 bg-white text-gray-900 border border-[var(--border)] rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                         <option value="">-- Pilih Unit Kerja --</option>
                         @foreach($unitKerjas as $uk)
                             <option value="{{ $uk->id }}">{{ $uk->nama_unit }}</option>
