@@ -38,7 +38,7 @@
 
     <div>
         <label for="password" class="block text-xs font-semibold text-white/80 mb-1.5 uppercase tracking-wider">Password</label>
-        <div class="relative">
+        <div class="relative password-wrap">
             <input type="password" id="password" name="password" required
                 class="w-full px-4 py-2.5 pr-11 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:border-sky-400 focus:ring-1 focus:ring-sky-400 outline-none transition-all placeholder:text-white/30"
                 placeholder="Masukkan password">
