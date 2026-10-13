@@ -247,25 +247,68 @@ class GradebookController extends Controller
             ->orderBy('nama')
             ->get();
 
+        $sesiMap = [];
+        if ($pretest) {
+            $allSessions = SesiEvaluasi::where('materi_id', $pretest->id)
+                ->orderBy('id', 'desc')
+                ->get()
+                ->groupBy('user_id');
+
+            foreach ($allSessions as $uId => $sessions) {
+                $active = $sessions->firstWhere('status', 'berlangsung');
+                $completed = $sessions->where('status', 'selesai')->sortByDesc('skor')->first();
+                $sesiMap[$uId] = [
+                    'active' => $active,
+                    'completed' => $completed,
+                ];
+            }
+        }
+
+        $stats = [
+            'total' => $pesertas->count(),
+            'selesai' => 0,
+            'mengerjakan' => 0,
+            'dijeda' => 0,
+            'belum' => 0,
+        ];
+
         $rows = [];
         foreach ($pesertas as $peserta) {
-            $nilaiPretest = null;
-            if ($pretest) {
-                $nilaiPretest = SesiEvaluasi::where('user_id', $peserta->id)
-                    ->where('materi_id', $pretest->id)
-                    ->where('status', 'selesai')
-                    ->max('skor');
+            $sesiInfo = $sesiMap[$peserta->id] ?? null;
+            $activeSesi = $sesiInfo['active'] ?? null;
+            $completedSesi = $sesiInfo['completed'] ?? null;
+
+            $statusUjian = 'belum_mulai';
+            $nilaiPretest = $completedSesi ? (float) $completedSesi->skor : null;
+
+            if ($activeSesi) {
+                if ($activeSesi->is_paused) {
+                    $statusUjian = 'dijeda';
+                    $stats['dijeda']++;
+                } else {
+                    $statusUjian = 'sedang_mengerjakan';
+                    $stats['mengerjakan']++;
+                }
+            } elseif ($completedSesi || $peserta->has_taken_pretest) {
+                $statusUjian = 'selesai';
+                $stats['selesai']++;
+            } else {
+                $stats['belum']++;
             }
 
             $rows[] = [
                 'user' => $peserta,
-                'nilai_pretest' => $nilaiPretest !== null ? (float) $nilaiPretest : null,
+                'nilai_pretest' => $nilaiPretest,
+                'status_ujian' => $statusUjian,
+                'active_sesi' => $activeSesi,
+                'completed_sesi' => $completedSesi,
             ];
         }
 
         return [
             'pretest' => $pretest,
             'rows' => $rows,
+            'stats' => $stats,
         ];
     }
 

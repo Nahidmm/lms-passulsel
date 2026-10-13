@@ -13,7 +13,9 @@
         th { background: #f3f4f6; font-weight: bold; text-transform: uppercase; font-size: 10px; }
         .center { text-align: center; }
         .badge-done { color: #047857; font-weight: bold; }
-        .badge-not { color: #b45309; font-weight: bold; }
+        .badge-active { color: #1d4ed8; font-weight: bold; }
+        .badge-pause { color: #b45309; font-weight: bold; }
+        .badge-not { color: #6b7280; }
         .footer { margin-top: 20px; font-size: 9px; color: #9ca3af; text-align: right; }
     </style>
 </head>
@@ -43,8 +45,16 @@
                 <td>{{ $row['user']->nip }}</td>
                 <td>{{ $row['user']->unitKerja?->nama_unit ?? '-' }}</td>
                 <td class="center">{{ $row['nilai_pretest'] !== null ? number_format($row['nilai_pretest'], 1) : '-' }}</td>
-                <td class="center {{ $row['nilai_pretest'] !== null ? 'badge-done' : 'badge-not' }}">
-                    {{ $row['nilai_pretest'] !== null ? 'Sudah' : 'Belum' }}
+                <td class="center {{ ($row['status_ujian'] ?? '') === 'selesai' ? 'badge-done' : (($row['status_ujian'] ?? '') === 'sedang_mengerjakan' ? 'badge-active' : (($row['status_ujian'] ?? '') === 'dijeda' ? 'badge-pause' : 'badge-not')) }}">
+                    @if(($row['status_ujian'] ?? '') === 'selesai')
+                        Selesai
+                    @elseif(($row['status_ujian'] ?? '') === 'sedang_mengerjakan')
+                        Mengerjakan
+                    @elseif(($row['status_ujian'] ?? '') === 'dijeda')
+                        Dijeda
+                    @else
+                        Belum
+                    @endif
                 </td>
             </tr>
             @endforeach
