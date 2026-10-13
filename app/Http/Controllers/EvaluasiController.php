@@ -81,7 +81,8 @@ class EvaluasiController extends Controller
         
         // Check if timeout (only if not paused)
         if ($materi->durasi_menit > 0 && !$sesi->is_paused && $sesi->sisaWaktu <= 0) {
-            return $this->processSubmit($sesi, []);
+            $fallbackJawaban = is_array($sesi->jawaban_tersimpan) ? $sesi->jawaban_tersimpan : [];
+            return $this->processSubmit($sesi, $fallbackJawaban);
         }
 
         $soalsQuery = $materi->soals()->with('pilihanJawaban')->where('is_active', true);
@@ -102,6 +103,33 @@ class EvaluasiController extends Controller
         return view('peserta.evaluasi.soal', compact('sesi', 'soals', 'materi'));
     }
 
+    public function syncAnswers(Request $request, SesiEvaluasi $sesi)
+    {
+        $user = Auth::user();
+        if ($sesi->user_id !== $user->id || $sesi->status !== 'berlangsung') {
+            return response()->json(['success' => false, 'message' => 'Sesi tidak valid.'], 403);
+        }
+
+        $jawaban = $request->input('jawaban', []);
+        $currentIndex = $request->input('current_soal_index');
+
+        $updateData = [
+            'jawaban_tersimpan' => is_array($jawaban) ? $jawaban : [],
+            'last_activity_at' => now(),
+            'waktu_terakhir_aksi' => now(),
+        ];
+        if ($currentIndex !== null) {
+            $updateData['current_soal_index'] = max(0, (int) $currentIndex);
+        }
+
+        $sesi->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'synced_at' => now()->toIso8601String(),
+        ]);
+    }
+
     public function pause(Request $request, SesiEvaluasi $sesi)
     {
         $user = Auth::user();
@@ -109,13 +137,17 @@ class EvaluasiController extends Controller
             return response()->json(['success' => false, 'message' => 'Sesi tidak valid.'], 403);
         }
 
-        if (!$sesi->is_paused) {
-            $sesi->update([
-                'is_paused' => true,
-                'last_activity_at' => now(),
-                'waktu_terakhir_aksi' => now(),
-            ]);
+        $jawaban = $request->input('jawaban');
+        $updateData = [
+            'is_paused' => true,
+            'last_activity_at' => now(),
+            'waktu_terakhir_aksi' => now(),
+        ];
+        if (is_array($jawaban)) {
+            $updateData['jawaban_tersimpan'] = $jawaban;
         }
+
+        $sesi->update($updateData);
 
         return response()->json([
             'success' => true,
@@ -171,6 +203,11 @@ class EvaluasiController extends Controller
 
     private function processSubmit(SesiEvaluasi $sesi, array $jawaban, array $catatan = [])
     {
+        // Fallback to saved answers in database if submitted array is empty
+        if (empty($jawaban) && !empty($sesi->jawaban_tersimpan) && is_array($sesi->jawaban_tersimpan)) {
+            $jawaban = $sesi->jawaban_tersimpan;
+        }
+
         $benar = 0;
         $totalSkor = 0;
         $maxSkor = 0;

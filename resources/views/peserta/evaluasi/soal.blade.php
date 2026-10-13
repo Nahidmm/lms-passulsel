@@ -666,6 +666,7 @@
             updateView();
             playAudioBeep(600, 0.03);
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            syncAnswersToServer();
         }
     }
 
@@ -801,18 +802,109 @@
             }
 
             localStorage.setItem(storageKey, JSON.stringify(data));
+            debouncedSyncAnswers();
         } catch (e) {
             console.error('Error saving answers to localStorage:', e);
         }
     }
 
+    let syncDebounceTimer = null;
+
+    function getFormattedAnswers() {
+        const form = document.getElementById('quiz-form');
+        if (!form) return {};
+        const answers = {};
+        const elements = form.elements;
+        for (let i = 0; i < elements.length; i++) {
+            const el = elements[i];
+            if (!el.name || el.name === '_token') continue;
+
+            const matchMatch = el.name.match(/^jawaban\[(\d+)\]\[(\d+)\]/);
+            if (matchMatch) {
+                const sId = matchMatch[1];
+                const pId = matchMatch[2];
+                if ((el.value || '').trim()) {
+                    if (!answers[sId]) answers[sId] = {};
+                    answers[sId][pId] = el.value.trim();
+                }
+                continue;
+            }
+
+            const matchArray = el.name.match(/^jawaban\[(\d+)\]\[\]/);
+            if (matchArray) {
+                const sId = matchArray[1];
+                if (el.checked) {
+                    if (!answers[sId]) answers[sId] = [];
+                    answers[sId].push(el.value);
+                }
+                continue;
+            }
+
+            const matchSingle = el.name.match(/^jawaban\[(\d+)\]$/);
+            if (matchSingle) {
+                const sId = matchSingle[1];
+                if (el.type === 'radio') {
+                    if (el.checked) answers[sId] = el.value;
+                } else if (el.type === 'text' || el.tagName === 'TEXTAREA') {
+                    if ((el.value || '').trim()) answers[sId] = el.value.trim();
+                }
+            }
+        }
+        return answers;
+    }
+
+    function syncAnswersToServer() {
+        @if($sesi->id !== 'preview')
+            const answers = getFormattedAnswers();
+            fetch("{{ route('peserta.evaluasi.sync', $sesi->id) }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    jawaban: answers,
+                    current_soal_index: currentSoal
+                })
+            }).catch(e => console.warn('Background sync warning:', e));
+        @endif
+    }
+
+    function debouncedSyncAnswers() {
+        if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+        syncDebounceTimer = setTimeout(() => {
+            syncAnswersToServer();
+        }, 1500);
+    }
+
     function loadSavedAnswers() {
         try {
             const raw = localStorage.getItem(storageKey);
-            if (!raw) return;
-            const data = JSON.parse(raw);
+            let data = raw ? JSON.parse(raw) : null;
             const form = document.getElementById('quiz-form');
             if (!form) return;
+
+            // Fallback from server database if localStorage is empty
+            @if(!empty($sesi->jawaban_tersimpan) && is_array($sesi->jawaban_tersimpan))
+                const serverAnswers = @json($sesi->jawaban_tersimpan);
+                if ((!data || !data.answers || Object.keys(data.answers).length === 0) && serverAnswers && Object.keys(serverAnswers).length > 0) {
+                    if (!data) data = { answers: {}, flagged: {} };
+                    for (const sId in serverAnswers) {
+                        const val = serverAnswers[sId];
+                        if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+                            for (const pId in val) {
+                                data.answers[`jawaban[${sId}][${pId}]`] = val[pId];
+                            }
+                        } else if (Array.isArray(val)) {
+                            data.answers[`jawaban[${sId}][]`] = val;
+                        } else {
+                            data.answers[`jawaban[${sId}]`] = val;
+                        }
+                    }
+                }
+            @endif
+
+            if (!data) return;
 
             // Restore Flags
             if (data.flagged) {
@@ -897,7 +989,7 @@
                         alert("Waktu simulasi ujian telah habis! (Mode Preview).");
                         window.location.reload();
                     @else
-                        alert("Waktu pengerjaan kuis telah habis! Jawaban Anda akan dikirimkan otomatis sekarang.");
+                        // Non-blocking auto submit: immediately submit form without alert popup blocking
                         submitFormDirectly();
                     @endif
                     return;
@@ -1132,7 +1224,7 @@
         if (overlay) overlay.classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
 
-        // 5. Notify server (if not preview)
+        // 5. Notify server with latest answers (if not preview)
         @if($sesi->id !== 'preview')
             try {
                 await fetch("{{ route('peserta.evaluasi.pause', $sesi->id) }}", {
@@ -1140,7 +1232,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
+                    },
+                    body: JSON.stringify({
+                        jawaban: getFormattedAnswers()
+                    })
                 });
             } catch (err) {
                 console.error('Gagal mengirim status pause ke server:', err);
