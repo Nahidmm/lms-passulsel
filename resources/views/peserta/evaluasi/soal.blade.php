@@ -7,6 +7,7 @@
     $isTimeAttack = ($materi->sub_mode ?? '') === 'time_attack';
     $timerPerSoal = ($materi->timer_per_soal ?? 0) > 0 ? (int)$materi->timer_per_soal : 0;
     $totalSoal = $soals->count();
+    $isPaused = ($sesi->id !== 'preview') ? (bool)($sesi->is_paused ?? false) : false;
     $sisaDetik = isset($sesi->sisaWaktu) ? (int)$sesi->sisaWaktu : (($materi->durasi_menit ?? 0) * 60);
     if ($sisaDetik <= 0 && ($materi->durasi_menit ?? 0) > 0) $sisaDetik = $materi->durasi_menit * 60;
 @endphp
@@ -150,8 +151,14 @@
             <h1 class="text-lg md:text-xl font-bold text-[var(--text-primary)] tracking-tight">{{ $materi->judul }}</h1>
         </div>
 
-        @if($sesi->id === 'preview')
-            <div class="flex flex-wrap items-center gap-2.5">
+        <div class="flex flex-wrap items-center gap-2.5">
+            <button type="button" onclick="triggerPause()" id="top-btn-pause-test"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/50 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-bold transition-all shadow-2xs">
+                <i data-lucide="pause-circle" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+                <span>Jeda Ujian (Pause)</span>
+            </button>
+
+            @if($sesi->id === 'preview')
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-semibold">
                     <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0"></i>
                     <span>Mode Simulasi Preview (Admin)</span>
@@ -160,8 +167,8 @@
                     <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
                     <span>Kembali ke Editor Kuis</span>
                 </a>
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 
     @if($totalSoal === 0)
@@ -487,6 +494,13 @@
                         </div>
                     @endif
 
+                    {{-- Dedicated Pause Button in Sidebar --}}
+                    <button type="button" onclick="triggerPause()" id="side-btn-pause-test"
+                        class="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/50 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-bold transition-all shadow-2xs">
+                        <i data-lucide="pause-circle" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+                        <span>Jeda Ujian (Pause)</span>
+                    </button>
+
                     {{-- Question Tiles Grid (Moodle Style) --}}
                     <div>
                         <div class="flex items-center justify-between mb-2.5">
@@ -546,6 +560,40 @@
     </div>
     @endif
 
+    {{-- ── FULLSCREEN PAUSE OVERLAY (Anti-Peek) ── --}}
+    <div id="pause-overlay" class="{{ $isPaused ? '' : 'hidden' }} fixed inset-0 z-[100] bg-slate-900/90 dark:bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 select-none">
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl max-w-md w-full p-6 md:p-8 text-center shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div class="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 flex items-center justify-center mx-auto text-amber-600 dark:text-amber-400 shadow-sm ring-4 ring-amber-500/10">
+                <i data-lucide="pause-circle" class="w-8 h-8"></i>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-extrabold text-[var(--text-primary)]">Ujian Sedang Dijeda</h3>
+                <p class="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
+                    Tampilan butir soal disembunyikan sementara untuk menjaga integritas evaluasi. Penghitung waktu ujian dihentikan sementara.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-[var(--text-secondary)] space-y-1">
+                <div class="flex items-center justify-between font-semibold">
+                    <span>Waktu tersisa saat dijeda:</span>
+                    <span id="pause-modal-timer" class="font-mono text-sm font-extrabold text-blue-600 dark:text-blue-400">{{ gmdate('i:s', $sisaDetik) }}</span>
+                </div>
+                <div class="text-[11px] text-slate-400">
+                    Klik tombol di bawah untuk melanjutkan pengerjaan ujian.
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button type="button" onclick="triggerResume()" id="btn-resume-test"
+                        class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white text-sm font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer">
+                    <i data-lucide="play-circle" class="w-5 h-5"></i>
+                    <span>Lanjutkan Ujian (Resume)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
 </div>
 @endsection
 
@@ -561,6 +609,8 @@
     let flaggedSoals = {};
     let soalTimers = {};
     let currentSoalInterval = null;
+    let isTestPaused = {{ $isPaused ? 'true' : 'false' }};
+    let currentDistance = {{ $sisaDetik }} * 1000;
 
     // Storage Key
     const storageKey = `moodle_quiz_{{ $sesi->id === 'preview' ? 'preview_' . $materi->id : $sesi->id }}`;
@@ -834,7 +884,9 @@
             const headerBox = document.getElementById('header-timer-box');
 
             const timerInterval = setInterval(() => {
+                if (isTestPaused) return; // Freeze timer if test is paused
                 distance -= 1000;
+                currentDistance = distance;
 
                 if (distance <= 0) {
                     clearInterval(timerInterval);
@@ -879,6 +931,7 @@
         if (el) el.textContent = distance + 's';
 
         currentSoalInterval = setInterval(() => {
+            if (isTestPaused) return; // Freeze timer per soal if paused
             distance--;
             soalTimers[idx] = distance;
             if (el) el.textContent = distance + 's';
@@ -948,7 +1001,7 @@
 
     window.addEventListener('beforeunload', (e) => {
         const form = document.getElementById('quiz-form');
-        if (form && !form.submitted && '{{ $sesi->id }}' !== 'preview') {
+        if (form && !form.submitted && '{{ $sesi->id }}' !== 'preview' && !isTestPaused) {
             e.preventDefault();
             e.returnValue = '';
         }
@@ -959,6 +1012,7 @@
         let cheatWarnings = 0;
         const maxWarnings = 3;
         function onTabBlurDetected() {
+            if (isTestPaused) return; // Don't trigger anti-cheat if test is paused
             const form = document.getElementById('quiz-form');
             if (form && form.submitted) return;
 
@@ -1054,6 +1108,84 @@
             btn.innerHTML = soundMuted ? '<i data-lucide="volume-x" class="w-4 h-4 text-rose-500"></i>' : '<i data-lucide="volume-2" class="w-4 h-4"></i>';
             if (window.lucide) lucide.createIcons();
         }
+    }
+
+    // ── Pause and Resume Handlers ──
+    async function triggerPause() {
+        if (isTestPaused) return;
+
+        // 1. Auto-save answers immediately to localStorage
+        saveAnswersToStorage();
+
+        // 2. Set paused state
+        isTestPaused = true;
+
+        // 3. Format remaining time to modal timer display
+        const m = Math.floor(currentDistance / 60000);
+        const s = Math.floor((currentDistance % 60000) / 1000);
+        const formatted = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+        const pTimer = document.getElementById('pause-modal-timer');
+        if (pTimer) pTimer.textContent = formatted;
+
+        // 4. Show fullscreen anti-peek overlay
+        const overlay = document.getElementById('pause-overlay');
+        if (overlay) overlay.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+
+        // 5. Notify server (if not preview)
+        @if($sesi->id !== 'preview')
+            try {
+                await fetch("{{ route('peserta.evaluasi.pause', $sesi->id) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+            } catch (err) {
+                console.error('Gagal mengirim status pause ke server:', err);
+            }
+        @endif
+    }
+
+    async function triggerResume() {
+        const btn = document.getElementById('btn-resume-test');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i><span>Melanjutkan Ujian...</span>';
+            if (window.lucide) lucide.createIcons();
+        }
+
+        @if($sesi->id !== 'preview')
+            try {
+                const res = await fetch("{{ route('peserta.evaluasi.resume', $sesi->id) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+                const data = await res.json();
+                if (data && data.sisa_detik !== undefined) {
+                    currentDistance = data.sisa_detik * 1000;
+                }
+            } catch (err) {
+                console.error('Gagal mengirim status resume ke server:', err);
+            }
+        @endif
+
+        isTestPaused = false;
+        const overlay = document.getElementById('pause-overlay');
+        if (overlay) overlay.classList.add('hidden');
+
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="play-circle" class="w-5 h-5"></i><span>Lanjutkan Ujian (Resume)</span>';
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // Restart question timer if applicable
+        startSoalTimer(currentSoal);
     }
 </script>
 @endpush

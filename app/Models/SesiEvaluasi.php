@@ -35,7 +35,11 @@ class SesiEvaluasi extends Model
     public function getSisaWaktuAttribute(): int
     {
         if (!$this->mulai_at || !$this->isBerlangsung()) return 0;
-        $batas = $this->mulai_at->addMinutes($this->durasi_menit);
+        $batas = $this->mulai_at->copy()->addMinutes($this->durasi_menit);
+        if ($this->is_paused) {
+            $ref = $this->last_activity_at ?: now();
+            return max(0, $ref->diffInSeconds($batas, false));
+        }
         return max(0, now()->diffInSeconds($batas, false));
     }
 }

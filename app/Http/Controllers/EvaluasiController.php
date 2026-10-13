@@ -79,8 +79,8 @@ class EvaluasiController extends Controller
 
         $materi = $sesi->materi;
         
-        // Check if timeout
-        if ($materi->durasi_menit > 0 && $sesi->sisaWaktu <= 0) {
+        // Check if timeout (only if not paused)
+        if ($materi->durasi_menit > 0 && !$sesi->is_paused && $sesi->sisaWaktu <= 0) {
             return $this->processSubmit($sesi, []);
         }
 
@@ -91,13 +91,64 @@ class EvaluasiController extends Controller
         }
         
         $soals = $soalsQuery->get();
-        $sesi->update([
-            'current_soal_index' => max(0, (int) $sesi->current_soal_index),
-            'last_activity_at' => now(),
-            'waktu_terakhir_aksi' => now(),
-        ]);
+        if (!$sesi->is_paused) {
+            $sesi->update([
+                'current_soal_index' => max(0, (int) $sesi->current_soal_index),
+                'last_activity_at' => now(),
+                'waktu_terakhir_aksi' => now(),
+            ]);
+        }
 
         return view('peserta.evaluasi.soal', compact('sesi', 'soals', 'materi'));
+    }
+
+    public function pause(Request $request, SesiEvaluasi $sesi)
+    {
+        $user = Auth::user();
+        if ($sesi->user_id !== $user->id || $sesi->status !== 'berlangsung') {
+            return response()->json(['success' => false, 'message' => 'Sesi tidak valid.'], 403);
+        }
+
+        if (!$sesi->is_paused) {
+            $sesi->update([
+                'is_paused' => true,
+                'last_activity_at' => now(),
+                'waktu_terakhir_aksi' => now(),
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_paused' => true,
+            'sisa_detik' => $sesi->sisaWaktu,
+            'message' => 'Ujian berhasil dijeda.'
+        ]);
+    }
+
+    public function resume(Request $request, SesiEvaluasi $sesi)
+    {
+        $user = Auth::user();
+        if ($sesi->user_id !== $user->id || $sesi->status !== 'berlangsung') {
+            return response()->json(['success' => false, 'message' => 'Sesi tidak valid.'], 403);
+        }
+
+        if ($sesi->is_paused) {
+            if ($sesi->last_activity_at && $sesi->mulai_at) {
+                $pausedSeconds = max(0, now()->diffInSeconds($sesi->last_activity_at));
+                $sesi->mulai_at = $sesi->mulai_at->copy()->addSeconds($pausedSeconds);
+            }
+            $sesi->is_paused = false;
+            $sesi->last_activity_at = now();
+            $sesi->waktu_terakhir_aksi = now();
+            $sesi->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_paused' => false,
+            'sisa_detik' => $sesi->sisaWaktu,
+            'message' => 'Ujian dilanjutkan kembali.'
+        ]);
     }
 
     public function submit(Request $request, SesiEvaluasi $sesi)

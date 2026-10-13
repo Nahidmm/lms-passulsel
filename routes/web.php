@@ -80,6 +80,8 @@ Route::middleware(['auth'])->group(function () {
             // Evaluasi (Kuis)
             Route::post('/evaluasi/start', [EvaluasiController::class, 'start'])->name('evaluasi.start');
             Route::get('/evaluasi/soal/{sesi}', [EvaluasiController::class, 'soal'])->name('evaluasi.soal');
+            Route::post('/evaluasi/{sesi}/pause', [EvaluasiController::class, 'pause'])->name('evaluasi.pause');
+            Route::post('/evaluasi/{sesi}/resume', [EvaluasiController::class, 'resume'])->name('evaluasi.resume');
             Route::post('/evaluasi/submit/{sesi}', [EvaluasiController::class, 'submit'])->name('evaluasi.submit');
             Route::get('/evaluasi/hasil/{sesi}', [EvaluasiController::class, 'hasil'])->name('evaluasi.hasil');
 
