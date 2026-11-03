@@ -106,11 +106,13 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('pelatihan.materi', \App\Http\Controllers\MateriController::class)->shallow();
             Route::resource('materi.soal', \App\Http\Controllers\SoalController::class)->shallow();
             Route::match(['get', 'post'], 'materi/{materi}/preview-quiz', [\App\Http\Controllers\MateriController::class, 'previewQuiz'])->name('materi.preview-quiz');
+            Route::post('soal/{soal}/resync', [\App\Http\Controllers\SoalController::class, 'resync'])->name('soal.resync');
 
             // Penugasan & Upload Sertifikat (STRAPSUS PAS)
             Route::resource('pelatihan.tugas', \App\Http\Controllers\Admin\TugasController::class)->parameters(['tugas' => 'tugas'])->shallow();
             Route::get('tugas/{tugas}/submissions', [\App\Http\Controllers\Admin\TugasGradingController::class, 'index'])->name('tugas.submissions');
             Route::post('tugas-submission/{submission}/nilai', [\App\Http\Controllers\Admin\TugasGradingController::class, 'grade'])->name('tugas.submission.nilai');
+            Route::get('tugas-pending', [\App\Http\Controllers\Admin\TugasGradingController::class, 'pendingIndex'])->name('tugas.pending');
 
             // Moodle-style Gradebook (Buku Nilai & Konfigurasi Bobot)
             Route::get('gradebook', [\App\Http\Controllers\Admin\GradebookController::class, 'globalIndex'])->name('gradebook.index');

@@ -238,6 +238,11 @@
                     <p class="text-[11px] text-text-secondary">Pengumpulan studi kasus atau sertifikat luar yang siap diperiksa</p>
                 </div>
             </div>
+            @if($countPendingTugas > 0)
+            <a href="{{ route('admin.tugas.pending') }}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+                Lihat Semua <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+            @endif
         </div>
 
         <div class="p-5">

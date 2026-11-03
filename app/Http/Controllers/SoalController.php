@@ -151,6 +151,94 @@ class SoalController extends Controller
         return redirect()->route('admin.pelatihan.index')->with('success', 'Soal berhasil dihapus.');
     }
 
+    public function resync(Soal $soal)
+    {
+        $tipe = $soal->tipe;
+        $materi = $soal->materis()->first();
+
+        // Hanya untuk tipe yang ada kunci jawaban otomatis
+        if (!in_array($tipe, ['pilihan_ganda', 'multi_select', 'isian_singkat', 'jenis_lainnya'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Soal tipe ' . $tipe . ' tidak dapat disinkronisasi otomatis (memerlukan penilaian manual).'
+            ], 422);
+        }
+
+        // Ambil kunci jawaban terbaru
+        $kunciBenar = \App\Models\PilihanJawaban::where('soal_id', $soal->id)
+            ->where('is_correct', true)
+            ->get();
+
+        if ($kunciBenar->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada kunci jawaban yang ditandai benar untuk soal ini.'
+            ], 422);
+        }
+
+        // Ambil semua HasilLatihan untuk soal ini
+        $hasilList = \App\Models\HasilLatihan::where('soal_id', $soal->id)->get();
+
+        $affectedSessionIds = collect();
+
+        foreach ($hasilList as $hasil) {
+            $isCorrect = false;
+            $skor = 0;
+
+            if (in_array($tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
+                $kunciId = $kunciBenar->first()?->id;
+                $isCorrect = $hasil->pilihan_id && $hasil->pilihan_id === $kunciId;
+            } elseif ($tipe === 'multi_select') {
+                $kunciIds = $kunciBenar->pluck('id')->toArray();
+                $isCorrect = $hasil->pilihan_id && in_array($hasil->pilihan_id, $kunciIds);
+            } elseif ($tipe === 'isian_singkat') {
+                $kunciTeks = strtolower(trim($kunciBenar->first()?->teks ?? ''));
+                $jawabanPeserta = strtolower(trim($hasil->jawaban_esai ?? ''));
+                $isCorrect = !empty($kunciTeks) && !empty($jawabanPeserta) && $jawabanPeserta === $kunciTeks;
+            }
+
+            $skor = $isCorrect ? ($soal->bobot ?? 10) : 0;
+
+            $hasil->update([
+                'is_correct' => $isCorrect,
+                'skor' => $skor,
+            ]);
+
+            $affectedSessionIds->push($hasil->sesi_evaluasi_id);
+        }
+
+        // Recalculate skor setiap sesi yang terpengaruh
+        $uniqueSessionIds = $affectedSessionIds->unique();
+
+        foreach ($uniqueSessionIds as $sesiId) {
+            $sesi = \App\Models\SesiEvaluasi::with(['hasilLatihan.soal', 'materi'])->find($sesiId);
+            if (!$sesi) continue;
+
+            $hasilAll = $sesi->hasilLatihan()->with('soal')->get();
+            $totalSkor = $hasilAll->sum('skor');
+            $maxSkor = $hasilAll->sum(fn($h) => $h->soal ? $h->soal->bobot : 0);
+            $skorAkhir = $maxSkor > 0 ? round(($totalSkor / $maxSkor) * 100, 2) : 0;
+            $benar = $hasilAll->where('is_correct', true)->count();
+
+            $sesi->update([
+                'skor' => $skorAkhir,
+                'benar' => $benar,
+            ]);
+
+            // Recalculate gradebook jika ada pelatihan
+            if ($materi && $materi->pelatihan_id) {
+                \App\Services\NilaiService::recalculate($sesi->user_id, $materi->pelatihan_id);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sinkronisasi berhasil! ' . $hasilList->count() . ' jawaban peserta telah diperbarui dari ' . $uniqueSessionIds->count() . ' sesi.',
+            'affected_sessions' => $uniqueSessionIds->count(),
+            'affected_answers' => $hasilList->count(),
+        ]);
+    }
+
     // ==========================================
     // PRIVATE HELPERS
     // ==========================================

@@ -51,7 +51,7 @@ class DashboardController extends Controller
         $pendingSubmissions = \App\Models\TugasSubmission::with(['user', 'tugas.pelatihan'])
             ->where('status', 'submitted')
             ->latest()
-            ->take(6)
+            ->take(10)
             ->get();
         $countPendingTugas = \App\Models\TugasSubmission::where('status', 'submitted')->count();
 

@@ -72,4 +72,30 @@ class TugasGradingController extends Controller
         return redirect()->route('admin.tugas.submissions', $submission->tugas_id)
             ->with('success', 'Nilai berhasil disimpan untuk ' . $submission->user->nama . '.');
     }
+
+    /**
+     * Halaman ringkasan semua tugas dengan submission pending.
+     */
+    public function pendingIndex()
+    {
+        // Ambil semua tugas yang punya submission pending, grouped by tugas
+        $tugasPending = \App\Models\Tugas::with(['pelatihan'])
+            ->withCount(['submissions as pending_count' => function($q) {
+                $q->where('status', 'submitted');
+            }])
+            ->having('pending_count', '>', 0)
+            ->orderByDesc('pending_count')
+            ->get();
+
+        $totalPending = \App\Models\TugasSubmission::where('status', 'submitted')->count();
+
+        // Juga ambil submission terbaru per tugas untuk preview
+        $recentSubmissions = \App\Models\TugasSubmission::with(['user.unitKerja', 'tugas.pelatihan'])
+            ->where('status', 'submitted')
+            ->latest()
+            ->get()
+            ->groupBy('tugas_id');
+
+        return view('admin.tugas.pending', compact('tugasPending', 'totalPending', 'recentSubmissions'));
+    }
 }

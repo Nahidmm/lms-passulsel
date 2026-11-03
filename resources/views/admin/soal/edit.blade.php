@@ -301,6 +301,15 @@
                         Batal
                     </a>
                 @endif
+                {{-- Tombol Sinkronisasi Nilai --}}
+                @if(in_array($soal->tipe, ['pilihan_ganda', 'multi_select', 'isian_singkat', 'jenis_lainnya']))
+                <button type="button" id="btn-resync"
+                    data-url="{{ route('admin.soal.resync', $soal->id) }}"
+                    class="inline-flex items-center gap-2 text-xs font-semibold py-2.5 px-5 rounded-xl border border-amber-400/50 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-600/40 transition-all">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    <span id="btn-resync-text">Sinkronisasi Nilai</span>
+                </button>
+                @endif
                 <button type="submit" class="btn btn-primary text-white text-xs font-semibold py-2.5 px-6 rounded-xl shadow-xs transition-all flex items-center gap-2">
                     <i data-lucide="save" class="w-4 h-4"></i>
                     <span>Simpan Perubahan Soal</span>
@@ -513,6 +522,40 @@ document.getElementById('soal-form')?.addEventListener('submit', function(e) {
             return false;
         }
     }
+});
+
+// Resync handler
+document.getElementById('btn-resync')?.addEventListener('click', function() {
+    const url = this.dataset.url;
+    const btn = this;
+    const textEl = document.getElementById('btn-resync-text');
+
+    if (!confirm('Sinkronisasi akan menghitung ulang nilai SEMUA peserta yang telah mengerjakan tes ini berdasarkan kunci jawaban terbaru.\n\nLanjutkan?')) return;
+
+    btn.disabled = true;
+    textEl.textContent = 'Menyinkronkan...';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ ' + data.message);
+        } else {
+            alert('⚠️ ' + data.message);
+        }
+    })
+    .catch(() => alert('Terjadi kesalahan. Silakan coba lagi.'))
+    .finally(() => {
+        btn.disabled = false;
+        textEl.textContent = 'Sinkronisasi Nilai';
+    });
 });
 </script>
 @endpush
