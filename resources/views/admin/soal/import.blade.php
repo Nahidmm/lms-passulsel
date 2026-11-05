@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Import Soal â€“ ' . $materi->judul)
+@section('title', 'Import Soal - ' . $materi->judul)
 
 @section('content')
 
@@ -44,7 +44,7 @@
     {{-- Download Template --}}
     <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6">
         <h3 class="text-lg font-bold text-text-primary mb-3 flex items-center gap-2">
-            <i data-lucide="file-down" class="w-5 h-5 text-accent"></i> Langkah 1 â€“ Download Template CSV
+            <i data-lucide="file-down" class="w-5 h-5 text-accent"></i> Langkah 1 - Download Template CSV
         </h3>
         <p class="text-sm text-text-secondary mb-4 leading-relaxed">
             Download template berikut, isi dengan soal-soal Anda, lalu upload kembali. Jangan mengubah nama kolom header.
@@ -58,7 +58,7 @@
     {{-- Format Penjelasan --}}
     <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6">
         <h3 class="text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
-            <i data-lucide="info" class="w-5 h-5 text-primary"></i> Langkah 2 â€“ Panduan Format CSV
+            <i data-lucide="info" class="w-5 h-5 text-primary"></i> Langkah 2 - Panduan Format CSV
         </h3>
         <div class="overflow-x-auto">
             <table class="w-full text-xs border-collapse">
@@ -73,12 +73,12 @@
                     <tr class="hover:bg-secondary/20">
                         <td class="px-3 py-2 border border-border font-medium">Pilihan Ganda</td>
                         <td class="px-3 py-2 border border-border font-mono text-indigo-600 dark:text-indigo-400">pilihan_ganda</td>
-                        <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_aâ€“opsi_d, <strong>kunci_jawaban</strong> (isi A/B/C/D)</td>
+                        <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_a-opsi_d, <strong>kunci_jawaban</strong> (isi A/B/C/D)</td>
                     </tr>
                     <tr class="hover:bg-secondary/20">
                         <td class="px-3 py-2 border border-border font-medium">Multi Select</td>
                         <td class="px-3 py-2 border border-border font-mono text-violet-600">multi_select</td>
-                        <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_aâ€“opsi_d, <strong>jawaban_benar_multi</strong> (misal: A,C,D)</td>
+                        <td class="px-3 py-2 border border-border text-text-secondary">pertanyaan, bobot, opsi_a-opsi_d, <strong>jawaban_benar_multi</strong> (misal: A,C,D)</td>
                     </tr>
                     <tr class="hover:bg-secondary/20">
                         <td class="px-3 py-2 border border-border font-medium">Essay</td>
@@ -103,7 +103,7 @@
     {{-- Upload Form --}}
     <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-6">
         <h3 class="text-lg font-bold text-text-primary mb-5 flex items-center gap-2">
-            <i data-lucide="upload" class="w-5 h-5 text-success"></i> Langkah 3 â€“ Upload File CSV
+            <i data-lucide="upload" class="w-5 h-5 text-success"></i> Langkah 3 - Upload File CSV
         </h3>
         <form action="{{ route('admin.soal.import.store', $materi->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
@@ -175,7 +175,7 @@
     function updateDropText(input) {
         const text = document.getElementById('drop-text');
         if (input.files && input.files[0]) {
-            text.textContent = 'âœ“ ' + input.files[0].name;
+            text.textContent = input.files[0].name;
             text.classList.add('text-success');
             dropZone.classList.add('border-success', 'bg-success/5');
         }

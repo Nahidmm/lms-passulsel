@@ -155,4 +155,45 @@ class KuisReviewController extends Controller
 
         return Response::stream($callback, 200, $headers);
     }
+
+    /**
+     * Reset hasil kuis peserta pada suatu sesi evaluasi.
+     */
+    public function resetPeserta(Materi $materi, SesiEvaluasi $sesi)
+    {
+        abort_if($sesi->materi_id !== $materi->id, 404);
+
+        $user = $sesi->user;
+        $userId = $sesi->user_id;
+
+        // 1. Hapus semua detail jawaban peserta pada sesi ini
+        $sesi->hasilLatihan()->delete();
+
+        // 2. Hapus sesi evaluasi
+        $sesi->delete();
+
+        // 3. Cek apakah peserta masih memiliki sesi kuis lain yang sudah selesai untuk materi ini
+        $sisaSesiSelesai = SesiEvaluasi::where('user_id', $userId)
+            ->where('materi_id', $materi->id)
+            ->where('status', 'selesai')
+            ->exists();
+
+        if (!$sisaSesiSelesai) {
+            // Revert progres materi menjadi 'belum'
+            \App\Models\ProgresMateri::where('user_id', $userId)
+                ->where('materi_id', $materi->id)
+                ->update(['status' => 'belum', 'tanggal_selesai' => null]);
+        }
+
+        // 4. Hitung ulang rekap nilai jika materi ini berada di bawah suatu pelatihan
+        if ($materi->pelatihan_id) {
+            \App\Services\NilaiService::recalculate($userId, $materi->pelatihan_id);
+        }
+
+        $namaPeserta = $user->nama ?? 'Peserta';
+
+        return redirect()
+            ->route('admin.kuis.peserta', $materi->id)
+            ->with('success', "Hasil kuis untuk {$namaPeserta} berhasil di-reset. Peserta dapat mengerjakan kuis ini kembali.");
+    }
 }

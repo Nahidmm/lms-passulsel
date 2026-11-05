@@ -138,7 +138,7 @@
         <div class="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
                 <h3 class="font-bold text-lg text-text-primary">Atur Role Kustom</h3>
-                <p class="text-sm text-text-secondary" id="modal-username">â€”</p>
+                <p class="text-sm text-text-secondary" id="modal-username">-</p>
             </div>
             <button onclick="closeAssignModal()" class="text-text-secondary hover:text-danger transition-colors p-1">
                 <i data-lucide="x" class="w-5 h-5"></i>

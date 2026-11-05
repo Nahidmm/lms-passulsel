@@ -130,6 +130,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('kuis/{materi}/peserta', [\App\Http\Controllers\Admin\KuisReviewController::class, 'indexPeserta'])->name('kuis.peserta');
             Route::get('kuis/{materi}/peserta/{sesi}', [\App\Http\Controllers\Admin\KuisReviewController::class, 'showJawaban'])->name('kuis.jawaban');
             Route::post('kuis/{materi}/peserta/{sesi}/nilai', [\App\Http\Controllers\Admin\KuisReviewController::class, 'nilaiManual'])->name('kuis.nilai-manual');
+            Route::post('kuis/{materi}/peserta/{sesi}/reset', [\App\Http\Controllers\Admin\KuisReviewController::class, 'resetPeserta'])->name('kuis.peserta.reset');
             Route::get('kuis/{materi}/export', [\App\Http\Controllers\Admin\KuisReviewController::class, 'exportNilai'])->name('kuis.export');
 
             // Import Soal dari CSV

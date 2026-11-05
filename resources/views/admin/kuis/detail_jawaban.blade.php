@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Jawaban â€“ ' . $sesi->user->nama)
+@section('title', 'Detail Jawaban - ' . $sesi->user->nama)
 
 @section('content')
 
@@ -8,6 +8,13 @@
     <a href="{{ route('admin.kuis.peserta', $materi->id) }}" class="text-text-secondary hover:text-primary flex items-center gap-1.5 font-medium transition-colors">
         <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Daftar Peserta
     </a>
+    <form action="{{ route('admin.kuis.peserta.reset', [$materi->id, $sesi->id]) }}" method="POST"
+          onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin me-reset hasil kuis peserta ini?\n\n- Seluruh jawaban dan nilai pada kuis ini akan dihapus permanen.\n- Progres materi peserta akan kembali menjadi belum selesai.\n- Nilai akhir pada Buku Nilai akan dihitung ulang secara otomatis.\n\nTindakan ini tidak dapat dibatalkan. Lanjutkan?');">
+        @csrf
+        <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white text-xs font-bold border border-rose-500/20 transition-all">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Kuis Peserta
+        </button>
+    </form>
 </div>
 
 {{-- Header info peserta --}}
@@ -43,7 +50,13 @@
             <div class="text-center px-5 py-3 rounded-xl {{ $lulus ? 'bg-success/10' : 'bg-danger/10' }}">
                 <p class="text-xs font-medium {{ $lulus ? 'text-success' : 'text-danger' }}">Nilai Akhir</p>
                 <p class="text-3xl font-bold mt-1 {{ $lulus ? 'text-success' : 'text-danger' }}">{{ number_format($sesi->skor, 1) }}</p>
-                <p class="text-xs font-bold {{ $lulus ? 'text-success' : 'text-danger' }}">{{ $lulus ? 'âœ“ LULUS' : 'âœ— TIDAK LULUS' }}</p>
+                <p class="text-xs font-bold {{ $lulus ? 'text-success' : 'text-danger' }} flex items-center justify-center gap-1 mt-0.5">
+                    @if($lulus)
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i> LULUS
+                    @else
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i> TIDAK LULUS
+                    @endif
+                </p>
             </div>
         </div>
     </div>
@@ -97,8 +110,12 @@
                         <div class="text-2xl font-bold {{ $isBenar ? 'text-success' : 'text-danger' }}">
                             {{ $isBenar ? '+' : '0' }}{{ $hasil->skor }}
                         </div>
-                        <div class="text-xs {{ $isBenar ? 'text-success' : 'text-danger' }} font-bold mt-0.5">
-                            {{ $isBenar ? 'âœ“ Benar' : 'âœ— Salah' }}
+                        <div class="text-xs {{ $isBenar ? 'text-success' : 'text-danger' }} font-bold mt-0.5 inline-flex items-center gap-1">
+                            @if($isBenar)
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i> Benar
+                            @else
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i> Salah
+                            @endif
                         </div>
                     @else
                         <div class="text-lg font-bold text-accent">{{ $hasil->skor }} / {{ $soal->bobot }}</div>
@@ -128,11 +145,17 @@
                                     {{ $pilihan->teks }}
                                 </span>
                                 @if($dipilih)
-                                    <span class="ml-auto text-xs font-bold {{ $benarPilihan ? 'text-success' : 'text-danger' }}">
-                                        {{ $benarPilihan ? 'âœ“ Dipilih (Benar)' : 'âœ— Dipilih (Salah)' }}
+                                    <span class="ml-auto text-xs font-bold inline-flex items-center gap-1 {{ $benarPilihan ? 'text-success' : 'text-danger' }}">
+                                        @if($benarPilihan)
+                                            <i data-lucide="check" class="w-3.5 h-3.5"></i> Dipilih (Benar)
+                                        @else
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i> Dipilih (Salah)
+                                        @endif
                                     </span>
                                 @elseif($benarPilihan)
-                                    <span class="ml-auto text-xs font-bold text-success">âœ“ Jawaban Benar</span>
+                                    <span class="ml-auto text-xs font-bold text-success inline-flex items-center gap-1">
+                                        <i data-lucide="check" class="w-3.5 h-3.5"></i> Jawaban Benar
+                                    </span>
                                 @endif
                             </div>
                         @endforeach
@@ -193,7 +216,7 @@
                         </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-text-primary mb-1.5">Nilai (0 â€“ {{ $soal->bobot }})</label>
+                                <label class="block text-xs font-semibold text-text-primary mb-1.5">Nilai (0 - {{ $soal->bobot }})</label>
                                 <input type="number" name="penilaian[{{ $hasil->id }}][skor]"
                                     value="{{ $hasil->skor }}" min="0" max="{{ $soal->bobot }}" step="0.5"
                                     class="w-full px-4 py-2.5 border border-border rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-xs focus:ring-2 focus:ring-accent focus:border-accent outline-none text-center text-lg font-bold">

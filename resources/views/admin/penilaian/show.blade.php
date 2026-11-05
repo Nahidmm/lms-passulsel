@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Penilaian â€” ' . $user->nama)
+@section('title', 'Detail Penilaian - ' . $user->nama)
 
 @section('content')
 
@@ -17,7 +17,7 @@
         <img src="{{ $user->avatar_url }}" alt="{{ $user->nama }}" class="w-20 h-20 rounded-2xl object-cover border-2 border-border shadow-sm shrink-0">
         <div class="flex-1 min-w-0">
             <h1 class="text-2xl font-bold text-text-primary truncate">{{ $user->nama }}</h1>
-            <p class="text-text-secondary text-sm mt-0.5">{{ $user->nip }} Â· {{ $user->jabatan->nama_jabatan ?? '-' }}</p>
+            <p class="text-text-secondary text-sm mt-0.5">{{ $user->nip }} &bull; {{ $user->jabatan->nama_jabatan ?? '-' }}</p>
         </div>
         {{-- Summary Cards --}}
         <div class="flex gap-4 flex-wrap">
@@ -188,7 +188,7 @@
                             Review Jawaban
                         </a>
                         @else
-                        <span class="text-xs text-text-secondary">â€”</span>
+                        <span class="text-xs text-text-secondary">-</span>
                         @endif
                     </td>
                 </tr>

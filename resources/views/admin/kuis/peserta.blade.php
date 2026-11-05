@@ -1,8 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Nilai Peserta â€“ ' . $materi->judul)
+@section('title', 'Nilai Peserta - ' . $materi->judul)
 
 @section('content')
+
+@if(session('success'))
+<div class="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-700 dark:text-green-300 flex items-center gap-3 text-sm">
+    <i data-lucide="check-circle" class="w-5 h-5 text-green-600 shrink-0"></i>
+    <span class="font-medium">{{ session('success') }}</span>
+</div>
+@endif
 
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div class="flex items-center gap-2">
@@ -97,10 +104,19 @@
                             {{ $sesi->selesai_at ? $sesi->selesai_at->format('d M Y, H:i') : '-' }}
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <a href="{{ route('admin.kuis.jawaban', [$materi->id, $sesi->id]) }}"
-                               class="inline-flex items-center gap-1 bg-primary/10 hover:bg-primary text-primary hover:text-[var(--text-primary)] text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
-                                <i data-lucide="eye" class="w-3.5 h-3.5"></i> Detail
-                            </a>
+                            <div class="inline-flex items-center gap-1.5 justify-center">
+                                <a href="{{ route('admin.kuis.jawaban', [$materi->id, $sesi->id]) }}"
+                                   class="inline-flex items-center gap-1 bg-primary/10 hover:bg-primary text-primary hover:text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-all" title="Lihat Detail Jawaban">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> Detail
+                                </a>
+                                <form action="{{ route('admin.kuis.peserta.reset', [$materi->id, $sesi->id]) }}" method="POST" class="inline-block"
+                                      onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin me-reset hasil kuis peserta ini?\n\n- Seluruh jawaban dan nilai pada kuis ini akan dihapus permanen.\n- Progres materi peserta akan kembali menjadi belum selesai.\n- Nilai akhir pada Buku Nilai akan dihitung ulang secara otomatis.\n\nTindakan ini tidak dapat dibatalkan. Lanjutkan?');">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-all" title="Reset Hasil Kuis Peserta">
+                                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
