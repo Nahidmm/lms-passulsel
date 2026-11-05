@@ -67,6 +67,27 @@ class GradebookController extends Controller
         $materis = $pelatihan->materis()->where('is_active', true)->orderBy('urutan')->get();
         $tugasList = $pelatihan->tugas()->where('is_active', true)->orderBy('urutan')->get();
 
+        // Identify posttest
+        $posttestMateri = $materis->first(function ($m) {
+            if ($m->is_posttest) return true;
+            $judul = strtolower($m->judul ?? '');
+            return str_contains($judul, 'posttest')
+                || str_contains($judul, 'post-test')
+                || str_contains($judul, 'ujian akhir')
+                || str_contains($judul, 'evaluasi akhir');
+        });
+
+        // Regular quizzes (excluding pretest and posttest)
+        $regularQuizzes = $materis->filter(function ($m) use ($posttestMateri) {
+            if ($m->jenis !== 'quiz') return false;
+            if ($m->is_pretest) return false;
+            if ($posttestMateri && $m->id === $posttestMateri->id) return false;
+            return true;
+        });
+
+        // Cek apakah pelatihan ini punya quiz formatif
+        $hasQuiz = $regularQuizzes->isNotEmpty();
+
         // Build gradebook data - recalculate to guarantee 100% fresh scores
         $gradebookData = [];
         foreach ($users as $user) {
@@ -120,7 +141,7 @@ class GradebookController extends Controller
         $unitKerjas = \App\Models\UnitKerja::orderBy('nama_unit')->get();
 
         return view('admin.gradebook.index', compact(
-            'pelatihan', 'allPelatihans', 'bobot', 'gradebookData', 'materis', 'tugasList', 'unitKerjas'
+            'pelatihan', 'allPelatihans', 'bobot', 'gradebookData', 'materis', 'tugasList', 'unitKerjas', 'hasQuiz'
         ));
     }
 
@@ -170,6 +191,23 @@ class GradebookController extends Controller
             ->orderBy('nama')
             ->get();
 
+        $posttestMateri = $pelatihan->materis()->where('is_active', true)->where(function ($q) {
+            $q->where('is_posttest', true)
+              ->orWhere('judul', 'LIKE', '%posttest%')
+              ->orWhere('judul', 'LIKE', '%post-test%')
+              ->orWhere('judul', 'LIKE', '%ujian akhir%')
+              ->orWhere('judul', 'LIKE', '%evaluasi akhir%');
+        })->first();
+
+        $quizQuery = $pelatihan->materis()
+            ->where('jenis', 'quiz')
+            ->where('is_pretest', false)
+            ->where('is_active', true);
+        if ($posttestMateri) {
+            $quizQuery->where('id', '!=', $posttestMateri->id);
+        }
+        $hasQuiz = $quizQuery->exists();
+
         $filename = 'Rekap_Nilai_' . str_replace(' ', '_', $pelatihan->judul) . '_' . date('Y-m-d') . '.csv';
 
         $headers = [
@@ -177,12 +215,18 @@ class GradebookController extends Controller
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        $callback = function () use ($users, $pelatihan) {
+        $callback = function () use ($users, $pelatihan, $hasQuiz) {
             $file = fopen('php://output', 'w');
             // BOM for Excel UTF-8
             fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-            fputcsv($file, ['No', 'NIP', 'Nama', 'Unit Kerja', 'Pretest', 'Quiz (Rata-rata)', 'Tugas', 'Post-Test', 'Nilai Akhir', 'Predikat', 'Status']);
+            $headerRow = ['No', 'NIP', 'Nama', 'Unit Kerja', 'Pretest'];
+            if ($hasQuiz) {
+                $headerRow[] = 'Quiz (Rata-rata)';
+            }
+            $headerRow = array_merge($headerRow, ['Tugas', 'Post-Test', 'Nilai Akhir', 'Predikat', 'Status']);
+
+            fputcsv($file, $headerRow);
 
             $no = 1;
             foreach ($users as $user) {
@@ -194,19 +238,25 @@ class GradebookController extends Controller
                     $rekap = NilaiService::recalculate($user->id, $pelatihan->id);
                 }
 
-                fputcsv($file, [
+                $row = [
                     $no++,
                     $user->nip,
                     $user->nama,
                     $user->unitKerja?->nama ?? '-',
                     $rekap->nilai_pretest ?? 0,
-                    $rekap->nilai_quiz_rata ?? 0,
+                ];
+                if ($hasQuiz) {
+                    $row[] = $rekap->nilai_quiz_rata ?? 0;
+                }
+                $row = array_merge($row, [
                     $rekap->nilai_tugas ?? 0,
                     $rekap->nilai_posttest ?? 0,
                     $rekap->nilai_akhir ?? 0,
                     $rekap->predikat ?? '-',
                     $rekap->status_kelulusan === 'lulus' ? 'LULUS' : 'BELUM LULUS',
                 ]);
+
+                fputcsv($file, $row);
             }
 
             fclose($file);
