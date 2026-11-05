@@ -88,8 +88,15 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 shrink-0 w-full md:w-auto">
-            @php $certSetting = \App\Models\SertifikatSetting::first(); @endphp
-            @if($sertifikat)
+            @php
+                $certSetting = \App\Models\SertifikatSetting::first();
+                $isPelatihanSertifAktif = (bool) ($pelatihan->sertif_aktif ?? true);
+            @endphp
+            @if(!$isPelatihanSertifAktif)
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-semibold text-[var(--text-secondary)]">
+                    <i data-lucide="slash" class="w-4 h-4 text-slate-500"></i> Penerbitan Sertifikat Pelatihan Ini Dinonaktifkan
+                </span>
+            @elseif($sertifikat)
                 <a href="{{ route('peserta.sertifikat.download', $sertifikat->credential_id) }}" target="_blank" class="btn btn-primary text-xs w-full sm:w-auto justify-center bg-emerald-600 hover:bg-emerald-700">
                     <i data-lucide="download" class="w-4 h-4"></i> Unduh Sertifikat (PDF)
                 </a>

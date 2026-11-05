@@ -130,7 +130,7 @@
                     <tr>
                         <th class="px-4 py-3 sticky left-0 bg-secondary/90 backdrop-blur z-10 border-r border-border">Nama Peserta</th>
                         <th class="px-4 py-3 border-r border-border">Unit Kerja</th>
-                        <th class="px-4 py-3 text-center border-r border-border">Pelatihan Diikuti</th>
+                        <th class="px-4 py-3 text-center border-r border-border">Kelulusan Pelatihan</th>
                         <th class="px-4 py-3 border-r border-border">Nilai Per Pelatihan</th>
                         <th class="px-4 py-3 text-center border-r border-border bg-primary/5">Rata2 Nilai Akhir</th>
                         <th class="px-4 py-3 text-center border-r border-border">Predikat</th>
@@ -165,8 +165,8 @@
                             {{ $u->unitKerja->nama ?? '-' }}
                         </td>
                         <td class="px-4 py-3 border-r border-border text-center whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1 font-bold {{ $item['totalCompleted'] > 0 ? 'text-primary' : 'text-text-secondary' }}">
-                                {{ $item['totalCompleted'] }} / {{ $item['totalEnrolled'] }} Selesai
+                            <span class="inline-flex items-center gap-1 font-bold {{ $item['totalCompleted'] > 0 ? 'text-emerald-600' : 'text-text-secondary' }}">
+                                {{ $item['totalCompleted'] }} / {{ $item['totalEnrolled'] }} Lulus
                             </span>
                         </td>
                         <td class="px-4 py-3 border-r border-border min-w-[280px]">

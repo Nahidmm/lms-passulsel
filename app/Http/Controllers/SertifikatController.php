@@ -19,6 +19,11 @@ class SertifikatController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        // Block peserta if sertifikat is deactivated for this pelatihan
+        if ($sertifikat->pelatihan && !$sertifikat->pelatihan->sertif_aktif && auth()->user()->isPeserta()) {
+            abort(403, 'Penerbitan sertifikat untuk pelatihan ini sedang dinonaktifkan.');
+        }
+
         $setting = SertifikatSetting::first();
         
         // Generate QR code for verification

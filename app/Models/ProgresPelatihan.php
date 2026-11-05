@@ -66,12 +66,15 @@ class ProgresPelatihan extends Model
                 'tanggal_selesai' => now(),
             ]);
 
-            // Check Certificate Setting (is_active & generation_mode)
+            $pelatihan = Pelatihan::find($pelatihanId);
+
+            // Check Certificate Setting (is_active & generation_mode) AND Pelatihan sertif_aktif
             $certSetting = SertifikatSetting::first();
             $certActive = $certSetting ? (bool) $certSetting->is_active : true;
             $generationMode = $certSetting ? $certSetting->generation_mode : 'admin_only';
+            $pelatihanSertifAktif = $pelatihan ? (bool) $pelatihan->sertif_aktif : true;
 
-            if ($certActive && $generationMode === 'auto') {
+            if ($certActive && $generationMode === 'auto' && $pelatihanSertifAktif) {
                 $credentialId = 'LMS-PAS-' . date('Y') . '-' . strtoupper(substr(md5($userId . $pelatihanId . time()), 0, 6));
                 Sertifikat::firstOrCreate(
                     ['user_id' => $userId, 'pelatihan_id' => $pelatihanId],
@@ -80,7 +83,6 @@ class ProgresPelatihan extends Model
             }
 
             // Notify the user that they completed the pelatihan
-            $pelatihan = Pelatihan::find($pelatihanId);
             Notification::kirim(
                 $userId,
                 'Pelatihan Selesai! 🎉',

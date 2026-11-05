@@ -272,11 +272,11 @@
             @if($setting && $setting->logo_instansi)
                 <img src="{{ \Illuminate\Support\Facades\Storage::url($setting->logo_instansi) }}" alt="Logo" class="kop-logo">
             @else
-                <img src="{{ asset('img/logo-kemenkumham.png') }}" onerror="this.src='{{ asset('img/logo.png') }}'; this.onerror=null;" alt="Logo" class="kop-logo">
+                <img src="{{ asset('logo/strapsuspas.png') }}" onerror="this.src='{{ asset('logo/logo.png') }}'; this.onerror=null;" alt="Logo" class="kop-logo">
             @endif
             <div class="kop-text">
-                <h2>Kementerian Hukum dan Hak Asasi Manusia RI</h2>
-                <h3>Kantor Wilayah Sulawesi Selatan</h3>
+                <h2>Direktorat Jenderal Pemasyarakatan</h2>
+                <h3>Kementerian Imigrasi dan Pemasyarakatan</h3>
                 <p>Lembaga Manajemen Pelatihan &amp; Kompetensi Pegawai Pemasyarakatan (LMS STRAPSUSPAS)</p>
                 <p>Jl. Sultan Alauddin No. 102, Kota Makassar, Sulawesi Selatan &bull; Portal: passulsel.kemenkumham.go.id</p>
             </div>
@@ -343,7 +343,7 @@
                         <th>Nama Peserta</th>
                         <th style="width: 120px;">NIP</th>
                         <th>Unit Kerja</th>
-                        <th style="width: 90px;">Pelatihan Selesai</th>
+                        <th style="width: 90px;">Pelatihan Lulus</th>
                         <th style="width: 80px;">Rata-rata Nilai</th>
                         <th style="width: 90px;">Predikat</th>
                         <th style="width: 80px;">Sertifikat</th>

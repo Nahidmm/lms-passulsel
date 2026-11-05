@@ -58,7 +58,7 @@ class GradebookController extends Controller
             $query->where('unit_kerja_id', $request->unit_kerja_id);
         }
 
-        $users = $query->with(['unitKerja', 'progresPelatihans.pelatihan', 'sertifikats'])->orderBy('nama')->get();
+        $users = $query->with(['unitKerja', 'progresPelatihans.pelatihan', 'sertifikats.pelatihan'])->orderBy('nama')->get();
 
         $allCoursesData = [];
         foreach ($users as $user) {
@@ -66,8 +66,13 @@ class GradebookController extends Controller
             $progresList = $user->progresPelatihans;
 
             $totalEnrolled = $progresList->count();
-            $totalCompleted = $progresList->where('status', 'selesai')->count();
-            $totalCerts = $user->sertifikats->count();
+            // Kelulusan / Selesai Pelatihan murni dari RekapNilai (status_kelulusan == 'lulus')
+            $totalCompleted = $rekaps->where('status_kelulusan', 'lulus')->count();
+
+            // Sertifikat hanya dihitung untuk pelatihan yang sertif_aktif == true
+            $totalCerts = $user->sertifikats->filter(function ($cert) {
+                return $cert->pelatihan && (bool) $cert->pelatihan->sertif_aktif;
+            })->count();
 
             $avgScore = $rekaps->isNotEmpty() ? $rekaps->avg('nilai_akhir') : 0;
 
@@ -78,7 +83,7 @@ class GradebookController extends Controller
                 $courseScores[$p->id] = [
                     'pelatihan' => $p,
                     'enrolled' => $pp !== null,
-                    'completed' => $pp && $pp->status === 'selesai',
+                    'completed' => $r && $r->status_kelulusan === 'lulus',
                     'nilai_akhir' => $r ? $r->nilai_akhir : null,
                     'status_kelulusan' => $r ? $r->status_kelulusan : null,
                 ];
@@ -467,7 +472,7 @@ class GradebookController extends Controller
                 $query->where('unit_kerja_id', $unitKerjaId);
             }
 
-            $users = $query->with(['unitKerja', 'progresPelatihans.pelatihan', 'sertifikats'])->orderBy('nama')->get();
+            $users = $query->with(['unitKerja', 'progresPelatihans.pelatihan', 'sertifikats.pelatihan'])->orderBy('nama')->get();
 
             $reportData = [];
             foreach ($users as $user) {
@@ -476,8 +481,12 @@ class GradebookController extends Controller
 
                 $avgScore = $rekaps->isNotEmpty() ? $rekaps->avg('nilai_akhir') : 0;
                 $totalEnrolled = $progresList->count();
-                $totalCompleted = $progresList->where('status', 'selesai')->count();
-                $totalCerts = $user->sertifikats->count();
+                // Kelulusan murni dari RekapNilai status_kelulusan == 'lulus'
+                $totalCompleted = $rekaps->where('status_kelulusan', 'lulus')->count();
+                // Sertifikat hanya dihitung untuk pelatihan yang sertif_aktif == true
+                $totalCerts = $user->sertifikats->filter(function ($cert) {
+                    return $cert->pelatihan && (bool) $cert->pelatihan->sertif_aktif;
+                })->count();
 
                 $reportData[] = [
                     'user' => $user,

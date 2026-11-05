@@ -456,13 +456,13 @@
                             @endif
                         </td>
                         <td class="py-4 px-4 text-center whitespace-nowrap">
-                            @if($userCert)
+                            @if($sertifNonaktifPerPelatihan)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20" title="Sertifikat nonaktif untuk pelatihan ini">
+                                    <i data-lucide="slash" class="w-3 h-3"></i> Nonaktif
+                                </span>
+                            @elseif($userCert)
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                                     <i data-lucide="award" class="w-3 h-3"></i> Terbit
-                                </span>
-                            @elseif($sertifNonaktifPerPelatihan)
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20" title="Sertifikat nonaktif untuk pelatihan ini">
-                                    <i data-lucide="x-circle" class="w-3 h-3"></i> Nonaktif
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20">
@@ -472,7 +472,19 @@
                         </td>
                         <td class="py-4 px-6 text-right whitespace-nowrap">
                             <div class="inline-flex items-center justify-end gap-2">
-                                @if($userCert)
+                                @if($sertifNonaktifPerPelatihan)
+                                    <span class="text-xs text-rose-600 font-medium px-2 py-1 bg-rose-500/10 rounded-lg">Sertifikat Dinonaktifkan</span>
+                                    @if($userCert)
+                                        <form action="{{ route('admin.sertifikat.destroy', $userCert->id) }}" method="POST"
+                                              onsubmit="return confirm('Hapus/cabut rekaman sertifikat lama ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white text-xs font-semibold border border-rose-500/20 transition-all" title="Hapus Sertifikat Lama">
+                                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Cabut
+                                            </button>
+                                        </form>
+                                    @endif
+                                @elseif($userCert)
                                     <a href="{{ route('peserta.sertifikat.download', $userCert->credential_id) }}" target="_blank"
                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors">
                                         <i data-lucide="download" class="w-3.5 h-3.5"></i> Unduh PDF
