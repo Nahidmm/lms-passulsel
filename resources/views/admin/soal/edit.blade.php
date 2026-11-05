@@ -127,7 +127,7 @@
 
                 <div id="choices-container" class="space-y-2.5">
                     @php $labels = ['A','B','C','D','E','F','G','H']; @endphp
-                    @if(in_array($currentTipe, ['pilihan_ganda', 'multi_select']) && $pilihanJawabans->isNotEmpty())
+                    @if(in_array($currentTipe, ['pilihan_ganda', 'multi_select', 'jenis_lainnya']) && $pilihanJawabans->isNotEmpty())
                         @foreach($pilihanJawabans as $idx => $p)
                         <div class="flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all" data-index="{{ $idx }}">
                             <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
