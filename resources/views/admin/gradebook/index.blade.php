@@ -45,19 +45,21 @@
 @endif
 
 <!-- Bobot Badges Summary -->
-<div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+<div class="grid grid-cols-2 {{ $hasQuiz ? 'sm:grid-cols-5' : 'sm:grid-cols-4' }} gap-3 mb-6">
     <div class="p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl">
         <span class="text-[11px] font-semibold text-text-secondary uppercase block">Pretest</span>
         <div class="flex items-baseline gap-1 mt-1">
             <span class="text-xl font-bold text-text-primary">{{ $bobot->bobot_pretest }}%</span>
         </div>
     </div>
+    @if($hasQuiz)
     <div class="p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl">
         <span class="text-[11px] font-semibold text-text-secondary uppercase block">Kuis Formatif</span>
         <div class="flex items-baseline gap-1 mt-1">
             <span class="text-xl font-bold text-text-primary">{{ $bobot->bobot_quiz }}%</span>
         </div>
     </div>
+    @endif
     <div class="p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl">
         <span class="text-[11px] font-semibold text-text-secondary uppercase block">Tugas / Sertifikat</span>
         <div class="flex items-baseline gap-1 mt-1">
@@ -138,7 +140,9 @@
                         <th class="px-4 py-3 sticky left-0 bg-secondary/90 backdrop-blur z-10 border-r border-border">Nama Peserta</th>
                         <th class="px-4 py-3 border-r border-border">Unit Kerja</th>
                         <th class="px-4 py-3 text-center border-r border-border">Pretest<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_pretest }}%)</span></th>
+                        @if($hasQuiz)
                         <th class="px-4 py-3 text-center border-r border-border">Rata2 Kuis<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_quiz }}%)</span></th>
+                        @endif
                         <th class="px-4 py-3 text-center border-r border-border">Rata2 Tugas<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_tugas }}%)</span></th>
                         <th class="px-4 py-3 text-center border-r border-border">Posttest<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_posttest }}%)</span></th>
                         @foreach(\App\Models\PenilaianTim::TEAMS as $timKey => $timLabel)
@@ -174,6 +178,7 @@
                                 <span class="text-text-secondary opacity-40">-</span>
                             @endif
                         </td>
+                        @if($hasQuiz)
                         <td class="px-4 py-3 text-center border-r border-border font-medium">
                             @if($r->nilai_quiz !== null)
                                 <span class="font-bold text-indigo-600" title="{{ count($item['quizDetails']) }} kuis">{{ number_format($r->nilai_quiz, 1) }}</span>
@@ -181,6 +186,7 @@
                                 <span class="text-text-secondary opacity-40">-</span>
                             @endif
                         </td>
+                        @endif
                         <td class="px-4 py-3 text-center border-r border-border font-medium">
                             @if($r->nilai_tugas !== null)
                                 <span class="font-bold text-amber-600">{{ number_format($r->nilai_tugas, 1) }}</span>
@@ -264,10 +270,17 @@
                     <label class="text-xs font-medium text-text-primary">Bobot Pretest (%)</label>
                     <input type="number" step="1" min="0" max="100" name="bobot_pretest" id="b_pretest" value="{{ $bobot->bobot_pretest }}" class="w-24 px-3 py-1.5 rounded-lg border border-border bg-[var(--card)] text-text-primary text-right font-bold text-sm" required>
                 </div>
+                @if($hasQuiz)
                 <div class="flex items-center justify-between gap-4">
                     <label class="text-xs font-medium text-text-primary">Bobot Kuis Formatif (%)</label>
                     <input type="number" step="1" min="0" max="100" name="bobot_quiz" id="b_quiz" value="{{ $bobot->bobot_quiz }}" class="w-24 px-3 py-1.5 rounded-lg border border-border bg-[var(--card)] text-text-primary text-right font-bold text-sm" required>
                 </div>
+                @else
+                <input type="hidden" name="bobot_quiz" id="b_quiz" value="0">
+                <div class="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs">
+                    Pelatihan ini tidak memiliki kuis formatif (bobot kuis diset 0%).
+                </div>
+                @endif
                 <div class="flex items-center justify-between gap-4">
                     <label class="text-xs font-medium text-text-primary">Bobot Tugas / Kasus (%)</label>
                     <input type="number" step="1" min="0" max="100" name="bobot_tugas" id="b_tugas" value="{{ $bobot->bobot_tugas }}" class="w-24 px-3 py-1.5 rounded-lg border border-border bg-[var(--card)] text-text-primary text-right font-bold text-sm" required>
@@ -300,25 +313,30 @@
 
 <script>
     function calculateTotal() {
-        const p = parseFloat(document.getElementById('b_pretest').value) || 0;
-        const q = parseFloat(document.getElementById('b_quiz').value) || 0;
-        const t = parseFloat(document.getElementById('b_tugas').value) || 0;
-        const pt = parseFloat(document.getElementById('b_posttest').value) || 0;
+        const p = parseFloat(document.getElementById('b_pretest')?.value) || 0;
+        const q = parseFloat(document.getElementById('b_quiz')?.value) || 0;
+        const t = parseFloat(document.getElementById('b_tugas')?.value) || 0;
+        const pt = parseFloat(document.getElementById('b_posttest')?.value) || 0;
         const total = p + q + t + pt;
 
         const label = document.getElementById('totalBobotLabel');
-        label.textContent = total + '%';
-        if (Math.abs(total - 100) < 0.01) {
-            label.className = 'text-sm font-extrabold text-green-600';
-            document.getElementById('btnSimpanBobot').disabled = false;
-        } else {
-            label.className = 'text-sm font-extrabold text-red-600';
-            document.getElementById('btnSimpanBobot').disabled = true;
+        if (label) {
+            label.textContent = total + '%';
+            if (Math.abs(total - 100) < 0.01) {
+                label.className = 'text-sm font-extrabold text-green-600';
+                document.getElementById('btnSimpanBobot').disabled = false;
+            } else {
+                label.className = 'text-sm font-extrabold text-red-600';
+                document.getElementById('btnSimpanBobot').disabled = true;
+            }
         }
     }
 
     ['b_pretest', 'b_quiz', 'b_tugas', 'b_posttest'].forEach(id => {
-        document.getElementById(id).addEventListener('input', calculateTotal);
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calculateTotal);
+        }
     });
     calculateTotal();
 </script>

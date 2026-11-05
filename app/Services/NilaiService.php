@@ -113,13 +113,29 @@ class NilaiService
         $tScore = $nilaiTugas ?? 0;
         $ptScore = $nilaiPosttest ?? 0;
 
-        $nilaiAkhir = round(
-            ($bobot->bobot_pretest / 100 * $pScore) +
-            ($bobot->bobot_quiz / 100 * $qScore) +
-            ($bobot->bobot_tugas / 100 * $tScore) +
-            ($bobot->bobot_posttest / 100 * $ptScore),
-            2
-        );
+        $hasQuiz = $quizMateris->isNotEmpty();
+        $bPretest = $bobot->bobot_pretest;
+        $bQuiz = $hasQuiz ? $bobot->bobot_quiz : 0;
+        $bTugas = $bobot->bobot_tugas;
+        $bPosttest = $bobot->bobot_posttest;
+
+        $activeWeightSum = $bPretest + $bQuiz + $bTugas + $bPosttest;
+
+        if ($activeWeightSum > 0 && !$hasQuiz && $bobot->bobot_quiz > 0) {
+            // Jika pelatihan tidak ada kuis tapi bobot_quiz > 0, skala bobot komponen yang ada ke 100% secara proporsional
+            $rawNilai = ($bPretest / 100 * $pScore) +
+                        ($bTugas / 100 * $tScore) +
+                        ($bPosttest / 100 * $ptScore);
+            $nilaiAkhir = round($rawNilai * (100 / $activeWeightSum), 2);
+        } else {
+            $nilaiAkhir = round(
+                ($bPretest / 100 * $pScore) +
+                ($bQuiz / 100 * $qScore) +
+                ($bTugas / 100 * $tScore) +
+                ($bPosttest / 100 * $ptScore),
+                2
+            );
+        }
 
         // 6. Tentukan Predikat & Kelulusan
         $predikat = self::getPredikat($nilaiAkhir);

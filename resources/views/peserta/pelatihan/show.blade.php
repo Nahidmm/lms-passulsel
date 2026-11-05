@@ -280,19 +280,24 @@
 
     {{-- Ringkasan Rekapitulasi Nilai Peserta --}}
     @if(isset($rekapNilai))
+    @php
+        $hasCourseQuiz = $materis->where('jenis', 'quiz')->where('is_pretest', false)->where('is_posttest', false)->isNotEmpty();
+    @endphp
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-xs">
         <h3 class="font-bold text-sm text-[var(--text-primary)] flex items-center gap-2 mb-4">
             <i data-lucide="award" class="w-4 h-4 text-indigo-600"></i> Rekapitulasi Nilai Anda Pada Pelatihan Ini
         </h3>
-        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+        <div class="grid grid-cols-2 {{ $hasCourseQuiz ? 'sm:grid-cols-5' : 'sm:grid-cols-4' }} gap-3 text-center">
             <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-[var(--border)]">
                 <span class="text-[11px] text-[var(--text-secondary)] font-semibold uppercase block">Pretest</span>
                 <span class="text-lg font-bold text-[var(--text-primary)] mt-1 block">{{ $rekapNilai->nilai_pretest !== null ? number_format($rekapNilai->nilai_pretest, 1) : '-' }}</span>
             </div>
+            @if($hasCourseQuiz)
             <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-[var(--border)]">
                 <span class="text-[11px] text-[var(--text-secondary)] font-semibold uppercase block">Kuis Formatif</span>
                 <span class="text-lg font-bold text-[var(--text-primary)] mt-1 block">{{ $rekapNilai->nilai_quiz !== null ? number_format($rekapNilai->nilai_quiz, 1) : '-' }}</span>
             </div>
+            @endif
             <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-[var(--border)]">
                 <span class="text-[11px] text-[var(--text-secondary)] font-semibold uppercase block">Penugasan</span>
                 <span class="text-lg font-bold text-[var(--text-primary)] mt-1 block">{{ $rekapNilai->nilai_tugas !== null ? number_format($rekapNilai->nilai_tugas, 1) : '-' }}</span>
