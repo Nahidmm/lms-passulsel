@@ -103,6 +103,7 @@ Route::middleware(['auth'])->group(function () {
         Route::middleware(['role:admin,superadmin'])->prefix('admin')->name('admin.')->group(function () {
             // Kelola Pelatihan, Materi, dan Soal (Nested)
             Route::resource('pelatihan', \App\Http\Controllers\PelatihanController::class);
+            Route::post('/pelatihan/{pelatihan}/toggle-sertif', [\App\Http\Controllers\PelatihanController::class, 'toggleSertif'])->name('pelatihan.toggle-sertif');
             Route::resource('pelatihan.materi', \App\Http\Controllers\MateriController::class)->shallow();
             Route::resource('materi.soal', \App\Http\Controllers\SoalController::class)->shallow();
             Route::match(['get', 'post'], 'materi/{materi}/preview-quiz', [\App\Http\Controllers\MateriController::class, 'previewQuiz'])->name('materi.preview-quiz');

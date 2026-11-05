@@ -65,6 +65,19 @@
                                 </div>
                             </td>
                             <td class="py-4 px-6 text-right space-x-1.5">
+                                {{-- Toggle Sertifikat --}}
+                                <form action="{{ route('admin.pelatihan.toggle-sertif', $pelatihan->id) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    @if($pelatihan->sertif_aktif)
+                                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors" title="Sertifikat aktif – klik untuk nonaktifkan">
+                                            <i data-lucide="award" class="w-3.5 h-3.5"></i> Sertif Aktif
+                                        </button>
+                                    @else
+                                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 hover:bg-rose-500/20 transition-colors" title="Sertifikat nonaktif – klik untuk aktifkan">
+                                            <i data-lucide="award-off" class="w-3.5 h-3.5"></i> Sertif Nonaktif
+                                        </button>
+                                    @endif
+                                </form>
                                 {{-- Structure builder --}}
                                 <a href="{{ route('admin.pelatihan.show', $pelatihan->id) }}"
                                    class="inline-flex p-2 border border-[var(--border)] text-[var(--text-secondary)] hover:text-primary hover:border-primary rounded-xl transition-all hover:bg-[var(--card)]" title="Kelola Kurikulum & Materi">

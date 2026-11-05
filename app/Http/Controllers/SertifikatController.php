@@ -100,6 +100,10 @@ class SertifikatController extends Controller
             return back()->with('error', 'Penerbitan sertifikat sedang dinonaktifkan di Pengaturan Sertifikat.');
         }
 
+        if (!$pelatihan->sertif_aktif) {
+            return back()->with('error', "Penerbitan sertifikat untuk pelatihan \"{$pelatihan->judul}\" sedang dinonaktifkan.");
+        }
+
         $credentialId = 'LMS-PAS-' . date('Y') . '-' . strtoupper(substr(md5($user->id . $pelatihan->id . time()), 0, 6));
 
         $sertifikat = Sertifikat::updateOrCreate(

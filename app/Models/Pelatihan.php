@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pelatihan extends Model
 {
-    protected $fillable = ['judul', 'deskripsi', 'gambar_thumbnail', 'is_active'];
+    protected $fillable = ['judul', 'deskripsi', 'gambar_thumbnail', 'is_active', 'sertif_aktif'];
+
+    protected $casts = ['is_active' => 'boolean', 'sertif_aktif' => 'boolean'];
 
     public function materis()
     {

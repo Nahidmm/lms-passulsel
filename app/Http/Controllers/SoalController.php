@@ -127,6 +127,66 @@ class SoalController extends Controller
         $this->storeAnswers($soal, $tipe, $request);
 
         $materi = $soal->materis()->first();
+
+        // Auto-resync affected student answers after question edit
+        if (in_array($tipe, ['pilihan_ganda', 'multi_select', 'isian_singkat', 'jenis_lainnya'])) {
+            $kunciBenar = \App\Models\PilihanJawaban::where('soal_id', $soal->id)
+                ->where('is_correct', true)
+                ->get();
+
+            if ($kunciBenar->isNotEmpty()) {
+                $hasilList = \App\Models\HasilLatihan::where('soal_id', $soal->id)->get();
+                $affectedSessionIds = collect();
+
+                foreach ($hasilList as $hasil) {
+                    $isCorrect = false;
+                    $skor = 0;
+
+                    if (in_array($tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
+                        $newKunciId = $kunciBenar->first()?->id;
+                        $isCorrect = $hasil->pilihan_id && $hasil->pilihan_id === $newKunciId;
+                    } elseif ($tipe === 'multi_select') {
+                        $kunciIds = $kunciBenar->pluck('id')->toArray();
+                        $isCorrect = $hasil->pilihan_id && in_array($hasil->pilihan_id, $kunciIds);
+                    } elseif ($tipe === 'isian_singkat') {
+                        $kunciTeks = strtolower(trim($kunciBenar->first()?->teks ?? ''));
+                        $jawabanPeserta = strtolower(trim($hasil->jawaban_esai ?? ''));
+                        $isCorrect = !empty($kunciTeks) && !empty($jawabanPeserta) && $jawabanPeserta === $kunciTeks;
+                    }
+
+                    $skor = $isCorrect ? ($soal->bobot ?? 10) : 0;
+
+                    $hasil->update([
+                        'is_correct' => $isCorrect,
+                        'skor' => $skor,
+                    ]);
+
+                    $affectedSessionIds->push($hasil->sesi_evaluasi_id);
+                }
+
+                // Recalculate each affected session's total score
+                foreach ($affectedSessionIds->unique() as $sesiId) {
+                    $sesi = \App\Models\SesiEvaluasi::with(['hasilLatihan.soal', 'materi'])->find($sesiId);
+                    if (!$sesi) continue;
+
+                    $hasilAll = $sesi->hasilLatihan()->with('soal')->get();
+                    $totalSkor = $hasilAll->sum('skor');
+                    $maxSkor = $hasilAll->sum(fn($h) => $h->soal ? $h->soal->bobot : 0);
+                    $skorAkhir = $maxSkor > 0 ? round(($totalSkor / $maxSkor) * 100, 2) : 0;
+                    $benar = $hasilAll->where('is_correct', true)->count();
+
+                    $sesi->update([
+                        'skor' => $skorAkhir,
+                        'benar' => $benar,
+                    ]);
+
+                    if ($materi && $materi->pelatihan_id) {
+                        \App\Services\NilaiService::recalculate($sesi->user_id, $materi->pelatihan_id);
+                    }
+                }
+            }
+        }
+
         if ($materi && $materi->is_pretest) {
             return redirect()->route('admin.pretest.index')
                 ->with('success', 'Soal berhasil diperbarui.');

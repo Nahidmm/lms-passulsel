@@ -393,6 +393,7 @@
                     <th class="py-3 px-6">Pelatihan / Kursus</th>
                     <th class="py-3 px-4 text-center">Status Belajar</th>
                     <th class="py-3 px-4">Tanggal Selesai</th>
+                    <th class="py-3 px-4 text-center">Nilai Akhir & Kelulusan</th>
                     <th class="py-3 px-4">Nomor Sertifikat (Credential)</th>
                     <th class="py-3 px-4 text-center">Status Sertifikat</th>
                     <th class="py-3 px-6 text-right">Aksi Admin</th>
@@ -402,6 +403,11 @@
                 @forelse($progresPelatihans as $pp)
                     @php
                         $userCert = $sertifikats->firstWhere('pelatihan_id', $pp->pelatihan_id);
+                        $rekapPp = $rekapNilais[$pp->pelatihan_id] ?? null;
+                        $sertifNonaktifPerPelatihan = $pp->pelatihan && !$pp->pelatihan->sertif_aktif;
+                        $sertifGlobalNonaktif = $certSetting && !$certSetting->is_active;
+                        $sertifDisabled = $sertifNonaktifPerPelatihan || $sertifGlobalNonaktif;
+                        $sertifDisabledReason = $sertifNonaktifPerPelatihan ? 'Sertifikat nonaktif untuk pelatihan ini' : ($sertifGlobalNonaktif ? 'Penerbitan dinonaktifkan' : '');
                     @endphp
                     <tr class="hover:bg-secondary/30 transition-colors">
                         <td class="py-4 px-6 font-semibold text-text-primary text-sm">
@@ -421,6 +427,26 @@
                         <td class="py-4 px-4 text-text-secondary whitespace-nowrap">
                             {{ $pp->tanggal_selesai ? \Carbon\Carbon::parse($pp->tanggal_selesai)->translatedFormat('d M Y') : '-' }}
                         </td>
+                        {{-- Nilai Akhir & Kelulusan dari RekapNilai --}}
+                        <td class="py-4 px-4 text-center whitespace-nowrap">
+                            @if($rekapPp)
+                                <span class="text-sm font-bold {{ $rekapPp->nilai_akhir >= 70 ? 'text-success' : 'text-danger' }}">
+                                    {{ number_format($rekapPp->nilai_akhir, 1) }}
+                                </span>
+                                @if($rekapPp->status_kelulusan === 'lulus')
+                                    <span class="block mt-0.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                                        <i data-lucide="check-circle" class="w-2.5 h-2.5"></i> Lulus
+                                    </span>
+                                @else
+                                    <span class="block mt-0.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                                        <i data-lucide="x-circle" class="w-2.5 h-2.5"></i> Tidak Lulus
+                                    </span>
+                                @endif
+                            @else
+                                <span class="text-text-secondary text-xs italic">-</span>
+                                <span class="block text-[10px] text-text-secondary">belum ada rekap nilai</span>
+                            @endif
+                        </td>
                         <td class="py-4 px-4 font-mono text-xs whitespace-nowrap">
                             @if($userCert)
                                 <span class="font-bold text-primary">{{ $userCert->credential_id }}</span>
@@ -433,6 +459,10 @@
                             @if($userCert)
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                                     <i data-lucide="award" class="w-3 h-3"></i> Terbit
+                                </span>
+                            @elseif($sertifNonaktifPerPelatihan)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20" title="Sertifikat nonaktif untuk pelatihan ini">
+                                    <i data-lucide="x-circle" class="w-3 h-3"></i> Nonaktif
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20">
@@ -462,8 +492,9 @@
                                         <input type="hidden" name="user_id" value="{{ $user->id }}">
                                         <input type="hidden" name="pelatihan_id" value="{{ $pp->pelatihan_id }}">
                                         <button type="submit"
-                                                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-xs transition-colors"
-                                                {{ ($certSetting && !$certSetting->is_active) ? 'disabled title="Penerbitan dinonaktifkan"' : '' }}>
+                                                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg {{ $sertifDisabled ? 'bg-secondary text-text-secondary cursor-not-allowed opacity-60' : 'bg-primary hover:bg-primary/90 text-white' }} text-xs font-semibold shadow-xs transition-colors"
+                                                {{ $sertifDisabled ? 'disabled' : '' }}
+                                                title="{{ $sertifDisabled ? $sertifDisabledReason : 'Terbitkan sertifikat kelulusan' }}">
                                             <i data-lucide="award" class="w-3.5 h-3.5"></i> Terbitkan Sertifikat
                                         </button>
                                     </form>
@@ -473,7 +504,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="py-8 text-center text-text-secondary text-sm">
+                        <td colspan="7" class="py-8 text-center text-text-secondary text-sm">
                             Peserta belum terdaftar di pelatihan manapun.
                         </td>
                     </tr>

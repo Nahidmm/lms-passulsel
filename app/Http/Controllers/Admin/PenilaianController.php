@@ -80,6 +80,11 @@ class PenilaianController extends Controller
 
         $certSetting = \App\Models\SertifikatSetting::first();
 
+        $rekapNilais = \App\Models\RekapNilai::where('user_id', $user->id)
+            ->with('pelatihan')
+            ->get()
+            ->keyBy('pelatihan_id');
+
         $totalPoinMateri = $progresMateri->unique('materi_id')->sum(fn($p) => $p->materi->poin ?? 0);
         $totalPoinEvaluasi = $sesis->groupBy('materi_id')->map(fn($group) => $group->max('skor'))->sum();
 
@@ -94,7 +99,7 @@ class PenilaianController extends Controller
             'user', 'sesis', 'rataRata', 'totalLulus',
             'progresMateri', 'totalPoinMateri', 'totalPoinEvaluasi',
             'tugasSubmissions', 'totalTugas', 'totalTugasDinilai', 'rataTugas',
-            'sertifikats', 'progresPelatihans', 'certSetting'
+            'sertifikats', 'progresPelatihans', 'certSetting', 'rekapNilais'
         ));
     }
 }

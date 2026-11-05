@@ -100,6 +100,13 @@ class PelatihanController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function toggleSertif(Pelatihan $pelatihan)
+    {
+        $pelatihan->update(['sertif_aktif' => !$pelatihan->sertif_aktif]);
+        $status = $pelatihan->sertif_aktif ? 'diaktifkan' : 'dinonaktifkan';
+        return back()->with('success', "Penerbitan sertifikat untuk pelatihan \"{$pelatihan->judul}\" telah {$status}.");
+    }
+
     // ==========================================
     // PESERTA ROUTES
     // ==========================================
