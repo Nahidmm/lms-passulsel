@@ -74,7 +74,9 @@ class GradebookController extends Controller
                 return $cert->pelatihan && (bool) $cert->pelatihan->sertif_aktif;
             })->count();
 
-            $avgScore = $rekaps->isNotEmpty() ? $rekaps->avg('nilai_akhir') : 0;
+            $enrolledIds = $progresList->pluck('pelatihan_id');
+            $enrolledRekaps = $rekaps->whereIn('pelatihan_id', $enrolledIds)->filter(fn($r) => $r->nilai_akhir !== null);
+            $avgScore = $enrolledRekaps->isNotEmpty() ? $enrolledRekaps->avg('nilai_akhir') : 0;
 
             $courseScores = [];
             foreach ($allPelatihans as $p) {
@@ -479,7 +481,9 @@ class GradebookController extends Controller
                 $rekaps = RekapNilai::where('user_id', $user->id)->with('pelatihan')->get();
                 $progresList = $user->progresPelatihans;
 
-                $avgScore = $rekaps->isNotEmpty() ? $rekaps->avg('nilai_akhir') : 0;
+                $enrolledIds = $progresList->pluck('pelatihan_id');
+            $enrolledRekaps = $rekaps->whereIn('pelatihan_id', $enrolledIds)->filter(fn($r) => $r->nilai_akhir !== null);
+            $avgScore = $enrolledRekaps->isNotEmpty() ? $enrolledRekaps->avg('nilai_akhir') : 0;
                 $totalEnrolled = $progresList->count();
                 // Kelulusan murni dari RekapNilai status_kelulusan == 'lulus'
                 $totalCompleted = $rekaps->where('status_kelulusan', 'lulus')->count();
