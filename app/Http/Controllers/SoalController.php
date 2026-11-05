@@ -122,70 +122,13 @@ class SoalController extends Controller
             'topik_pelatihan_id' => $request->input('topik_pelatihan_id'),
         ]);
 
-        // Clear old choices and re-create
-        $soal->pilihanJawaban()->delete();
-        $this->storeAnswers($soal, $tipe, $request);
+        // Update pilihan jawaban IN-PLACE (keep same IDs so student answers remain valid)
+        $this->updateAnswersInPlace($soal, $tipe, $request);
 
         $materi = $soal->materis()->first();
 
-        // Auto-resync affected student answers after question edit
-        if (in_array($tipe, ['pilihan_ganda', 'multi_select', 'isian_singkat', 'jenis_lainnya'])) {
-            $kunciBenar = \App\Models\PilihanJawaban::where('soal_id', $soal->id)
-                ->where('is_correct', true)
-                ->get();
-
-            if ($kunciBenar->isNotEmpty()) {
-                $hasilList = \App\Models\HasilLatihan::where('soal_id', $soal->id)->get();
-                $affectedSessionIds = collect();
-
-                foreach ($hasilList as $hasil) {
-                    $isCorrect = false;
-                    $skor = 0;
-
-                    if (in_array($tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
-                        $newKunciId = $kunciBenar->first()?->id;
-                        $isCorrect = $hasil->pilihan_id && $hasil->pilihan_id === $newKunciId;
-                    } elseif ($tipe === 'multi_select') {
-                        $kunciIds = $kunciBenar->pluck('id')->toArray();
-                        $isCorrect = $hasil->pilihan_id && in_array($hasil->pilihan_id, $kunciIds);
-                    } elseif ($tipe === 'isian_singkat') {
-                        $kunciTeks = strtolower(trim($kunciBenar->first()?->teks ?? ''));
-                        $jawabanPeserta = strtolower(trim($hasil->jawaban_esai ?? ''));
-                        $isCorrect = !empty($kunciTeks) && !empty($jawabanPeserta) && $jawabanPeserta === $kunciTeks;
-                    }
-
-                    $skor = $isCorrect ? ($soal->bobot ?? 10) : 0;
-
-                    $hasil->update([
-                        'is_correct' => $isCorrect,
-                        'skor' => $skor,
-                    ]);
-
-                    $affectedSessionIds->push($hasil->sesi_evaluasi_id);
-                }
-
-                // Recalculate each affected session's total score
-                foreach ($affectedSessionIds->unique() as $sesiId) {
-                    $sesi = \App\Models\SesiEvaluasi::with(['hasilLatihan.soal', 'materi'])->find($sesiId);
-                    if (!$sesi) continue;
-
-                    $hasilAll = $sesi->hasilLatihan()->with('soal')->get();
-                    $totalSkor = $hasilAll->sum('skor');
-                    $maxSkor = $hasilAll->sum(fn($h) => $h->soal ? $h->soal->bobot : 0);
-                    $skorAkhir = $maxSkor > 0 ? round(($totalSkor / $maxSkor) * 100, 2) : 0;
-                    $benar = $hasilAll->where('is_correct', true)->count();
-
-                    $sesi->update([
-                        'skor' => $skorAkhir,
-                        'benar' => $benar,
-                    ]);
-
-                    if ($materi && $materi->pelatihan_id) {
-                        \App\Services\NilaiService::recalculate($sesi->user_id, $materi->pelatihan_id);
-                    }
-                }
-            }
-        }
+        // Auto-resync: recalculate correctness of all existing student answers based on new kunci
+        $this->resyncAfterUpdate($soal, $tipe, $materi);
 
         if ($materi && $materi->is_pretest) {
             return redirect()->route('admin.pretest.index')
@@ -302,6 +245,159 @@ class SoalController extends Controller
     // ==========================================
     // PRIVATE HELPERS
     // ==========================================
+
+    /**
+     * Update pilihan jawaban IN-PLACE, keeping existing IDs so that
+     * HasilLatihan.pilihan_id references remain valid for student answers.
+     *
+     * Strategy:
+     * - If count of new choices == count of existing choices: update each by position.
+     * - If new choices added: create extra ones.
+     * - If choices removed: delete extras (from the end).
+     */
+    private function updateAnswersInPlace(Soal $soal, string $tipe, Request $request): void
+    {
+        $hurufs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+        if (in_array($tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
+            $jawabanBenar = (int) $request->input('jawaban_benar', 0);
+            $pilihanBaru  = $request->input('pilihan', []);
+            $existing     = $soal->pilihanJawaban()->orderBy('id')->get();
+
+            foreach ($pilihanBaru as $index => $teks) {
+                $data = [
+                    'huruf'      => $hurufs[$index] ?? ($index + 1),
+                    'teks'       => $teks,
+                    'is_correct' => $index === $jawabanBenar,
+                ];
+                if (isset($existing[$index])) {
+                    // Update in-place (ID preserved — student answers stay valid)
+                    $existing[$index]->update($data);
+                } else {
+                    // New extra choice added by admin
+                    $soal->pilihanJawaban()->create($data);
+                }
+            }
+
+            // Remove extra old choices if admin removed some options
+            if ($existing->count() > count($pilihanBaru)) {
+                $toDelete = $existing->slice(count($pilihanBaru));
+                foreach ($toDelete as $old) {
+                    $old->delete();
+                }
+            }
+
+        } elseif ($tipe === 'multi_select') {
+            $jawabanBenar = array_map('intval', $request->input('jawaban_benar', []));
+            $pilihanBaru  = $request->input('pilihan', []);
+            $existing     = $soal->pilihanJawaban()->orderBy('id')->get();
+
+            foreach ($pilihanBaru as $index => $teks) {
+                $data = [
+                    'huruf'      => $hurufs[$index] ?? ($index + 1),
+                    'teks'       => $teks,
+                    'is_correct' => in_array($index, $jawabanBenar),
+                ];
+                if (isset($existing[$index])) {
+                    $existing[$index]->update($data);
+                } else {
+                    $soal->pilihanJawaban()->create($data);
+                }
+            }
+            if ($existing->count() > count($pilihanBaru)) {
+                foreach ($existing->slice(count($pilihanBaru)) as $old) {
+                    $old->delete();
+                }
+            }
+
+        } elseif ($tipe === 'isian_singkat') {
+            $existing = $soal->pilihanJawaban()->orderBy('id')->first();
+            $data = ['huruf' => 'A', 'teks' => $request->input('jawaban_teks'), 'is_correct' => true];
+            if ($existing) {
+                $existing->update($data);
+            } else {
+                $soal->pilihanJawaban()->create($data);
+            }
+
+        } elseif ($tipe === 'menjodohkan') {
+            // Menjodohkan: delete+recreate is acceptable (no pilihan_id stored for matching)
+            $soal->pilihanJawaban()->delete();
+            $kiri  = $request->input('pasangan_kiri', []);
+            $kanan = $request->input('pasangan_kanan', []);
+            foreach ($kiri as $index => $teksKiri) {
+                $soal->pilihanJawaban()->create([
+                    'huruf'      => 'L' . ($index + 1),
+                    'teks'       => $teksKiri . '|||' . ($kanan[$index] ?? ''),
+                    'is_correct' => true,
+                ]);
+            }
+        }
+        // essay: no choices needed
+    }
+
+    /**
+     * After updating a soal, recalculate all existing student HasilLatihan records
+     * for this soal and update session scores + gradebook.
+     * Since IDs are now preserved by updateAnswersInPlace(), the comparison is accurate.
+     */
+    private function resyncAfterUpdate(Soal $soal, string $tipe, ?object $materi): void
+    {
+        if (!in_array($tipe, ['pilihan_ganda', 'multi_select', 'isian_singkat', 'jenis_lainnya'])) {
+            return; // Essay/menjodohkan require manual grading
+        }
+
+        $kunciBenar = \App\Models\PilihanJawaban::where('soal_id', $soal->id)
+            ->where('is_correct', true)
+            ->get();
+
+        if ($kunciBenar->isEmpty()) {
+            return;
+        }
+
+        $hasilList = \App\Models\HasilLatihan::where('soal_id', $soal->id)->get();
+        if ($hasilList->isEmpty()) {
+            return;
+        }
+
+        $affectedSessionIds = collect();
+
+        foreach ($hasilList as $hasil) {
+            $isCorrect = false;
+
+            if (in_array($tipe, ['pilihan_ganda', 'jenis_lainnya'])) {
+                $kunciId   = $kunciBenar->first()?->id;
+                $isCorrect = $hasil->pilihan_id && $hasil->pilihan_id === $kunciId;
+            } elseif ($tipe === 'multi_select') {
+                $kunciIds  = $kunciBenar->pluck('id')->toArray();
+                $isCorrect = $hasil->pilihan_id && in_array($hasil->pilihan_id, $kunciIds);
+            } elseif ($tipe === 'isian_singkat') {
+                $kunciTeks      = strtolower(trim($kunciBenar->first()?->teks ?? ''));
+                $jawabanPeserta = strtolower(trim($hasil->jawaban_esai ?? ''));
+                $isCorrect      = !empty($kunciTeks) && !empty($jawabanPeserta) && $jawabanPeserta === $kunciTeks;
+            }
+
+            $skor = $isCorrect ? ($soal->bobot ?? 10) : 0;
+            $hasil->update(['is_correct' => $isCorrect, 'skor' => $skor]);
+            $affectedSessionIds->push($hasil->sesi_evaluasi_id);
+        }
+
+        foreach ($affectedSessionIds->unique() as $sesiId) {
+            $sesi = \App\Models\SesiEvaluasi::find($sesiId);
+            if (!$sesi) continue;
+
+            $hasilAll  = $sesi->hasilLatihan()->with('soal')->get();
+            $totalSkor = $hasilAll->sum('skor');
+            $maxSkor   = $hasilAll->sum(fn($h) => $h->soal ? $h->soal->bobot : 0);
+            $skorAkhir = $maxSkor > 0 ? round(($totalSkor / $maxSkor) * 100, 2) : 0;
+            $benar     = $hasilAll->where('is_correct', true)->count();
+
+            $sesi->update(['skor' => $skorAkhir, 'benar' => $benar]);
+
+            if ($materi && $materi->pelatihan_id) {
+                \App\Services\NilaiService::recalculate($sesi->user_id, $materi->pelatihan_id);
+            }
+        }
+    }
 
     private function storeAnswers(Soal $soal, string $tipe, Request $request): void
     {
