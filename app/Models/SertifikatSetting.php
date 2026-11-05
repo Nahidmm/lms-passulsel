@@ -12,7 +12,13 @@ class SertifikatSetting extends Model
         'tempat_tanda_tangan',
         'logo_instansi',
         'ttd_image',
-        'tipe_ttd'
+        'tipe_ttd',
+        'is_active',
+        'generation_mode',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
     //
 }

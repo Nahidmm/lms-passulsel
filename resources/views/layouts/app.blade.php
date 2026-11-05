@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#ffffff">
     <meta name="description" content="STRAPSUS PAS - Petugas Paten, Pembinaan Pasti, Pemasyarakatan Berdampak | Kanwil Ditjenpas Sulsel.">
     <title>@yield('title', 'Dashboard') - STRAPSUS PAS</title>

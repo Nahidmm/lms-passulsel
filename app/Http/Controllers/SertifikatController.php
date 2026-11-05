@@ -81,4 +81,42 @@ class SertifikatController extends Controller
         $sertifikat = Sertifikat::where('credential_id', $credential_id)->with(['user', 'pelatihan'])->first();
         return view('public.verify_certificate', compact('sertifikat', 'credential_id'));
     }
+
+    /**
+     * Penerbitan Sertifikat secara manual oleh Admin.
+     */
+    public function generate(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'pelatihan_id' => 'required|exists:pelatihans,id',
+        ]);
+
+        $user = \App\Models\User::findOrFail($request->user_id);
+        $pelatihan = \App\Models\Pelatihan::findOrFail($request->pelatihan_id);
+
+        $setting = SertifikatSetting::first();
+        if ($setting && !$setting->is_active) {
+            return back()->with('error', 'Penerbitan sertifikat sedang dinonaktifkan di Pengaturan Sertifikat.');
+        }
+
+        $credentialId = 'LMS-PAS-' . date('Y') . '-' . strtoupper(substr(md5($user->id . $pelatihan->id . time()), 0, 6));
+
+        $sertifikat = Sertifikat::updateOrCreate(
+            ['user_id' => $user->id, 'pelatihan_id' => $pelatihan->id],
+            ['credential_id' => $credentialId, 'issued_at' => now()]
+        );
+
+        return back()->with('success', "Sertifikat untuk peserta {$user->nama} ({$pelatihan->judul}) berhasil diterbitkan. No. Registrasi: {$credentialId}");
+    }
+
+    /**
+     * Pencabutan / pembatalan sertifikat oleh Admin.
+     */
+    public function destroy(Sertifikat $sertifikat)
+    {
+        $userName = $sertifikat->user->nama ?? 'Peserta';
+        $sertifikat->delete();
+        return back()->with('success', "Sertifikat untuk {$userName} berhasil dicabut / dibatalkan.");
+    }
 }

@@ -66,18 +66,24 @@ class ProgresPelatihan extends Model
                 'tanggal_selesai' => now(),
             ]);
 
-            // Generate Certificate
-            $credentialId = 'LMS-PAS-' . date('Y') . '-' . strtoupper(substr(md5($userId . $pelatihanId . time()), 0, 6));
-            Sertifikat::firstOrCreate(
-                ['user_id' => $userId, 'pelatihan_id' => $pelatihanId],
-                ['credential_id' => $credentialId, 'issued_at' => now()]
-            );
+            // Check Certificate Setting (is_active & generation_mode)
+            $certSetting = SertifikatSetting::first();
+            $certActive = $certSetting ? (bool) $certSetting->is_active : true;
+            $generationMode = $certSetting ? $certSetting->generation_mode : 'admin_only';
+
+            if ($certActive && $generationMode === 'auto') {
+                $credentialId = 'LMS-PAS-' . date('Y') . '-' . strtoupper(substr(md5($userId . $pelatihanId . time()), 0, 6));
+                Sertifikat::firstOrCreate(
+                    ['user_id' => $userId, 'pelatihan_id' => $pelatihanId],
+                    ['credential_id' => $credentialId, 'issued_at' => now()]
+                );
+            }
 
             // Notify the user that they completed the pelatihan
             $pelatihan = Pelatihan::find($pelatihanId);
             Notification::kirim(
                 $userId,
-                'Pelatihan Selesai! ðŸŽ‰',
+                'Pelatihan Selesai! 🎉',
                 "Selamat! Anda berhasil menyelesaikan pelatihan \"{$pelatihan->judul}\". Poin Anda telah diperbarui.",
                 'success',
                 'award',

@@ -26,10 +26,14 @@ class SertifikatSettingController extends Controller
             'logo_instansi' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'ttd_image' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
             'tipe_ttd' => 'required|in:qr,image,both',
+            'is_active' => 'nullable|boolean',
+            'generation_mode' => 'required|in:auto,admin_only',
         ]);
 
         $setting = SertifikatSetting::first() ?? new SertifikatSetting();
         $setting->fill($validated);
+        $setting->is_active = $request->has('is_active');
+        $setting->generation_mode = $request->input('generation_mode', 'admin_only');
 
         if ($request->hasFile('logo_instansi')) {
             if ($setting->logo_instansi) {

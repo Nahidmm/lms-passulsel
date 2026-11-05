@@ -26,6 +26,47 @@
     @method('PUT')
     
     <div class="p-6 md:p-8 space-y-6">
+        {{-- Pengaturan Status & Kebijakan Penerbitan --}}
+        <div class="p-5 rounded-2xl bg-[var(--muted)]/50 border border-[var(--border)] space-y-4">
+            <h2 class="text-sm font-bold text-text-primary uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-4 h-4 text-primary"></i> Kebijakan & Kontrol Penerbitan Sertifikat
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
+                {{-- Toggle Aktif / Nonaktif --}}
+                <div class="flex items-start gap-3.5 p-4 rounded-xl bg-[var(--card)] border border-[var(--border)]">
+                    <input type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', $setting->is_active ?? true) ? 'checked' : '' }}
+                        class="w-5 h-5 mt-0.5 rounded text-primary border-border focus:ring-primary cursor-pointer">
+                    <div class="space-y-0.5">
+                        <label for="is_active" class="text-sm font-bold text-text-primary cursor-pointer">
+                            Aktifkan Penerbitan Sertifikat
+                        </label>
+                        <p class="text-xs text-text-secondary">
+                            Jika dinonaktifkan, seluruh penerbitan sertifikat ditutup sementara dan peserta tidak dapat mengunduh sertifikat.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Mode Penerbitan (Auto vs Admin Only) --}}
+                <div class="space-y-2 p-4 rounded-xl bg-[var(--card)] border border-[var(--border)]">
+                    <label for="generation_mode" class="block text-xs font-bold text-text-primary uppercase tracking-wider">
+                        Metode Penerbitan Sertifikat
+                    </label>
+                    <select id="generation_mode" name="generation_mode" class="w-full px-3 py-2 border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none text-xs bg-secondary/50 font-medium">
+                        <option value="admin_only" {{ old('generation_mode', $setting->generation_mode ?? 'admin_only') === 'admin_only' ? 'selected' : '' }}>
+                            🛡️ Terbitkan oleh Admin Saja (Manual - Direkomendasikan)
+                        </option>
+                        <option value="auto" {{ old('generation_mode', $setting->generation_mode ?? 'admin_only') === 'auto' ? 'selected' : '' }}>
+                            ⚡ Otomatis (Saat peserta menyelesaikan seluruh materi)
+                        </option>
+                    </select>
+                    <p class="text-[11px] text-text-secondary">
+                        Pada mode Admin, admin/penguji berhak memverifikasi nilai sebelum menekan tombol "Terbitkan Sertifikat" di Buku Nilai / Transkrip.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label for="nama_penandatangan" class="block text-sm font-semibold text-text-primary mb-1.5">Nama Penandatangan</label>

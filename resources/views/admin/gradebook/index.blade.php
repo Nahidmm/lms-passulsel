@@ -18,6 +18,9 @@
     </div>
     
     <div class="flex flex-wrap items-center gap-2">
+        <a href="{{ route('admin.gradebook.cetak', ['pelatihan_id' => $pelatihan->id, 'unit_kerja_id' => request('unit_kerja_id')]) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-colors">
+            <i data-lucide="printer" class="w-4 h-4"></i> Cetak Lengkap
+        </a>
         <button onclick="document.getElementById('bobotModal').classList.remove('hidden')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-[var(--card)] hover:bg-secondary text-text-primary text-xs font-semibold shadow-sm transition-colors">
             <i data-lucide="sliders" class="w-4 h-4 text-primary"></i> Atur Bobot Nilai
         </button>
@@ -85,9 +88,10 @@
 <div class="bg-[var(--card)] border border-[var(--border)] shadow-xs rounded-xl p-4 mb-6">
     <form method="GET" action="{{ route('admin.pelatihan.gradebook', $pelatihan->id) }}" class="flex flex-wrap items-center gap-3">
         <!-- Course Switcher -->
-        <div class="min-w-[240px]">
+        <div class="min-w-[260px]">
             <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Pilih Kursus LMS</label>
-            <select onchange="window.location.href='{{ url('admin/pelatihan') }}/' + this.value + '/gradebook'" class="w-full px-3 py-2 text-xs rounded-lg border border-border bg-[var(--card)] text-text-primary focus:border-primary outline-none font-semibold">
+            <select onchange="window.location.href = this.value === 'all' ? '{{ route('admin.gradebook.index') }}?pelatihan_id=all' : '{{ url('admin/pelatihan') }}/' + this.value + '/gradebook'" class="w-full px-3 py-2 text-xs rounded-lg border border-border bg-[var(--card)] text-text-primary focus:border-primary outline-none font-semibold">
+                <option value="all">🌟 Semua Pelatihan (Seluruh Kursus)</option>
                 @foreach($allPelatihans as $p)
                     <option value="{{ $p->id }}" {{ $pelatihan->id == $p->id ? 'selected' : '' }}>
                         {{ $p->judul }}

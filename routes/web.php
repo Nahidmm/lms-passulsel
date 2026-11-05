@@ -116,6 +116,7 @@ Route::middleware(['auth'])->group(function () {
 
             // Moodle-style Gradebook (Buku Nilai & Konfigurasi Bobot)
             Route::get('gradebook', [\App\Http\Controllers\Admin\GradebookController::class, 'globalIndex'])->name('gradebook.index');
+            Route::get('gradebook/cetak', [\App\Http\Controllers\Admin\GradebookController::class, 'cetak'])->name('gradebook.cetak');
             Route::get('pelatihan/{pelatihan}/gradebook', [\App\Http\Controllers\Admin\GradebookController::class, 'index'])->name('pelatihan.gradebook');
             Route::post('pelatihan/{pelatihan}/gradebook/bobot', [\App\Http\Controllers\Admin\GradebookController::class, 'updateBobot'])->name('pelatihan.gradebook.bobot');
             Route::get('pelatihan/{pelatihan}/gradebook/export', [\App\Http\Controllers\Admin\GradebookController::class, 'export'])->name('pelatihan.gradebook.export');
@@ -190,6 +191,12 @@ Route::middleware(['auth'])->group(function () {
 
             // Kalender Akademik
             Route::resource('kalender', KalenderController::class);
+
+            // ==========================================
+            // AKSI SERTIFIKAT (Admin / Superadmin)
+            // ==========================================
+            Route::post('/sertifikat/generate', [\App\Http\Controllers\SertifikatController::class, 'generate'])->name('sertifikat.generate');
+            Route::delete('/sertifikat/{sertifikat}', [\App\Http\Controllers\SertifikatController::class, 'destroy'])->name('sertifikat.destroy');
 
             // ==========================================
             // SERTIFIKAT (Superadmin Only)

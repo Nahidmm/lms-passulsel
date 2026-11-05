@@ -62,12 +62,39 @@ class PenilaianController extends Controller
             ->orderByDesc('tanggal_selesai')
             ->get();
 
+        // Riwayat tugas & penugasan kasus
+        $tugasSubmissions = \App\Models\TugasSubmission::with(['tugas.pelatihan', 'penilai'])
+            ->where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        // Sertifikat dan progres pelatihan user
+        $sertifikats = \App\Models\Sertifikat::with('pelatihan')
+            ->where('user_id', $user->id)
+            ->latest('issued_at')
+            ->get();
+
+        $progresPelatihans = \App\Models\ProgresPelatihan::with('pelatihan')
+            ->where('user_id', $user->id)
+            ->get();
+
+        $certSetting = \App\Models\SertifikatSetting::first();
+
         $totalPoinMateri = $progresMateri->unique('materi_id')->sum(fn($p) => $p->materi->poin ?? 0);
         $totalPoinEvaluasi = $sesis->groupBy('materi_id')->map(fn($group) => $group->max('skor'))->sum();
 
         $rataRata   = $sesis->avg('skor') ?? 0;
         $totalLulus = $sesis->filter(fn($s) => $s->skor >= $s->passing_grade)->count();
 
-        return view('admin.penilaian.show', compact('user', 'sesis', 'rataRata', 'totalLulus', 'progresMateri', 'totalPoinMateri', 'totalPoinEvaluasi'));
+        $totalTugas = $tugasSubmissions->count();
+        $totalTugasDinilai = $tugasSubmissions->where('status', 'graded')->count();
+        $rataTugas = $tugasSubmissions->where('status', 'graded')->avg('nilai') ?? 0;
+
+        return view('admin.penilaian.show', compact(
+            'user', 'sesis', 'rataRata', 'totalLulus',
+            'progresMateri', 'totalPoinMateri', 'totalPoinEvaluasi',
+            'tugasSubmissions', 'totalTugas', 'totalTugasDinilai', 'rataTugas',
+            'sertifikats', 'progresPelatihans', 'certSetting'
+        ));
     }
 }

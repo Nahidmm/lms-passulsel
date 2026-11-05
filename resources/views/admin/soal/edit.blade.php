@@ -126,7 +126,18 @@
                 </div>
 
                 <div id="choices-container" class="space-y-2.5">
-                    @php $labels = ['A','B','C','D','E','F','G','H']; @endphp
+                    @php
+                        $labels = ['A','B','C','D','E','F','G','H'];
+                        $hasAnyCorrect = $pilihanJawabans->contains('is_correct', true) || old('jawaban_benar') !== null;
+                    @endphp
+
+                    @if(in_array($currentTipe, ['pilihan_ganda', 'jenis_lainnya']) && !$hasAnyCorrect)
+                        <div id="no-key-warning" class="p-3 mb-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs flex items-center gap-2">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i>
+                            <span><strong>Perhatian:</strong> Soal ini belum memiliki kunci jawaban yang ditandai. Silakan klik bulatan radio pada opsi yang benar.</span>
+                        </div>
+                    @endif
+
                     @if(in_array($currentTipe, ['pilihan_ganda', 'multi_select', 'jenis_lainnya']) && $pilihanJawabans->isNotEmpty())
                         @foreach($pilihanJawabans as $idx => $p)
                         @php
@@ -135,18 +146,22 @@
                             $isCheckboxChecked = ($currentTipe === 'multi_select')
                                 && (old('jawaban_benar') !== null ? in_array($idx, (array)old('jawaban_benar')) : (bool)$p->is_correct);
                         @endphp
-                        <div class="flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all" data-index="{{ $idx }}">
-                            <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
-                                <input type="radio" name="jawaban_benar" value="{{ $idx }}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer {{ !in_array($currentTipe, ['pilihan_ganda', 'jenis_lainnya']) ? 'hidden' : '' }}" {{ $isRadioChecked ? 'checked' : '' }} title="Tandai sebagai kunci benar">
-                                <input type="checkbox" name="jawaban_benar[]" value="{{ $idx }}" class="ms-checkbox w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer {{ $currentTipe !== 'multi_select' ? 'hidden' : '' }}" {{ $isCheckboxChecked ? 'checked' : '' }} title="Tandai sebagai kunci benar">
+                        <div class="flex items-center gap-3 choice-row p-2.5 rounded-xl border transition-all {{ $isRadioChecked || $isCheckboxChecked ? 'border-emerald-500/60 bg-emerald-50/40 dark:bg-emerald-950/20' : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)]' }}" data-index="{{ $idx }}">
+                            <div class="correct-indicator shrink-0 flex items-center justify-center pl-1 cursor-pointer">
+                                <input type="radio" name="jawaban_benar" value="{{ $idx }}" class="pg-radio w-4 h-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer {{ !in_array($currentTipe, ['pilihan_ganda', 'jenis_lainnya']) ? 'hidden' : '' }}" {{ $isRadioChecked ? 'checked' : '' }} title="Tandai sebagai kunci benar">
+                                <input type="checkbox" name="jawaban_benar[]" value="{{ $idx }}" class="ms-checkbox w-4 h-4 text-emerald-600 focus:ring-emerald-500 rounded cursor-pointer {{ $currentTipe !== 'multi_select' ? 'hidden' : '' }}" {{ $isCheckboxChecked ? 'checked' : '' }} title="Tandai sebagai kunci benar">
                             </div>
 
-                            <span class="w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0">
+                            <span class="choice-label-badge w-6 h-6 rounded-lg {{ $isRadioChecked || $isCheckboxChecked ? 'bg-emerald-600 text-white' : 'bg-[var(--muted)] text-[var(--text-secondary)]' }} flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer">
                                 {{ $labels[$idx] ?? $idx+1 }}
                             </span>
 
                             <input type="text" name="pilihan[]" value="{{ old("pilihan.$idx", $p->teks) }}" placeholder="Teks pilihan"
                                 class="flex-1 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs text-[var(--text-primary)] transition-all">
+
+                            <span class="kunci-badge px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/50 shrink-0 {{ $isRadioChecked || $isCheckboxChecked ? '' : 'hidden' }}">
+                                Kunci Benar
+                            </span>
 
                             @if($idx >= 2)
                                 <button type="button" onclick="removeChoice(this)" class="p-1.5 text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors" title="Hapus Opsi">
@@ -159,14 +174,17 @@
                         @endforeach
                     @else
                         @foreach(['A','B','C','D'] as $i => $label)
-                        <div class="flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all" data-index="{{ $i }}">
-                            <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
-                                <input type="radio" name="jawaban_benar" value="{{ $i }}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer" {{ $i === 0 ? 'checked' : '' }}>
-                                <input type="checkbox" name="jawaban_benar[]" value="{{ $i }}" class="ms-checkbox hidden w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer">
+                        <div class="flex items-center gap-3 choice-row p-2.5 rounded-xl border transition-all {{ $i === 0 ? 'border-emerald-500/60 bg-emerald-50/40 dark:bg-emerald-950/20' : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)]' }}" data-index="{{ $i }}">
+                            <div class="correct-indicator shrink-0 flex items-center justify-center pl-1 cursor-pointer">
+                                <input type="radio" name="jawaban_benar" value="{{ $i }}" class="pg-radio w-4 h-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer" {{ $i === 0 ? 'checked' : '' }}>
+                                <input type="checkbox" name="jawaban_benar[]" value="{{ $i }}" class="ms-checkbox hidden w-4 h-4 text-emerald-600 focus:ring-emerald-500 rounded cursor-pointer">
                             </div>
-                            <span class="w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0">{{ $label }}</span>
+                            <span class="choice-label-badge w-6 h-6 rounded-lg {{ $i === 0 ? 'bg-emerald-600 text-white' : 'bg-[var(--muted)] text-[var(--text-secondary)]' }} flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer">{{ $label }}</span>
                             <input type="text" name="pilihan[]" placeholder="Teks pilihan {{ $label }}"
                                 class="flex-1 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs text-[var(--text-primary)] transition-all">
+                            <span class="kunci-badge px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/50 shrink-0 {{ $i === 0 ? '' : 'hidden' }}">
+                                Kunci Benar
+                            </span>
                             @if($i >= 2)
                                 <button type="button" onclick="removeChoice(this)" class="p-1.5 text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
                             @else
@@ -405,6 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const selected = document.querySelector('input[name="tipe"]:checked')?.value || 'pilihan_ganda';
     showSection(selected);
     updateTypeCards(selected);
+    refreshChoiceHighlights();
     if (window.lucide) {
         window.lucide.createIcons();
     }
@@ -417,6 +436,7 @@ document.querySelectorAll('.type-card').forEach(card => {
         if (radio) radio.checked = true;
         showSection(type);
         updateTypeCards(type);
+        refreshChoiceHighlights();
     });
 });
 
@@ -434,13 +454,16 @@ document.getElementById('btn-add-choice')?.addEventListener('click', function() 
     const activeType = document.querySelector('input[name="tipe"]:checked')?.value || 'pilihan_ganda';
     const isMulti = activeType === 'multi_select';
     div.innerHTML = `
-        <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
-            <input type="radio" name="jawaban_benar" value="${index}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer ${isMulti ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
-            <input type="checkbox" name="jawaban_benar[]" value="${index}" class="ms-checkbox w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer ${!isMulti ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
+        <div class="correct-indicator shrink-0 flex items-center justify-center pl-1 cursor-pointer">
+            <input type="radio" name="jawaban_benar" value="${index}" class="pg-radio w-4 h-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer ${isMulti ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
+            <input type="checkbox" name="jawaban_benar[]" value="${index}" class="ms-checkbox w-4 h-4 text-emerald-600 focus:ring-emerald-500 rounded cursor-pointer ${!isMulti ? 'hidden' : ''}" title="Tandai sebagai kunci benar">
         </div>
-        <span class="w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0">${label}</span>
+        <span class="choice-label-badge w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer">${label}</span>
         <input type="text" name="pilihan[]" placeholder="Teks pilihan ${label}" required
             class="flex-1 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs text-[var(--text-primary)] transition-all">
+        <span class="kunci-badge px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/50 shrink-0 hidden">
+            Kunci Benar
+        </span>
         <button type="button" onclick="removeChoice(this)" class="p-1.5 text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors" title="Hapus Opsi">
             <i data-lucide="x" class="w-4 h-4"></i>
         </button>`;
@@ -455,6 +478,7 @@ function removeChoice(btn) {
     if (document.querySelectorAll('.choice-row').length <= 2) return alert('Minimal 2 pilihan jawaban.');
     row.remove();
     reindexChoices();
+    refreshChoiceHighlights();
 }
 
 function reindexChoices() {
@@ -464,7 +488,7 @@ function reindexChoices() {
         row.dataset.index = i;
         const radio = row.querySelector('.pg-radio');
         const check = row.querySelector('.ms-checkbox');
-        const span = row.querySelector('span');
+        const span = row.querySelector('.choice-label-badge');
         const input = row.querySelector('input[name="pilihan[]"]');
         if (radio) radio.value = i;
         if (check) check.value = i;
@@ -472,6 +496,63 @@ function reindexChoices() {
         if (input) input.placeholder = `Teks pilihan ${label}`;
     });
 }
+
+function refreshChoiceHighlights() {
+    const activeType = document.querySelector('input[name="tipe"]:checked')?.value || 'pilihan_ganda';
+    const rows = document.querySelectorAll('#choices-container .choice-row');
+    let hasSelected = false;
+
+    rows.forEach(row => {
+        const radio = row.querySelector('.pg-radio');
+        const check = row.querySelector('.ms-checkbox');
+        const isChecked = (activeType === 'multi_select') ? (check && check.checked) : (radio && radio.checked);
+        const labelBadge = row.querySelector('.choice-label-badge');
+        const kunciBadge = row.querySelector('.kunci-badge');
+
+        if (isChecked) {
+            hasSelected = true;
+            row.className = 'flex items-center gap-3 choice-row p-2.5 rounded-xl border border-emerald-500/60 bg-emerald-50/40 dark:bg-emerald-950/20 transition-all';
+            if (labelBadge) labelBadge.className = 'choice-label-badge w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer';
+            if (kunciBadge) kunciBadge.classList.remove('hidden');
+        } else {
+            row.className = 'flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all';
+            if (labelBadge) labelBadge.className = 'choice-label-badge w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer';
+            if (kunciBadge) kunciBadge.classList.add('hidden');
+        }
+    });
+
+    const warning = document.getElementById('no-key-warning');
+    if (warning && hasSelected) {
+        warning.classList.add('hidden');
+    }
+}
+
+document.getElementById('choices-container')?.addEventListener('change', function(e) {
+    if (e.target.matches('.pg-radio, .ms-checkbox')) {
+        refreshChoiceHighlights();
+    }
+});
+
+document.getElementById('choices-container')?.addEventListener('click', function(e) {
+    const indicator = e.target.closest('.correct-indicator') || e.target.closest('.choice-label-badge');
+    if (indicator) {
+        const row = indicator.closest('.choice-row');
+        const activeType = document.querySelector('input[name="tipe"]:checked')?.value || 'pilihan_ganda';
+        if (activeType === 'multi_select') {
+            const check = row.querySelector('.ms-checkbox');
+            if (check && e.target !== check) {
+                check.checked = !check.checked;
+                refreshChoiceHighlights();
+            }
+        } else {
+            const radio = row.querySelector('.pg-radio');
+            if (radio && e.target !== radio) {
+                radio.checked = true;
+                refreshChoiceHighlights();
+            }
+        }
+    }
+});
 
 document.getElementById('btn-add-pair')?.addEventListener('click', function() {
     const rows = document.querySelectorAll('#pairs-container .pair-row');
@@ -541,13 +622,20 @@ document.getElementById('btn-resync')?.addEventListener('click', function() {
     btn.disabled = true;
     textEl.textContent = 'Menyinkronkan...';
 
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        || document.querySelector('input[name="_token"]')?.value
+        || '{{ csrf_token() }}';
+
     fetch(url, {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            'X-CSRF-TOKEN': token,
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+            _token: token
+        })
     })
     .then(r => r.json())
     .then(data => {

@@ -21,6 +21,11 @@ class GradebookController extends Controller
     public function globalIndex(Request $request)
     {
         $pelatihanId = $request->get('pelatihan_id');
+
+        if ($pelatihanId === 'all') {
+            return $this->allCoursesIndex($request);
+        }
+
         $pelatihan = null;
         if ($pelatihanId) {
             $pelatihan = Pelatihan::find($pelatihanId);
@@ -36,6 +41,63 @@ class GradebookController extends Controller
         }
 
         return $this->index($pelatihan, $request);
+    }
+
+    /**
+     * Tampilan Buku Nilai untuk Seluruh Pelatihan / Kursus (Master Rekap).
+     */
+    public function allCoursesIndex(Request $request)
+    {
+        $allPelatihans = Pelatihan::orderBy('judul')->get();
+        $unitKerjas = \App\Models\UnitKerja::orderBy('nama_unit')->get();
+
+        $query = User::where('role', 'peserta')
+            ->where('status_akun', 'approved');
+
+        if ($request->filled('unit_kerja_id')) {
+            $query->where('unit_kerja_id', $request->unit_kerja_id);
+        }
+
+        $users = $query->with(['unitKerja', 'progresPelatihans.pelatihan', 'sertifikats'])->orderBy('nama')->get();
+
+        $allCoursesData = [];
+        foreach ($users as $user) {
+            $rekaps = RekapNilai::where('user_id', $user->id)->with('pelatihan')->get();
+            $progresList = $user->progresPelatihans;
+
+            $totalEnrolled = $progresList->count();
+            $totalCompleted = $progresList->where('status', 'selesai')->count();
+            $totalCerts = $user->sertifikats->count();
+
+            $avgScore = $rekaps->isNotEmpty() ? $rekaps->avg('nilai_akhir') : 0;
+
+            $courseScores = [];
+            foreach ($allPelatihans as $p) {
+                $r = $rekaps->firstWhere('pelatihan_id', $p->id);
+                $pp = $progresList->firstWhere('pelatihan_id', $p->id);
+                $courseScores[$p->id] = [
+                    'pelatihan' => $p,
+                    'enrolled' => $pp !== null,
+                    'completed' => $pp && $pp->status === 'selesai',
+                    'nilai_akhir' => $r ? $r->nilai_akhir : null,
+                    'status_kelulusan' => $r ? $r->status_kelulusan : null,
+                ];
+            }
+
+            $allCoursesData[] = [
+                'user' => $user,
+                'totalEnrolled' => $totalEnrolled,
+                'totalCompleted' => $totalCompleted,
+                'totalCerts' => $totalCerts,
+                'avgScore' => $avgScore,
+                'courseScores' => $courseScores,
+                'rekaps' => $rekaps,
+            ];
+        }
+
+        return view('admin.gradebook.all_courses', compact(
+            'allPelatihans', 'unitKerjas', 'allCoursesData', 'users'
+        ));
     }
 
     /**
@@ -379,6 +441,94 @@ class GradebookController extends Controller
         $pdf = Pdf::loadView('pdf.pretest-detail', $data)->setPaper('a4', 'portrait');
 
         return $pdf->download('Hasil-Pretest-' . $user->nip . '.pdf');
+    }
+
+    /**
+     * Cetak Lengkap Laporan Gradebook (Buku Nilai) — Mode Kursus Tunggal atau Seluruh Kursus.
+     */
+    public function cetak(Request $request)
+    {
+        $pelatihanId = $request->get('pelatihan_id', 'all');
+        $unitKerjaId = $request->get('unit_kerja_id');
+        $setting = \App\Models\SertifikatSetting::first();
+
+        $unitKerjaFilter = null;
+        if ($unitKerjaId) {
+            $unitKerjaFilter = \App\Models\UnitKerja::find($unitKerjaId);
+        }
+
+        $allPelatihans = Pelatihan::orderBy('judul')->get();
+
+        if ($pelatihanId === 'all') {
+            $query = User::where('role', 'peserta')
+                ->where('status_akun', 'approved');
+
+            if ($unitKerjaId) {
+                $query->where('unit_kerja_id', $unitKerjaId);
+            }
+
+            $users = $query->with(['unitKerja', 'progresPelatihans.pelatihan', 'sertifikats'])->orderBy('nama')->get();
+
+            $reportData = [];
+            foreach ($users as $user) {
+                $rekaps = RekapNilai::where('user_id', $user->id)->with('pelatihan')->get();
+                $progresList = $user->progresPelatihans;
+
+                $avgScore = $rekaps->isNotEmpty() ? $rekaps->avg('nilai_akhir') : 0;
+                $totalEnrolled = $progresList->count();
+                $totalCompleted = $progresList->where('status', 'selesai')->count();
+                $totalCerts = $user->sertifikats->count();
+
+                $reportData[] = [
+                    'user' => $user,
+                    'totalEnrolled' => $totalEnrolled,
+                    'totalCompleted' => $totalCompleted,
+                    'totalCerts' => $totalCerts,
+                    'avgScore' => $avgScore,
+                    'rekaps' => $rekaps,
+                ];
+            }
+
+            return view('admin.gradebook.cetak', [
+                'isAll' => true,
+                'pelatihan' => null,
+                'allPelatihans' => $allPelatihans,
+                'reportData' => $reportData,
+                'unitKerjaFilter' => $unitKerjaFilter,
+                'setting' => $setting,
+            ]);
+        }
+
+        // Single Pelatihan
+        $pelatihan = Pelatihan::findOrFail($pelatihanId);
+        $bobot = BobotNilai::getOrCreateDefault($pelatihan->id);
+
+        $query = User::where('role', 'peserta')
+            ->where('status_akun', 'approved');
+
+        if ($unitKerjaId) {
+            $query->where('unit_kerja_id', $unitKerjaId);
+        }
+
+        $users = $query->with(['unitKerja'])->orderBy('nama')->get();
+
+        $gradebookData = [];
+        foreach ($users as $user) {
+            $rekap = NilaiService::recalculate($user->id, $pelatihan->id);
+            $gradebookData[] = [
+                'user' => $user,
+                'rekap' => $rekap,
+            ];
+        }
+
+        return view('admin.gradebook.cetak', [
+            'isAll' => false,
+            'pelatihan' => $pelatihan,
+            'bobot' => $bobot,
+            'gradebookData' => $gradebookData,
+            'unitKerjaFilter' => $unitKerjaFilter,
+            'setting' => $setting,
+        ]);
     }
 
     /**
