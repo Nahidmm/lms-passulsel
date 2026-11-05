@@ -69,6 +69,16 @@ class User extends Authenticatable
         return $this->hasMany(RekapNilai::class);
     }
 
+    public function sertifikats()
+    {
+        return $this->hasMany(Sertifikat::class);
+    }
+
+    public function sertifikat()
+    {
+        return $this->hasMany(Sertifikat::class);
+    }
+
     public function getActivePelatihan()
     {
         return $this->progresPelatihans()
