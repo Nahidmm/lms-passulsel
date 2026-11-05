@@ -129,10 +129,16 @@
                     @php $labels = ['A','B','C','D','E','F','G','H']; @endphp
                     @if(in_array($currentTipe, ['pilihan_ganda', 'multi_select', 'jenis_lainnya']) && $pilihanJawabans->isNotEmpty())
                         @foreach($pilihanJawabans as $idx => $p)
+                        @php
+                            $isRadioChecked = in_array($currentTipe, ['pilihan_ganda', 'jenis_lainnya'])
+                                && (old('jawaban_benar') !== null ? (string)old('jawaban_benar') === (string)$idx : (bool)$p->is_correct);
+                            $isCheckboxChecked = ($currentTipe === 'multi_select')
+                                && (old('jawaban_benar') !== null ? in_array($idx, (array)old('jawaban_benar')) : (bool)$p->is_correct);
+                        @endphp
                         <div class="flex items-center gap-3 choice-row p-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--text-muted)] transition-all" data-index="{{ $idx }}">
                             <div class="correct-indicator shrink-0 flex items-center justify-center pl-1">
-                                <input type="radio" name="jawaban_benar" value="{{ $idx }}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer {{ $currentTipe !== 'pilihan_ganda' ? 'hidden' : '' }}" {{ $p->is_correct && $currentTipe === 'pilihan_ganda' ? 'checked' : '' }} title="Tandai sebagai kunci benar">
-                                <input type="checkbox" name="jawaban_benar[]" value="{{ $idx }}" class="ms-checkbox w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer {{ $currentTipe !== 'multi_select' ? 'hidden' : '' }}" {{ $p->is_correct && $currentTipe === 'multi_select' ? 'checked' : '' }} title="Tandai sebagai kunci benar">
+                                <input type="radio" name="jawaban_benar" value="{{ $idx }}" class="pg-radio w-4 h-4 text-primary border-[var(--border)] focus:ring-primary cursor-pointer {{ !in_array($currentTipe, ['pilihan_ganda', 'jenis_lainnya']) ? 'hidden' : '' }}" {{ $isRadioChecked ? 'checked' : '' }} title="Tandai sebagai kunci benar">
+                                <input type="checkbox" name="jawaban_benar[]" value="{{ $idx }}" class="ms-checkbox w-4 h-4 text-primary border-[var(--border)] focus:ring-primary rounded cursor-pointer {{ $currentTipe !== 'multi_select' ? 'hidden' : '' }}" {{ $isCheckboxChecked ? 'checked' : '' }} title="Tandai sebagai kunci benar">
                             </div>
 
                             <span class="w-6 h-6 rounded-lg bg-[var(--muted)] text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold shrink-0">
