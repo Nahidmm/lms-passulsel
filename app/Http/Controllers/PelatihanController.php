@@ -15,7 +15,7 @@ class PelatihanController extends Controller
 
     public function index()
     {
-        $pelatihans = Pelatihan::latest()->paginate(10);
+        $pelatihans = Pelatihan::withCount(['materis', 'tugas'])->latest()->paginate(10);
         return view('admin.pelatihan.index', compact('pelatihans'));
     }
 

@@ -25,7 +25,7 @@
                         <th class="py-3.5 px-6 text-center w-16">ID</th>
                         <th class="py-3.5 px-6">Judul Pelatihan</th>
                         <th class="py-3.5 px-6 text-center">Status</th>
-                        <th class="py-3.5 px-6 text-center">Materi Terdaftar</th>
+                        <th class="py-3.5 px-6 text-center">Konten & Tugas</th>
                         <th class="py-3.5 px-6 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -53,16 +53,27 @@
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-center">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--muted)] text-[var(--text-primary)] font-medium text-xs border border-[var(--border)]">
-                                    <i data-lucide="layers" class="w-3.5 h-3.5 text-primary"></i>
-                                    {{ $pelatihan->materis->count() }} Materi
-                                </span>
+                                <div class="inline-flex flex-wrap items-center justify-center gap-1.5">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg {{ $pelatihan->materis_count > 0 ? 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20' : 'bg-[var(--muted)] text-[var(--text-secondary)] border-[var(--border)]' }} font-medium text-xs border" title="{{ $pelatihan->materis_count }} Materi">
+                                        <i data-lucide="book-open" class="w-3.5 h-3.5 {{ $pelatihan->materis_count > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-[var(--text-muted)]' }}"></i>
+                                        {{ $pelatihan->materis_count }} Materi
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg {{ $pelatihan->tugas_count > 0 ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20' : 'bg-[var(--muted)] text-[var(--text-secondary)] border-[var(--border)]' }} font-medium text-xs border" title="{{ $pelatihan->tugas_count }} Penugasan">
+                                        <i data-lucide="clipboard-list" class="w-3.5 h-3.5 {{ $pelatihan->tugas_count > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--text-muted)]' }}"></i>
+                                        {{ $pelatihan->tugas_count }} Tugas
+                                    </span>
+                                </div>
                             </td>
                             <td class="py-4 px-6 text-right space-x-1.5">
                                 {{-- Structure builder --}}
                                 <a href="{{ route('admin.pelatihan.show', $pelatihan->id) }}"
                                    class="inline-flex p-2 border border-[var(--border)] text-[var(--text-secondary)] hover:text-primary hover:border-primary rounded-xl transition-all hover:bg-[var(--card)]" title="Kelola Kurikulum & Materi">
                                     <i data-lucide="layout-template" class="w-4 h-4"></i>
+                                </a>
+                                {{-- Buku Nilai (Gradebook) --}}
+                                <a href="{{ route('admin.pelatihan.gradebook', $pelatihan->id) }}"
+                                   class="inline-flex p-2 border border-[var(--border)] text-[var(--text-secondary)] hover:text-primary hover:border-primary rounded-xl transition-all hover:bg-[var(--card)]" title="Buku Nilai (Gradebook)">
+                                    <i data-lucide="award" class="w-4 h-4"></i>
                                 </a>
                                 {{-- Edit --}}
                                 <a href="{{ route('admin.pelatihan.edit', $pelatihan->id) }}"

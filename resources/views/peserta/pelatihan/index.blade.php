@@ -83,11 +83,18 @@
                     <h3 class="font-bold text-base text-[var(--text-primary)] leading-snug mb-2 line-clamp-2">{{ $pelatihan->judul }}</h3>
                     <p class="text-sm text-[var(--text-secondary)] line-clamp-2 leading-relaxed flex-1">{{ $pelatihan->deskripsi }}</p>
 
-                    <div class="flex items-center gap-3 mt-4 pt-3 border-t border-[var(--border)] text-xs text-[var(--text-secondary)] font-medium">
+                    <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-[var(--border)] text-xs text-[var(--text-secondary)] font-medium">
                         <span class="flex items-center gap-1.5">
-                            <i data-lucide="layers" class="w-3.5 h-3.5 text-primary"></i>
-                            {{ $pelatihan->materis->count() }} Materi Pelajaran
+                            <i data-lucide="book-open" class="w-3.5 h-3.5 text-primary"></i>
+                            {{ $pelatihan->materis->count() }} Materi
                         </span>
+                        @if($pelatihan->tugas->count() > 0)
+                            <span class="text-[var(--text-muted)]">&bull;</span>
+                            <span class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
+                                <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>
+                                {{ $pelatihan->tugas->count() }} Tugas
+                            </span>
+                        @endif
                     </div>
                 </div>
 
