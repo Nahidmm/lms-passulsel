@@ -138,6 +138,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('gradebook/cetak', [GradebookController::class, 'cetak'])->name('gradebook.cetak');
             Route::get('gradebook/export', [GradebookController::class, 'exportAllCourses'])->name('gradebook.export');
             Route::post('gradebook/bobot-global', [GradebookController::class, 'updateGlobalBobot'])->name('gradebook.bobot-global');
+            Route::get('gradebook/peserta/{user}', [GradebookController::class, 'showGlobalParticipant'])->name('gradebook.peserta.show');
             Route::get('pelatihan/{pelatihan}/gradebook', [GradebookController::class, 'index'])->name('pelatihan.gradebook');
             Route::post('pelatihan/{pelatihan}/gradebook/bobot', [GradebookController::class, 'updateBobot'])->name('pelatihan.gradebook.bobot');
             Route::get('pelatihan/{pelatihan}/gradebook/export', [GradebookController::class, 'export'])->name('pelatihan.gradebook.export');

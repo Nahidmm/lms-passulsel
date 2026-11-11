@@ -65,6 +65,31 @@ class GradebookController extends Controller
     }
 
     /**
+     * Full cross-course report card for one participant.
+     */
+    public function showGlobalParticipant(User $user)
+    {
+        abort_unless($user->role === 'peserta', 404);
+
+        $user->load(['unitKerja', 'progresPelatihans']);
+        $allPelatihans = Pelatihan::query()
+            ->with([
+                'materis' => fn ($query) => $query->where('is_active', true)->orderBy('urutan'),
+                'tugas' => fn ($query) => $query->where('is_active', true)->orderBy('urutan'),
+            ])
+            ->orderBy('judul')
+            ->get();
+        $global = $this->globalGradebookService->calculate($user, $allPelatihans);
+
+        return view('admin.gradebook.show', [
+            'user' => $user,
+            'courseScores' => $global['courseScores'],
+            'globalSummary' => $global['summary'],
+            'gradebookSettings' => $this->globalGradebookService->settings(),
+        ]);
+    }
+
+    /**
      * Moodle-style Grader Report — matriks lengkap nilai peserta.
      */
     public function index(Pelatihan $pelatihan, Request $request)
