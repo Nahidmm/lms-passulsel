@@ -47,6 +47,10 @@ class PretestController extends Controller
             'is_active' => $request->has('is_active'),
         ]);
 
+        $maxPause = (int) $request->input('max_pause_count', 2);
+        $pauseMinutes = (int) $request->input('max_pause_minutes', 5);
+        $pretest->updatePauseConfig($maxPause, $pauseMinutes);
+
         return back()->with('success', 'Pengaturan Pretest berhasil disimpan.');
     }
 

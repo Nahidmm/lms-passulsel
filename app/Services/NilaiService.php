@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BobotNilai;
 use App\Models\Materi;
+use App\Models\PenilaianTim;
 use App\Models\RekapNilai;
 use App\Models\SesiEvaluasi;
 use App\Models\Tugas;
@@ -107,42 +108,38 @@ class NilaiService
             }
         }
 
-        // 5. Hitung Nilai Akhir Terbobot
-        $pScore = $nilaiPretest ?? 0;
+        // 5. Penilaian akhir dari masing-masing Tim Pembinaan (satu input final).
+        $nilaiTim = self::getTeamScores($userId);
+
+        // Pretest dan posttest adalah nilai mandiri/diagnostik dan tidak masuk Nilai Akhir.
         $qScore = $nilaiQuizRata ?? 0;
         $tScore = $nilaiTugas ?? 0;
-        $ptScore = $nilaiPosttest ?? 0;
 
         $hasQuiz = $quizMateris->isNotEmpty();
-        $bPretest = $bobot->bobot_pretest;
         $bQuiz = $hasQuiz ? $bobot->bobot_quiz : 0;
         $bTugas = $bobot->bobot_tugas;
-        $bPosttest = $bobot->bobot_posttest;
+        $activeWeightSum = $bQuiz + $bTugas;
+        $rawNilai = ($bQuiz / 100 * $qScore) + ($bTugas / 100 * $tScore);
 
-        $activeWeightSum = $bPretest + $bQuiz + $bTugas + $bPosttest;
-
-        if ($activeWeightSum > 0 && !$hasQuiz && $bobot->bobot_quiz > 0) {
-            // Jika pelatihan tidak ada kuis tapi bobot_quiz > 0, skala bobot komponen yang ada ke 100% secara proporsional
-            $rawNilai = ($bPretest / 100 * $pScore) +
-                        ($bTugas / 100 * $tScore) +
-                        ($bPosttest / 100 * $ptScore);
-            $nilaiAkhir = round($rawNilai * (100 / $activeWeightSum), 2);
-        } else {
-            $nilaiAkhir = round(
-                ($bPretest / 100 * $pScore) +
-                ($bQuiz / 100 * $qScore) +
-                ($bTugas / 100 * $tScore) +
-                ($bPosttest / 100 * $ptScore),
-                2
-            );
+        foreach (array_keys(PenilaianTim::TEAMS) as $timKey) {
+            $weight = (float) $bobot->{'bobot_' . $timKey};
+            $activeWeightSum += $weight;
+            $rawNilai += ($weight / 100) * ($nilaiTim[$timKey] ?? 0);
         }
+
+        // Jika tidak ada kuis formatif, bobot komponen yang aktif dinormalisasi ke 100%.
+        $nilaiAkhir = $activeWeightSum > 0
+            ? round($rawNilai * (100 / $activeWeightSum), 2)
+            : 0;
 
         // 6. Tentukan Predikat & Kelulusan
         $predikat = self::getPredikat($nilaiAkhir);
 
-        // Peserta lulus jika nilai akhir >= passing grade, dan jika ada posttest harus sudah dikerjakan
-        $hasTakenPosttestIfNeeded = ($posttestMateri === null || $nilaiPosttest !== null);
-        $statusKelulusan = ($nilaiAkhir >= $bobot->passing_grade && $hasTakenPosttestIfNeeded)
+        // Posttest tetap wajib diselesaikan jika tersedia, walaupun nilainya tidak dibobotkan.
+        $hasTakenPosttestIfNeeded = $posttestMateri === null || $nilaiPosttest !== null;
+        $hasCompleteTeamScores = collect($nilaiTim)->filter(fn ($nilai) => $nilai !== null)->count()
+            === count(PenilaianTim::TEAMS);
+        $statusKelulusan = ($nilaiAkhir >= $bobot->passing_grade && $hasTakenPosttestIfNeeded && $hasCompleteTeamScores)
             ? 'lulus'
             : 'tidak_lulus';
 
@@ -159,6 +156,28 @@ class NilaiService
                 'status_kelulusan' => $statusKelulusan,
             ]
         );
+    }
+
+    /**
+     * Nilai final tunggal dari empat Tim Pembinaan.
+     * Pekan 1 dipertahankan sebagai slot final agar kompatibel dengan tabel lama.
+     */
+    public static function getTeamScores(int $userId): array
+    {
+        $scores = array_fill_keys(array_keys(PenilaianTim::TEAMS), null);
+
+        PenilaianTim::where('user_id', $userId)
+            ->where('pekan', 1)
+            ->get()
+            ->each(function (PenilaianTim $penilaian) use (&$scores) {
+                if (array_key_exists($penilaian->tim, $scores)) {
+                    $scores[$penilaian->tim] = $penilaian->nilai !== null
+                        ? (float) $penilaian->nilai
+                        : null;
+                }
+            });
+
+        return $scores;
     }
 
     /**

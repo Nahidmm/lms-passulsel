@@ -417,11 +417,13 @@
                         <th>Nama Peserta</th>
                         <th style="width: 110px;">NIP</th>
                         <th>Unit Kerja</th>
-                        <th style="width: 55px;">Pretest<br>({{ $bobot->bobot_pretest }}%)</th>
+                        <th style="width: 55px;">Pretest<br>(Mandiri)</th>
                         <th style="width: 55px;">Kuis<br>({{ $bobot->bobot_quiz }}%)</th>
                         <th style="width: 55px;">Tugas<br>({{ $bobot->bobot_tugas }}%)</th>
-                        <th style="width: 55px;">Posttest<br>({{ $bobot->bobot_posttest }}%)</th>
-                        <th style="width: 55px;">Tim</th>
+                        <th style="width: 55px;">Posttest<br>(Mandiri)</th>
+                        @foreach(\App\Models\PenilaianTim::TEAMS as $timKey => $timLabel)
+                            <th style="width: 55px;">{{ str_replace('Tim Pembinaan ', '', $timLabel) }}<br>({{ $bobot->{'bobot_' . $timKey} }}%)</th>
+                        @endforeach
                         <th style="width: 65px;">Nilai Akhir</th>
                         <th style="width: 75px;">Predikat</th>
                         <th style="width: 70px;">Status</th>
@@ -443,7 +445,10 @@
                             <td class="text-center">{{ $r && $r->nilai_quiz !== null ? number_format($r->nilai_quiz, 1) : '-' }}</td>
                             <td class="text-center">{{ $r && $r->nilai_tugas !== null ? number_format($r->nilai_tugas, 1) : '-' }}</td>
                             <td class="text-center">{{ $r && $r->nilai_posttest !== null ? number_format($r->nilai_posttest, 1) : '-' }}</td>
-                            <td class="text-center">{{ $r && $r->nilai_tim !== null ? number_format($r->nilai_tim, 1) : '-' }}</td>
+                            @foreach(\App\Models\PenilaianTim::TEAMS as $timKey => $timLabel)
+                                @php $nilaiTim = $item['timAverages'][$timKey] ?? null; @endphp
+                                <td class="text-center">{{ $nilaiTim !== null ? number_format($nilaiTim, 1) : '-' }}</td>
+                            @endforeach
                             <td class="text-center font-bold" style="background-color: #f8fafc;">
                                 {{ $r && $r->nilai_akhir !== null ? number_format($r->nilai_akhir, 1) : '-' }}
                             </td>
@@ -454,7 +459,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="12" class="text-center" style="padding: 20px;">Tidak ada data peserta untuk kursus ini.</td>
+                            <td colspan="15" class="text-center" style="padding: 20px;">Tidak ada data peserta untuk kursus ini.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -137,22 +137,45 @@ class EvaluasiController extends Controller
             return response()->json(['success' => false, 'message' => 'Sesi tidak valid.'], 403);
         }
 
+        $materi = $sesi->materi;
+        $maxPause = $materi ? $materi->max_pause_count : 2;
+        $currentPauseCount = $sesi->pause_count;
+
+        if ($maxPause === 0) {
+            return response()->json(['success' => false, 'message' => 'Fitur jeda dinonaktifkan untuk evaluasi ini.'], 403);
+        }
+
+        if ($maxPause > 0 && $currentPauseCount >= $maxPause && !$sesi->is_paused) {
+            return response()->json(['success' => false, 'message' => "Batas maksimal jeda ({$maxPause} kali) telah habis."], 403);
+        }
+
         $jawaban = $request->input('jawaban');
+        $jawabanData = is_array($jawaban) ? $jawaban : (is_array($sesi->jawaban_tersimpan) ? $sesi->jawaban_tersimpan : []);
+
+        if (!$sesi->is_paused) {
+            $cnt = isset($jawabanData['_pause_count']) ? (int) $jawabanData['_pause_count'] : 0;
+            $jawabanData['_pause_count'] = $cnt + 1;
+        }
+
         $updateData = [
             'is_paused' => true,
             'last_activity_at' => now(),
             'waktu_terakhir_aksi' => now(),
+            'jawaban_tersimpan' => $jawabanData,
         ];
-        if (is_array($jawaban)) {
-            $updateData['jawaban_tersimpan'] = $jawaban;
-        }
 
         $sesi->update($updateData);
+
+        $newPauseCount = $sesi->pause_count;
+        $sisaKuota = $maxPause > 0 ? max(0, $maxPause - $newPauseCount) : null;
 
         return response()->json([
             'success' => true,
             'is_paused' => true,
             'sisa_detik' => $sesi->sisaWaktu,
+            'pause_count' => $newPauseCount,
+            'max_pause' => $maxPause,
+            'sisa_kuota' => $sisaKuota,
             'message' => 'Ujian berhasil dijeda.'
         ]);
     }
@@ -207,6 +230,9 @@ class EvaluasiController extends Controller
         if (empty($jawaban) && !empty($sesi->jawaban_tersimpan) && is_array($sesi->jawaban_tersimpan)) {
             $jawaban = $sesi->jawaban_tersimpan;
         }
+
+        // Remove system metadata fields
+        unset($jawaban['_pause_count']);
 
         $benar = 0;
         $totalSkor = 0;

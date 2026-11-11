@@ -12,14 +12,9 @@
         </p>
     </div>
 
-    <form method="GET" action="{{ route('tim.dashboard') }}" class="flex items-center gap-2">
-        <label class="text-xs font-semibold text-text-secondary">Pekan:</label>
-        <select name="pekan" onchange="this.form.submit()" class="px-3 py-2 rounded-lg border border-border bg-[var(--card)] text-sm text-text-primary">
-            @for($i = 1; $i <= 12; $i++)
-                <option value="{{ $i }}" {{ $pekan === $i ? 'selected' : '' }}>Pekan {{ $i }}</option>
-            @endfor
-        </select>
-    </form>
+    <div class="px-3 py-2 rounded-lg bg-primary/10 text-primary text-xs font-semibold">
+        Penilaian final &bull; diinput satu kali dan dapat dikoreksi
+    </div>
 </div>
 
 @if(session('success'))
@@ -28,8 +23,6 @@
 
 <form method="POST" action="{{ route('tim.penilaian.store') }}">
     @csrf
-    <input type="hidden" name="pekan" value="{{ $pekan }}">
-
     <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-xs">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
@@ -38,7 +31,7 @@
                         <th class="px-4 py-3">Peserta</th>
                         <th class="px-4 py-3 text-center">Nilai Pretest</th>
                         <th class="px-4 py-3 text-center">Nilai Pelatihan</th>
-                        <th class="px-4 py-3 text-center" style="min-width:120px">Nilai Pekan (0-100)</th>
+                        <th class="px-4 py-3 text-center" style="min-width:120px">Nilai Akhir Tim (0-100)</th>
                         <th class="px-4 py-3">Catatan</th>
                     </tr>
                 </thead>
@@ -80,7 +73,7 @@
             </table>
         </div>
         <div class="p-4 border-t border-border flex justify-end">
-            <button type="submit" class="btn btn-primary text-white text-sm px-5 py-2.5 rounded-xl font-semibold">Simpan Penilaian Pekan {{ $pekan }}</button>
+            <button type="submit" class="btn btn-primary text-white text-sm px-5 py-2.5 rounded-xl font-semibold">Simpan Penilaian Akhir</button>
         </div>
     </div>
 </form>

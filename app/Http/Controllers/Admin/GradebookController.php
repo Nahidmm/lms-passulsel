@@ -190,13 +190,8 @@ class GradebookController extends Controller
                 ];
             }
 
-            // Nilai per Tim Pembinaan (rata-rata)
-            $timAverages = [];
-            foreach (array_keys(\App\Models\PenilaianTim::TEAMS) as $timKey) {
-                $timAverages[$timKey] = \App\Models\PenilaianTim::where('user_id', $user->id)
-                    ->where('tim', $timKey)
-                    ->avg('nilai');
-            }
+            // Satu nilai final dari masing-masing Tim Pembinaan.
+            $timAverages = NilaiService::getTeamScores($user->id);
 
             $gradebookData[] = [
                 'user' => $user,
@@ -220,16 +215,22 @@ class GradebookController extends Controller
     public function updateBobot(Request $request, Pelatihan $pelatihan)
     {
         $validated = $request->validate([
-            'bobot_pretest' => 'required|numeric|min:0|max:100',
             'bobot_quiz' => 'required|numeric|min:0|max:100',
             'bobot_tugas' => 'required|numeric|min:0|max:100',
-            'bobot_posttest' => 'required|numeric|min:0|max:100',
+            'bobot_mental' => 'required|numeric|min:0|max:100',
+            'bobot_fisik' => 'required|numeric|min:0|max:100',
+            'bobot_akhlak' => 'required|numeric|min:0|max:100',
+            'bobot_kompetensi' => 'required|numeric|min:0|max:100',
             'passing_grade' => 'required|numeric|min:0|max:100',
         ]);
 
+        $validated['bobot_pretest'] = 0;
+        $validated['bobot_posttest'] = 0;
+
         // Validate total equals 100
-        $total = $validated['bobot_pretest'] + $validated['bobot_quiz']
-            + $validated['bobot_tugas'] + $validated['bobot_posttest'];
+        $total = $validated['bobot_quiz'] + $validated['bobot_tugas']
+            + $validated['bobot_mental'] + $validated['bobot_fisik']
+            + $validated['bobot_akhlak'] + $validated['bobot_kompetensi'];
 
         if (abs($total - 100) > 0.01) {
             return back()->with('error', 'Total bobot harus tepat 100%. Saat ini: ' . $total . '%.');
@@ -293,7 +294,10 @@ class GradebookController extends Controller
             if ($hasQuiz) {
                 $headerRow[] = 'Quiz (Rata-rata)';
             }
-            $headerRow = array_merge($headerRow, ['Tugas', 'Post-Test', 'Nilai Akhir', 'Predikat', 'Status']);
+            $headerRow = array_merge($headerRow, [
+                'Tugas', 'Post-Test', 'Mental', 'Fisik', 'Akhlak', 'Kompetensi',
+                'Nilai Akhir', 'Predikat', 'Status'
+            ]);
 
             fputcsv($file, $headerRow);
 
@@ -317,9 +321,14 @@ class GradebookController extends Controller
                 if ($hasQuiz) {
                     $row[] = $rekap->nilai_quiz_rata ?? 0;
                 }
+                $teamScores = NilaiService::getTeamScores($user->id);
                 $row = array_merge($row, [
                     $rekap->nilai_tugas ?? 0,
                     $rekap->nilai_posttest ?? 0,
+                    $teamScores['mental'] ?? '',
+                    $teamScores['fisik'] ?? '',
+                    $teamScores['akhlak'] ?? '',
+                    $teamScores['kompetensi'] ?? '',
                     $rekap->nilai_akhir ?? 0,
                     $rekap->predikat ?? '-',
                     $rekap->status_kelulusan === 'lulus' ? 'LULUS' : 'BELUM LULUS',
@@ -531,6 +540,7 @@ class GradebookController extends Controller
             $gradebookData[] = [
                 'user' => $user,
                 'rekap' => $rekap,
+                'timAverages' => NilaiService::getTeamScores($user->id),
             ];
         }
 

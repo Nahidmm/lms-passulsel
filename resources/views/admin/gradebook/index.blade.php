@@ -48,11 +48,11 @@
 @endif
 
 <!-- Bobot Badges Summary -->
-<div class="grid grid-cols-2 {{ $hasQuiz ? 'sm:grid-cols-5' : 'sm:grid-cols-4' }} gap-3 mb-6">
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
     <div class="p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl">
         <span class="text-[11px] font-semibold text-text-secondary uppercase block">Pretest</span>
         <div class="flex items-baseline gap-1 mt-1">
-            <span class="text-xl font-bold text-text-primary">{{ $bobot->bobot_pretest }}%</span>
+            <span class="text-sm font-bold text-purple-600">Mandiri</span>
         </div>
     </div>
     @if($hasQuiz)
@@ -72,9 +72,17 @@
     <div class="p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl">
         <span class="text-[11px] font-semibold text-text-secondary uppercase block">Posttest / Ujian</span>
         <div class="flex items-baseline gap-1 mt-1">
-            <span class="text-xl font-bold text-text-primary">{{ $bobot->bobot_posttest }}%</span>
+            <span class="text-sm font-bold text-emerald-600">Mandiri</span>
         </div>
     </div>
+    @foreach(\App\Models\PenilaianTim::TEAMS as $timKey => $timLabel)
+    <div class="p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl">
+        <span class="text-[11px] font-semibold text-text-secondary uppercase block">{{ str_replace('Tim Pembinaan ', '', $timLabel) }}</span>
+        <div class="flex items-baseline gap-1 mt-1">
+            <span class="text-xl font-bold text-text-primary">{{ $bobot->{'bobot_' . $timKey} }}%</span>
+        </div>
+    </div>
+    @endforeach
     <div class="p-3 bg-primary/5 border border-primary/20 rounded-xl">
         <span class="text-[11px] font-semibold text-primary uppercase block">Passing Grade</span>
         <div class="flex items-baseline gap-1 mt-1">
@@ -143,16 +151,15 @@
                     <tr>
                         <th class="px-4 py-3 sticky left-0 bg-secondary/90 backdrop-blur z-10 border-r border-border">Nama Peserta</th>
                         <th class="px-4 py-3 border-r border-border">Unit Kerja</th>
-                        <th class="px-4 py-3 text-center border-r border-border">Pretest<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_pretest }}%)</span></th>
+                        <th class="px-4 py-3 text-center border-r border-border">Pretest<br><span class="text-[10px] text-purple-600 lowercase font-normal">mandiri</span></th>
                         @if($hasQuiz)
                         <th class="px-4 py-3 text-center border-r border-border">Rata2 Kuis<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_quiz }}%)</span></th>
                         @endif
                         <th class="px-4 py-3 text-center border-r border-border">Rata2 Tugas<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_tugas }}%)</span></th>
-                        <th class="px-4 py-3 text-center border-r border-border">Posttest<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->bobot_posttest }}%)</span></th>
+                        <th class="px-4 py-3 text-center border-r border-border">Posttest<br><span class="text-[10px] text-emerald-600 lowercase font-normal">mandiri</span></th>
                         @foreach(\App\Models\PenilaianTim::TEAMS as $timKey => $timLabel)
-                            <th class="px-4 py-3 text-center border-r border-border">{{ str_replace('Tim Pembinaan ', '', $timLabel) }}</th>
+                            <th class="px-4 py-3 text-center border-r border-border">{{ str_replace('Tim Pembinaan ', '', $timLabel) }}<br><span class="text-[10px] text-primary lowercase font-normal">({{ $bobot->{'bobot_' . $timKey} }}%)</span></th>
                         @endforeach
-                        <th class="px-4 py-3 text-center border-r border-border">Rata2 Tim</th>
                         <th class="px-4 py-3 text-center border-r border-border bg-primary/5">Nilai Akhir</th>
                         <th class="px-4 py-3 text-center border-r border-border">Predikat</th>
                         <th class="px-4 py-3 text-center border-r border-border">Status</th>
@@ -214,13 +221,6 @@
                                 @endif
                             </td>
                         @endforeach
-                        <td class="px-4 py-3 text-center border-r border-border font-medium">
-                            @if($avgTim !== null)
-                                <span class="font-bold text-teal-600">{{ number_format($avgTim, 1) }}</span>
-                            @else
-                                <span class="text-text-secondary opacity-40">-</span>
-                            @endif
-                        </td>
                         <td class="px-4 py-3 text-center border-r border-border bg-primary/5 font-bold text-primary text-sm">
                             {{ number_format($r->nilai_akhir, 1) }}
                         </td>
@@ -270,9 +270,8 @@
             </p>
 
             <div class="space-y-3">
-                <div class="flex items-center justify-between gap-4">
-                    <label class="text-xs font-medium text-text-primary">Bobot Pretest (%)</label>
-                    <input type="number" step="1" min="0" max="100" name="bobot_pretest" id="b_pretest" value="{{ $bobot->bobot_pretest }}" class="w-24 px-3 py-1.5 rounded-lg border border-border bg-[var(--card)] text-text-primary text-right font-bold text-sm" required>
+                <div class="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-purple-300 text-xs">
+                    Pre-test dan post-test berdiri sendiri serta tidak masuk perhitungan Nilai Akhir.
                 </div>
                 @if($hasQuiz)
                 <div class="flex items-center justify-between gap-4">
@@ -289,10 +288,12 @@
                     <label class="text-xs font-medium text-text-primary">Bobot Tugas / Kasus (%)</label>
                     <input type="number" step="1" min="0" max="100" name="bobot_tugas" id="b_tugas" value="{{ $bobot->bobot_tugas }}" class="w-24 px-3 py-1.5 rounded-lg border border-border bg-[var(--card)] text-text-primary text-right font-bold text-sm" required>
                 </div>
+                @foreach(\App\Models\PenilaianTim::TEAMS as $timKey => $timLabel)
                 <div class="flex items-center justify-between gap-4">
-                    <label class="text-xs font-medium text-text-primary">Bobot Posttest / Ujian (%)</label>
-                    <input type="number" step="1" min="0" max="100" name="bobot_posttest" id="b_posttest" value="{{ $bobot->bobot_posttest }}" class="w-24 px-3 py-1.5 rounded-lg border border-border bg-[var(--card)] text-text-primary text-right font-bold text-sm" required>
+                    <label class="text-xs font-medium text-text-primary">Bobot {{ $timLabel }} (%)</label>
+                    <input type="number" step="1" min="0" max="100" name="bobot_{{ $timKey }}" id="b_{{ $timKey }}" value="{{ $bobot->{'bobot_' . $timKey} }}" class="bobot-final w-24 px-3 py-1.5 rounded-lg border border-border bg-[var(--card)] text-text-primary text-right font-bold text-sm" required>
                 </div>
+                @endforeach
 
                 <div class="pt-2 border-t border-border flex items-center justify-between">
                     <span class="text-xs font-bold text-text-primary">Total Bobot:</span>
@@ -317,11 +318,11 @@
 
 <script>
     function calculateTotal() {
-        const p = parseFloat(document.getElementById('b_pretest')?.value) || 0;
         const q = parseFloat(document.getElementById('b_quiz')?.value) || 0;
         const t = parseFloat(document.getElementById('b_tugas')?.value) || 0;
-        const pt = parseFloat(document.getElementById('b_posttest')?.value) || 0;
-        const total = p + q + t + pt;
+        const teamTotal = Array.from(document.querySelectorAll('.bobot-final'))
+            .reduce((sum, input) => sum + (parseFloat(input.value) || 0), 0);
+        const total = q + t + teamTotal;
 
         const label = document.getElementById('totalBobotLabel');
         if (label) {
@@ -336,7 +337,7 @@
         }
     }
 
-    ['b_pretest', 'b_quiz', 'b_tugas', 'b_posttest'].forEach(id => {
+    ['b_quiz', 'b_tugas', 'b_mental', 'b_fisik', 'b_akhlak', 'b_kompetensi'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('input', calculateTotal);

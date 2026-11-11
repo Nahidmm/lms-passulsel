@@ -42,4 +42,23 @@ class SesiEvaluasi extends Model
         }
         return max(0, now()->diffInSeconds($batas, false));
     }
+
+    public function getPauseCountAttribute(): int
+    {
+        $data = $this->jawaban_tersimpan;
+        if (is_array($data) && isset($data['_pause_count'])) {
+            return (int) $data['_pause_count'];
+        }
+        return 0;
+    }
+
+    public function incrementPauseCount(): int
+    {
+        $data = is_array($this->jawaban_tersimpan) ? $this->jawaban_tersimpan : [];
+        $current = isset($data['_pause_count']) ? (int) $data['_pause_count'] : 0;
+        $data['_pause_count'] = $current + 1;
+        $this->jawaban_tersimpan = $data;
+        $this->save();
+        return $data['_pause_count'];
+    }
 }

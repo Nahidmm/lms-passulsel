@@ -10,6 +10,13 @@
     $isPaused = ($sesi->id !== 'preview') ? (bool)($sesi->is_paused ?? false) : false;
     $sisaDetik = isset($sesi->sisaWaktu) ? (int)$sesi->sisaWaktu : (($materi->durasi_menit ?? 0) * 60);
     if ($sisaDetik <= 0 && ($materi->durasi_menit ?? 0) > 0) $sisaDetik = $materi->durasi_menit * 60;
+
+    // Custom pause configuration
+    $maxPause = $materi->max_pause_count ?? 2;
+    $pauseMinutes = $materi->max_pause_minutes ?? 5;
+    $currentPauseCount = ($sesi->id !== 'preview') ? ($sesi->pause_count ?? 0) : 0;
+    $canPause = ($maxPause === -1) || ($currentPauseCount < $maxPause);
+    $sisaJedaText = ($maxPause === -1) ? 'Bebas' : max(0, $maxPause - $currentPauseCount) . 'x';
 @endphp
 
 @push('styles')
@@ -152,11 +159,14 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
-            <button type="button" onclick="triggerPause()" id="top-btn-pause-test"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/50 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-bold transition-all shadow-2xs">
-                <i data-lucide="pause-circle" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
-                <span>Jeda Ujian (Pause)</span>
-            </button>
+            @if($maxPause !== 0)
+                <button type="button" onclick="triggerPause()" id="top-btn-pause-test"
+                    @if(!$canPause) disabled title="Batas maksimal jeda telah habis" @endif
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-2xs {{ $canPause ? 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/50 border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 cursor-pointer' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed opacity-60' }}">
+                    <i data-lucide="pause-circle" class="w-4 h-4 {{ $canPause ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400' }}"></i>
+                    <span id="top-pause-btn-text">Jeda Ujian ({{ $canPause ? 'Sisa ' . $sisaJedaText : 'Habis' }})</span>
+                </button>
+            @endif
 
             @if($sesi->id === 'preview')
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-semibold">
@@ -494,12 +504,15 @@
                         </div>
                     @endif
 
-                    {{-- Dedicated Pause Button in Sidebar --}}
-                    <button type="button" onclick="triggerPause()" id="side-btn-pause-test"
-                        class="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/50 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-bold transition-all shadow-2xs">
-                        <i data-lucide="pause-circle" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
-                        <span>Jeda Ujian (Pause)</span>
-                    </button>
+                    @if($maxPause !== 0)
+                        {{-- Dedicated Pause Button in Sidebar --}}
+                        <button type="button" onclick="triggerPause()" id="side-btn-pause-test"
+                            @if(!$canPause) disabled title="Batas maksimal jeda telah habis" @endif
+                            class="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition-all shadow-2xs {{ $canPause ? 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/50 border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 cursor-pointer' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed opacity-60' }}">
+                            <i data-lucide="pause-circle" class="w-4 h-4 {{ $canPause ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400' }}"></i>
+                            <span id="side-pause-btn-text">Jeda Ujian ({{ $canPause ? 'Sisa ' . $sisaJedaText : 'Habis' }})</span>
+                        </button>
+                    @endif
 
                     {{-- Question Tiles Grid (Moodle Style) --}}
                     <div>
@@ -574,12 +587,20 @@
                 </p>
             </div>
 
-            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-[var(--text-secondary)] space-y-1">
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-[var(--text-secondary)] space-y-2">
                 <div class="flex items-center justify-between font-semibold">
                     <span>Waktu tersisa saat dijeda:</span>
                     <span id="pause-modal-timer" class="font-mono text-sm font-extrabold text-blue-600 dark:text-blue-400">{{ gmdate('i:s', $sisaDetik) }}</span>
                 </div>
-                <div class="text-[11px] text-slate-400">
+                @if($pauseMinutes > 0)
+                    <div class="flex items-center justify-between font-medium text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-2 rounded-lg border border-amber-200 dark:border-amber-900/60">
+                        <span class="flex items-center gap-1.5">
+                            <i data-lucide="clock" class="w-3.5 h-3.5"></i> Jeda otomatis selesai:
+                        </span>
+                        <span id="pause-auto-resume-timer" class="font-mono font-bold text-xs">{{ sprintf('%02d:00', $pauseMinutes) }}</span>
+                    </div>
+                @endif
+                <div class="text-[11px] text-slate-400 text-left">
                     Klik tombol di bawah untuk melanjutkan pengerjaan ujian.
                 </div>
             </div>
@@ -1202,9 +1223,46 @@
         }
     }
 
+    // State Variables for Custom Pause
+    let maxPauseLimit = {{ (int) $maxPause }};
+    let currentPauseCount = {{ (int) $currentPauseCount }};
+    let pauseDurationLimitSec = {{ (int) $pauseMinutes * 60 }};
+    let pauseAutoResumeInterval = null;
+    let pauseRemainingSec = pauseDurationLimitSec;
+
+    function updatePauseButtons(sisaKuota) {
+        const topBtn = document.getElementById('top-btn-pause-test');
+        const sideBtn = document.getElementById('side-btn-pause-test');
+        const topText = document.getElementById('top-pause-btn-text');
+        const sideText = document.getElementById('side-pause-btn-text');
+
+        const label = (maxPauseLimit === -1) ? 'Jeda Ujian (Bebas)' : (sisaKuota > 0 ? `Jeda Ujian (Sisa ${sisaKuota}x)` : 'Batas Jeda Habis (0x)');
+        if (topText) topText.textContent = label;
+        if (sideText) sideText.textContent = label;
+
+        const disabled = maxPauseLimit > 0 && sisaKuota <= 0;
+        [topBtn, sideBtn].forEach(btn => {
+            if (!btn) return;
+            btn.disabled = disabled;
+            if (disabled) {
+                btn.className = btn.className.replace(/bg-amber-50[^\s]*/g, 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed opacity-60');
+            }
+        });
+    }
+
     // ── Pause and Resume Handlers ──
     async function triggerPause() {
         if (isTestPaused) return;
+
+        if (maxPauseLimit === 0) {
+            alert('Fitur jeda dinonaktifkan untuk ujian ini.');
+            return;
+        }
+
+        if (maxPauseLimit > 0 && currentPauseCount >= maxPauseLimit) {
+            alert('Batas maksimal jeda untuk ujian ini telah habis.');
+            return;
+        }
 
         // 1. Auto-save answers immediately to localStorage
         saveAnswersToStorage();
@@ -1219,15 +1277,34 @@
         const pTimer = document.getElementById('pause-modal-timer');
         if (pTimer) pTimer.textContent = formatted;
 
-        // 4. Show fullscreen anti-peek overlay
+        // 4. Start auto-resume countdown if duration is configured
+        if (pauseDurationLimitSec > 0) {
+            pauseRemainingSec = pauseDurationLimitSec;
+            if (pauseAutoResumeInterval) clearInterval(pauseAutoResumeInterval);
+            const autoTimerEl = document.getElementById('pause-auto-resume-timer');
+            pauseAutoResumeInterval = setInterval(() => {
+                pauseRemainingSec--;
+                if (autoTimerEl) {
+                    const am = Math.floor(pauseRemainingSec / 60);
+                    const as = pauseRemainingSec % 60;
+                    autoTimerEl.textContent = (am < 10 ? '0' + am : am) + ':' + (as < 10 ? '0' + as : as);
+                }
+                if (pauseRemainingSec <= 0) {
+                    clearInterval(pauseAutoResumeInterval);
+                    triggerResume();
+                }
+            }, 1000);
+        }
+
+        // 5. Show fullscreen anti-peek overlay
         const overlay = document.getElementById('pause-overlay');
         if (overlay) overlay.classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
 
-        // 5. Notify server with latest answers (if not preview)
+        // 6. Notify server with latest answers (if not preview)
         @if($sesi->id !== 'preview')
             try {
-                await fetch("{{ route('peserta.evaluasi.pause', $sesi->id) }}", {
+                const res = await fetch("{{ route('peserta.evaluasi.pause', $sesi->id) }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1237,13 +1314,26 @@
                         jawaban: getFormattedAnswers()
                     })
                 });
+                const data = await res.json();
+                if (data && data.sisa_kuota !== undefined) {
+                    currentPauseCount = data.pause_count;
+                    updatePauseButtons(data.sisa_kuota);
+                }
             } catch (err) {
                 console.error('Gagal mengirim status pause ke server:', err);
             }
+        @else
+            currentPauseCount++;
+            updatePauseButtons(maxPauseLimit > 0 ? Math.max(0, maxPauseLimit - currentPauseCount) : null);
         @endif
     }
 
     async function triggerResume() {
+        if (pauseAutoResumeInterval) {
+            clearInterval(pauseAutoResumeInterval);
+            pauseAutoResumeInterval = null;
+        }
+
         const btn = document.getElementById('btn-resume-test');
         if (btn) {
             btn.disabled = true;

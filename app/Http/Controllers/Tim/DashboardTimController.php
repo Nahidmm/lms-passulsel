@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Tim;
 
 use App\Http\Controllers\Controller;
 use App\Models\PenilaianTim;
+use App\Models\Pelatihan;
 use App\Models\User;
+use App\Services\NilaiService;
 use Illuminate\Http\Request;
 
 class DashboardTimController extends Controller
@@ -12,8 +14,6 @@ class DashboardTimController extends Controller
     public function dashboard(Request $request)
     {
         $tim = auth()->user();
-        $pekan = max(1, (int) $request->get('pekan', 1));
-
         $pesertas = User::where('role', 'peserta')
             ->where('status_akun', 'approved')
             ->orderBy('nama')
@@ -34,11 +34,11 @@ class DashboardTimController extends Controller
         }
 
         $penilaian = PenilaianTim::where('tim', $tim->tim)
-            ->where('pekan', $pekan)
+            ->where('pekan', 1)
             ->get()
             ->keyBy('user_id');
 
-        return view('tim.dashboard', compact('tim', 'pesertas', 'pekan', 'penilaian'));
+        return view('tim.dashboard', compact('tim', 'pesertas', 'penilaian'));
     }
 
     public function storePenilaian(Request $request)
@@ -46,7 +46,6 @@ class DashboardTimController extends Controller
         $tim = auth()->user();
 
         $validated = $request->validate([
-            'pekan' => 'required|integer|min:1',
             'nilai' => 'required|array',
             'nilai.*' => 'nullable|numeric|min:0|max:100',
             'catatan' => 'nullable|array',
@@ -59,15 +58,19 @@ class DashboardTimController extends Controller
             }
 
             PenilaianTim::updateOrCreate(
-                ['tim' => $tim->tim, 'user_id' => $userId, 'pekan' => $validated['pekan']],
+                ['tim' => $tim->tim, 'user_id' => $userId, 'pekan' => 1],
                 [
                     'nilai' => $nilai,
                     'catatan' => $validated['catatan'][$userId] ?? null,
                     'dinilai_oleh' => $tim->id,
                 ]
             );
+
+            foreach (Pelatihan::pluck('id') as $pelatihanId) {
+                NilaiService::recalculate((int) $userId, (int) $pelatihanId);
+            }
         }
 
-        return back()->with('success', 'Penilaian pekan berhasil disimpan.');
+        return back()->with('success', 'Penilaian akhir Tim Pembinaan berhasil disimpan dan gradebook telah diperbarui.');
     }
 }

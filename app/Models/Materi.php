@@ -45,4 +45,40 @@ class Materi extends Model
     {
         return $this->file_path ? asset('storage/' . $this->file_path) : $this->url_link;
     }
+
+    public function getPauseConfigAttribute(): array
+    {
+        $default = ['max_pause' => 2, 'pause_minutes' => 5];
+        if (!empty($this->theme_name) && str_starts_with($this->theme_name, '{')) {
+            $decoded = json_decode($this->theme_name, true);
+            if (is_array($decoded) && isset($decoded['pause'])) {
+                return array_merge($default, $decoded['pause']);
+            }
+        }
+        return $default;
+    }
+
+    public function getMaxPauseCountAttribute(): int
+    {
+        return (int) ($this->pause_config['max_pause'] ?? 2);
+    }
+
+    public function getMaxPauseMinutesAttribute(): int
+    {
+        return (int) ($this->pause_config['pause_minutes'] ?? 5);
+    }
+
+    public function updatePauseConfig(int $maxPause, int $pauseMinutes): void
+    {
+        $current = [];
+        if (!empty($this->theme_name) && str_starts_with($this->theme_name, '{')) {
+            $current = json_decode($this->theme_name, true) ?: [];
+        }
+        $current['pause'] = [
+            'max_pause' => $maxPause,
+            'pause_minutes' => $pauseMinutes,
+        ];
+        $this->theme_name = json_encode($current);
+        $this->save();
+    }
 }

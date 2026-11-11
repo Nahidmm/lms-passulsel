@@ -164,6 +164,43 @@
                 <input type="number" name="durasi_menit" value="{{ $pretest->durasi_menit }}" class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none" min="0">
                 <p class="text-[11px] text-[var(--text-muted)] mt-1">Ketik 0 jika asesmen pretest tidak memiliki batasan waktu.</p>
             </div>
+
+            {{-- Konfigurasi Jeda Ujian (Pause) --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20">
+                <div>
+                    <label class="block text-xs font-bold text-amber-900 dark:text-amber-200 mb-1 flex items-center gap-1.5">
+                        <i data-lucide="pause-circle" class="w-4 h-4 text-amber-600"></i>
+                        Batas Maksimal Jeda (Pause)
+                    </label>
+                    @php $currentMaxPause = $pretest->max_pause_count; @endphp
+                    <select name="max_pause_count" class="w-full px-3 py-2 text-xs rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-slate-900 text-[var(--text-primary)] focus:ring-1 focus:ring-amber-500 outline-none">
+                        <option value="0" {{ $currentMaxPause === 0 ? 'selected' : '' }}>0 - Nonaktifkan Jeda (Tidak Boleh)</option>
+                        <option value="1" {{ $currentMaxPause === 1 ? 'selected' : '' }}>1 Kali Jeda</option>
+                        <option value="2" {{ $currentMaxPause === 2 ? 'selected' : '' }}>2 Kali Jeda (Rekomendasi)</option>
+                        <option value="3" {{ $currentMaxPause === 3 ? 'selected' : '' }}>3 Kali Jeda</option>
+                        <option value="5" {{ $currentMaxPause === 5 ? 'selected' : '' }}>5 Kali Jeda</option>
+                        <option value="-1" {{ $currentMaxPause === -1 ? 'selected' : '' }}>Tanpa Batas (Bebas)</option>
+                    </select>
+                    <p class="text-[11px] text-amber-700/80 dark:text-amber-300/70 mt-1">Berapa kali peserta boleh menekan tombol jeda.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-amber-900 dark:text-amber-200 mb-1 flex items-center gap-1.5">
+                        <i data-lucide="timer" class="w-4 h-4 text-amber-600"></i>
+                        Batas Waktu Tiap Jeda (Menit)
+                    </label>
+                    @php $currentPauseMin = $pretest->max_pause_minutes; @endphp
+                    <select name="max_pause_minutes" class="w-full px-3 py-2 text-xs rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-slate-900 text-[var(--text-primary)] focus:ring-1 focus:ring-amber-500 outline-none">
+                        <option value="3" {{ $currentPauseMin === 3 ? 'selected' : '' }}>3 Menit</option>
+                        <option value="5" {{ $currentPauseMin === 5 ? 'selected' : '' }}>5 Menit (Rekomendasi)</option>
+                        <option value="10" {{ $currentPauseMin === 10 ? 'selected' : '' }}>10 Menit</option>
+                        <option value="15" {{ $currentPauseMin === 15 ? 'selected' : '' }}>15 Menit</option>
+                        <option value="0" {{ $currentPauseMin === 0 ? 'selected' : '' }}>Tanpa Batas Durasi</option>
+                    </select>
+                    <p class="text-[11px] text-amber-700/80 dark:text-amber-300/70 mt-1">Ujian otomatis berlanjut jika waktu jeda habis.</p>
+                </div>
+            </div>
+
             <div class="p-3.5 rounded-xl border border-[var(--border)] bg-slate-50/50 dark:bg-slate-900/50 flex items-center gap-3">
                 <input type="checkbox" name="is_active" id="is_active_pretest" value="1" {{ $pretest->is_active ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 rounded border-[var(--border)] focus:ring-indigo-500">
                 <div>
