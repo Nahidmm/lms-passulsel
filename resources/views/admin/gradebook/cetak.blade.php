@@ -312,9 +312,10 @@
             @php
                 $totalPeserta = count($reportData);
                 $totalCerts = collect($reportData)->sum('totalCerts');
-                $avgScores = collect($reportData)->pluck('avgScore')->filter(fn($v) => $v > 0);
+                $avgScores = collect($reportData)
+                    ->filter(fn($row) => $row['totalEnrolled'] > 0)
+                    ->pluck('globalSummary.nilai_akhir');
                 $rataGlobal = $avgScores->isNotEmpty() ? $avgScores->avg() : 0;
-                $maxNilai = $avgScores->isNotEmpty() ? $avgScores->max() : 0;
             @endphp
 
             <div class="stats-grid">
@@ -327,7 +328,7 @@
                     <div class="stat-value">{{ $allPelatihans->count() }}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Rata-rata Nilai Komposit</div>
+                    <div class="stat-label">Rata-rata Nilai Akhir Global</div>
                     <div class="stat-value">{{ $rataGlobal > 0 ? number_format($rataGlobal, 1) : '-' }}</div>
                 </div>
                 <div class="stat-item">
@@ -341,40 +342,54 @@
                     <tr>
                         <th style="width: 35px;">No</th>
                         <th>Nama Peserta</th>
-                        <th style="width: 120px;">NIP</th>
-                        <th>Unit Kerja</th>
-                        <th style="width: 90px;">Pelatihan Lulus</th>
-                        <th style="width: 80px;">Rata-rata Nilai</th>
-                        <th style="width: 90px;">Predikat</th>
-                        <th style="width: 80px;">Sertifikat</th>
+                        <th style="width: 90px;">NIP</th>
+                        <th>Nilai Mentah Seluruh Course</th>
+                        <th>Komponen Berbobot</th>
+                        <th style="width: 55px;">Nilai Akhir</th>
+                        <th style="width: 65px;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($reportData as $idx => $item)
                         @php
                             $u = $item['user'];
-                            $avg = $item['avgScore'];
-                            $predikat = match(true) {
-                                $avg >= 85 => 'Sangat Baik',
-                                $avg >= 70 => 'Baik',
-                                $avg >= 55 => 'Cukup',
-                                $avg > 0   => 'Kurang',
-                                default    => 'Belum Ada',
-                            };
+                            $summary = $item['globalSummary'];
+                            $componentLabels = [
+                                'quiz' => 'Kuis', 'tugas' => 'Tugas', 'mental' => 'Mental',
+                                'fisik' => 'Fisik', 'akhlak' => 'Akhlak', 'kompetensi' => 'Kompetensi',
+                            ];
                         @endphp
                         <tr>
                             <td class="text-center">{{ $idx + 1 }}</td>
-                            <td><strong>{{ $u->nama }}</strong></td>
+                            <td><strong>{{ $u->nama }}</strong><br><small>{{ $u->unitKerja->nama ?? $u->unitKerja->nama_unit ?? '-' }}</small></td>
                             <td class="text-center">{{ $u->nip }}</td>
-                            <td>{{ $u->unitKerja->nama ?? '-' }}</td>
-                            <td class="text-center font-bold">{{ $item['totalCompleted'] }} / {{ $item['totalEnrolled'] }}</td>
-                            <td class="text-center font-bold">{{ $avg > 0 ? number_format($avg, 1) : '-' }}</td>
-                            <td class="text-center">{{ $predikat }}</td>
-                            <td class="text-center">{{ $item['totalCerts'] > 0 ? $item['totalCerts'] . ' Terbit' : '-' }}</td>
+                            <td>
+                                @forelse(collect($item['courseScores'])->where('enrolled', true) as $course)
+                                    <strong>{{ $course['pelatihan']->judul }}</strong>:
+                                    @forelse($course['items'] as $gradeItem)
+                                        {{ $gradeItem['label'] }}={{ $gradeItem['score'] !== null ? number_format($gradeItem['score'], 1) : '-' }}{{ !$loop->last ? ';' : '' }}
+                                    @empty - @endforelse
+                                    <br>
+                                @empty
+                                    Belum mengikuti course.
+                                @endforelse
+                            </td>
+                            <td>
+                                @foreach($componentLabels as $key => $label)
+                                    {{ $label }}: {{ ($summary['scores'][$key] ?? null) !== null ? number_format($summary['scores'][$key], 1) : '-' }}
+                                    × {{ number_format($summary['effective_weights'][$key] ?? 0, 1) }}%
+                                    = {{ number_format($summary['contributions'][$key] ?? 0, 1) }}{{ !$loop->last ? ';' : '' }}
+                                @endforeach
+                            </td>
+                            <td class="text-center font-bold">{{ number_format($summary['nilai_akhir'], 1) }}<br>{{ $summary['predikat'] }}</td>
+                            <td class="text-center font-bold">
+                                {{ strtoupper(str_replace('_', ' ', $summary['status_kelulusan'])) }}<br>
+                                <small>{{ $summary['item_selesai'] }}/{{ $summary['total_item'] }} item</small>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center" style="padding: 20px;">Tidak ada data peserta ditemukan.</td>
+                            <td colspan="7" class="text-center" style="padding: 20px;">Tidak ada data peserta ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>

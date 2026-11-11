@@ -193,6 +193,19 @@
                         <td class="px-4 py-3 text-center border-r border-border font-medium">
                             @if($r->nilai_quiz !== null)
                                 <span class="font-bold text-indigo-600" title="{{ count($item['quizDetails']) }} kuis">{{ number_format($r->nilai_quiz, 1) }}</span>
+                                @if(!empty($item['quizDetails']))
+                                    <details class="mt-1 text-left">
+                                        <summary class="cursor-pointer text-[9px] text-primary">lihat semua nilai</summary>
+                                        <div class="mt-1 min-w-[180px] space-y-1 rounded border border-border bg-[var(--card)] p-2 shadow-sm">
+                                            @foreach($item['quizDetails'] as $quiz)
+                                                <div class="flex items-center justify-between gap-2 text-[9px]">
+                                                    <span class="max-w-[135px] truncate text-text-secondary">{{ $quiz['judul'] }}</span>
+                                                    <strong>{{ $quiz['skor'] ?? '-' }}</strong>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </details>
+                                @endif
                             @else
                                 <span class="text-text-secondary opacity-40">-</span>
                             @endif
@@ -201,6 +214,19 @@
                         <td class="px-4 py-3 text-center border-r border-border font-medium">
                             @if($r->nilai_tugas !== null)
                                 <span class="font-bold text-amber-600">{{ number_format($r->nilai_tugas, 1) }}</span>
+                                @if(!empty($item['tugasDetails']))
+                                    <details class="mt-1 text-left">
+                                        <summary class="cursor-pointer text-[9px] text-primary">lihat semua nilai</summary>
+                                        <div class="mt-1 min-w-[180px] space-y-1 rounded border border-border bg-[var(--card)] p-2 shadow-sm">
+                                            @foreach($item['tugasDetails'] as $tugas)
+                                                <div class="flex items-center justify-between gap-2 text-[9px]">
+                                                    <span class="max-w-[135px] truncate text-text-secondary">{{ $tugas['judul'] }}</span>
+                                                    <strong>{{ $tugas['nilai'] ?? '-' }}</strong>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </details>
+                                @endif
                             @else
                                 <span class="text-text-secondary opacity-40">-</span>
                             @endif

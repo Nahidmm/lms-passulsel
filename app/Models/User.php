@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -12,7 +13,7 @@ class User extends Authenticatable
     protected $fillable = [
         'nip', 'nama', 'email', 'golongan', 'jabatan_id', 'role',
         'status_akun', 'password', 'avatar', 'force_change_password', 'has_taken_pretest',
-        'pretest_exempt', 'unit_kerja_id', 'alamat', 'no_hp', 'tim', 'anggota_tim'
+        'pretest_exempt', 'unit_kerja_id', 'alamat', 'no_hp', 'tim', 'anggota_tim',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -22,7 +23,6 @@ class User extends Authenticatable
         'force_change_password' => 'boolean',
         'pretest_exempt' => 'boolean',
     ];
-
 
     public function jabatan()
     {
@@ -69,6 +69,11 @@ class User extends Authenticatable
         return $this->hasMany(RekapNilai::class);
     }
 
+    public function rekapNilaiGlobal()
+    {
+        return $this->hasOne(RekapNilaiGlobal::class);
+    }
+
     public function sertifikats()
     {
         return $this->hasMany(Sertifikat::class);
@@ -83,7 +88,7 @@ class User extends Authenticatable
     {
         return $this->progresPelatihans()
             ->where('status', 'aktif')
-            ->whereHas('pelatihan', fn($q) => $q->where('is_active', true))
+            ->whereHas('pelatihan', fn ($q) => $q->where('is_active', true))
             ->first();
     }
 
@@ -110,7 +115,7 @@ class User extends Authenticatable
      * Other users get permissions from their base role's default Role record
      * plus any custom roles assigned to them.
      */
-    public function allPermissions(): \Illuminate\Support\Collection
+    public function allPermissions(): Collection
     {
         if ($this->isSuperadmin()) {
             return Permission::all();
@@ -121,7 +126,7 @@ class User extends Authenticatable
         $basePermissions = $baseRole ? $baseRole->permissions : collect();
 
         // Collect permissions from custom roles
-        $customPermissions = $this->customRoles->flatMap(fn($role) => $role->permissions);
+        $customPermissions = $this->customRoles->flatMap(fn ($role) => $role->permissions);
 
         return $basePermissions->merge($customPermissions)->unique('id');
     }
@@ -134,17 +139,37 @@ class User extends Authenticatable
         if ($this->isSuperadmin()) {
             return true;
         }
+
         return $this->allPermissions()->contains('kode', $kode);
     }
 
     // ==========================================
     // Role Helpers
     // ==========================================
-    public function isSuperadmin(): bool { return $this->role === 'superadmin'; }
-    public function isAdmin(): bool { return in_array($this->role, ['admin', 'superadmin']); }
-    public function isPeserta(): bool { return $this->role === 'peserta'; }
-    public function isTim(): bool { return $this->role === 'tim'; }
-    public function isApproved(): bool { return $this->status_akun === 'approved'; }
+    public function isSuperadmin(): bool
+    {
+        return $this->role === 'superadmin';
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'superadmin']);
+    }
+
+    public function isPeserta(): bool
+    {
+        return $this->role === 'peserta';
+    }
+
+    public function isTim(): bool
+    {
+        return $this->role === 'tim';
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status_akun === 'approved';
+    }
 
     public function hasActiveSesiEvaluasi(): bool
     {
@@ -164,30 +189,35 @@ class User extends Authenticatable
     public function getRataRataSkor(): float
     {
         $avg = $this->sesiEvaluasi()->where('status', 'selesai')->avg('skor');
+
         return round($avg ?? 0, 1);
     }
 
     public function getProgresKeseluruhan(): int
     {
-        $total = \App\Models\Materi::where('is_active', true)->count();
-        if ($total === 0) return 0;
+        $total = Materi::where('is_active', true)->count();
+        if ($total === 0) {
+            return 0;
+        }
         $selesai = $this->getMateriSelesaiCount();
+
         return (int) round(($selesai / $total) * 100);
     }
 
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            return asset('storage/'.$this->avatar);
         }
         $initials = strtoupper(substr($this->nama, 0, 2));
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->nama) . '&background=003366&color=C5A02E&bold=true&size=80';
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->nama).'&background=003366&color=C5A02E&bold=true&size=80';
     }
 
     // ==========================================
     // Gamifikasi: Scoring & Badge
     // ==========================================
-    
+
     public function getTotalPoin(): int
     {
         // Avoid N+1 issues when called on collections by checking if total_poin attribute is already calculated via DB Query
@@ -196,24 +226,24 @@ class User extends Authenticatable
         }
 
         // Poin dari MEMBACA materi (non-quiz saja, agar tidak double-count dengan xp_earned kuis)
-        $completedNonQuizIds = \App\Models\ProgresMateri::where('user_id', $this->id)
+        $completedNonQuizIds = ProgresMateri::where('user_id', $this->id)
             ->where('status', 'selesai')
             ->get('materi_id')
             ->pluck('materi_id')
             ->unique();
 
-        $poinMateri = \App\Models\Materi::whereIn('id', $completedNonQuizIds)
+        $poinMateri = Materi::whereIn('id', $completedNonQuizIds)
             ->where('jenis', '!=', 'quiz')
             ->sum('poin');
 
         // Poin dari KUIS: hanya ambil xp_earned terbaik per kuis (dihitung saat submit)
-        $poinEvaluasi = \App\Models\SesiEvaluasi::where('user_id', $this->id)
+        $poinEvaluasi = SesiEvaluasi::where('user_id', $this->id)
             ->where('status', 'selesai')
             ->groupBy('materi_id')
             ->selectRaw('MAX(xp_earned) as max_xp')
             ->get()
             ->sum('max_xp');
-        
+
         return (int) $poinMateri + (int) $poinEvaluasi;
     }
 
@@ -223,9 +253,16 @@ class User extends Authenticatable
     public function getBadgeAttribute(): string
     {
         $poin = $this->getTotalPoin();
-        if ($poin > 1000) return 'Platinum / Expert';
-        if ($poin > 500) return 'Gold / Mahir';
-        if ($poin > 200) return 'Silver / Aktif';
+        if ($poin > 1000) {
+            return 'Platinum / Expert';
+        }
+        if ($poin > 500) {
+            return 'Gold / Mahir';
+        }
+        if ($poin > 200) {
+            return 'Silver / Aktif';
+        }
+
         return 'Bronze / Pemula';
     }
 
@@ -235,9 +272,16 @@ class User extends Authenticatable
     public function getBadgeColorAttribute(): string
     {
         $poin = $this->getTotalPoin();
-        if ($poin > 1000) return 'text-slate-800 bg-slate-200 border-slate-400'; // Platinum
-        if ($poin > 500) return 'text-yellow-700 bg-yellow-100 border-yellow-400'; // Gold
-        if ($poin > 200) return 'text-gray-600 bg-gray-100 border-gray-300'; // Silver
+        if ($poin > 1000) {
+            return 'text-slate-800 bg-slate-200 border-slate-400';
+        } // Platinum
+        if ($poin > 500) {
+            return 'text-yellow-700 bg-yellow-100 border-yellow-400';
+        } // Gold
+        if ($poin > 200) {
+            return 'text-gray-600 bg-gray-100 border-gray-300';
+        } // Silver
+
         return 'text-amber-800 bg-amber-100 border-amber-500'; // Bronze (Copper-ish)
     }
 
@@ -247,10 +291,16 @@ class User extends Authenticatable
     public function getBadgeIconAttribute(): string
     {
         $poin = $this->getTotalPoin();
-        if ($poin > 1000) return 'diamond'; // Platinum
-        if ($poin > 500) return 'award'; // Gold
-        if ($poin > 200) return 'medal'; // Silver
+        if ($poin > 1000) {
+            return 'diamond';
+        } // Platinum
+        if ($poin > 500) {
+            return 'award';
+        } // Gold
+        if ($poin > 200) {
+            return 'medal';
+        } // Silver
+
         return 'shield'; // Bronze
     }
 }
-

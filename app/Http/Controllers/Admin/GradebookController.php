@@ -4,23 +4,29 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BobotNilai;
+use App\Models\Materi;
 use App\Models\Pelatihan;
 use App\Models\RekapNilai;
+use App\Models\SertifikatSetting;
 use App\Models\SesiEvaluasi;
 use App\Models\TugasSubmission;
+use App\Models\UnitKerja;
 use App\Models\User;
+use App\Services\GlobalGradebookService;
 use App\Services\NilaiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class GradebookController extends Controller
 {
+    public function __construct(private readonly GlobalGradebookService $globalGradebookService) {}
+
     /**
      * Akses Global Gradebook dari Sidebar Admin — otomatis memilih kursus aktif atau pilihan admin.
      */
     public function globalIndex(Request $request)
     {
-        $pelatihanId = $request->get('pelatihan_id');
+        $pelatihanId = $request->get('pelatihan_id', 'all');
 
         if ($pelatihanId === 'all') {
             return $this->allCoursesIndex($request);
@@ -31,11 +37,11 @@ class GradebookController extends Controller
             $pelatihan = Pelatihan::find($pelatihanId);
         }
 
-        if (!$pelatihan) {
+        if (! $pelatihan) {
             $pelatihan = Pelatihan::where('is_active', true)->first() ?? Pelatihan::first();
         }
 
-        if (!$pelatihan) {
+        if (! $pelatihan) {
             return redirect()->route('admin.pelatihan.index')
                 ->with('warning', 'Belum ada data pelatihan/kursus. Silakan buat pelatihan terlebih dahulu.');
         }
@@ -48,63 +54,14 @@ class GradebookController extends Controller
      */
     public function allCoursesIndex(Request $request)
     {
-        $allPelatihans = Pelatihan::orderBy('judul')->get();
-        $unitKerjas = \App\Models\UnitKerja::orderBy('nama_unit')->get();
+        $unitKerjaId = $request->filled('unit_kerja_id') ? (int) $request->unit_kerja_id : null;
+        $report = $this->globalReportData($unitKerjaId);
+        $unitKerjas = UnitKerja::orderBy('nama_unit')->get();
 
-        $query = User::where('role', 'peserta')
-            ->where('status_akun', 'approved');
-
-        if ($request->filled('unit_kerja_id')) {
-            $query->where('unit_kerja_id', $request->unit_kerja_id);
-        }
-
-        $users = $query->with(['unitKerja', 'progresPelatihans.pelatihan', 'sertifikats.pelatihan'])->orderBy('nama')->get();
-
-        $allCoursesData = [];
-        foreach ($users as $user) {
-            $rekaps = RekapNilai::where('user_id', $user->id)->with('pelatihan')->get();
-            $progresList = $user->progresPelatihans;
-
-            $totalEnrolled = $progresList->count();
-            // Kelulusan / Selesai Pelatihan murni dari RekapNilai (status_kelulusan == 'lulus')
-            $totalCompleted = $rekaps->where('status_kelulusan', 'lulus')->count();
-
-            // Sertifikat hanya dihitung untuk pelatihan yang sertif_aktif == true
-            $totalCerts = $user->sertifikats->filter(function ($cert) {
-                return $cert->pelatihan && (bool) $cert->pelatihan->sertif_aktif;
-            })->count();
-
-            $enrolledIds = $progresList->pluck('pelatihan_id');
-            $enrolledRekaps = $rekaps->whereIn('pelatihan_id', $enrolledIds)->filter(fn($r) => $r->nilai_akhir !== null);
-            $avgScore = $enrolledRekaps->isNotEmpty() ? $enrolledRekaps->avg('nilai_akhir') : 0;
-
-            $courseScores = [];
-            foreach ($allPelatihans as $p) {
-                $r = $rekaps->firstWhere('pelatihan_id', $p->id);
-                $pp = $progresList->firstWhere('pelatihan_id', $p->id);
-                $courseScores[$p->id] = [
-                    'pelatihan' => $p,
-                    'enrolled' => $pp !== null,
-                    'completed' => $r && $r->status_kelulusan === 'lulus',
-                    'nilai_akhir' => $r ? $r->nilai_akhir : null,
-                    'status_kelulusan' => $r ? $r->status_kelulusan : null,
-                ];
-            }
-
-            $allCoursesData[] = [
-                'user' => $user,
-                'totalEnrolled' => $totalEnrolled,
-                'totalCompleted' => $totalCompleted,
-                'totalCerts' => $totalCerts,
-                'avgScore' => $avgScore,
-                'courseScores' => $courseScores,
-                'rekaps' => $rekaps,
-            ];
-        }
-
-        return view('admin.gradebook.all_courses', compact(
-            'allPelatihans', 'unitKerjas', 'allCoursesData', 'users'
-        ));
+        return view('admin.gradebook.all_courses', [
+            ...$report,
+            'unitKerjas' => $unitKerjas,
+        ]);
     }
 
     /**
@@ -117,13 +74,10 @@ class GradebookController extends Controller
 
         // Get users with their rekap_nilais
         $query = User::where('role', 'peserta')
-            ->where('status_akun', 'approved');
-
-        if ($request->boolean('enrolled_only')) {
-            $query->whereHas('progresPelatihans', function ($q) use ($pelatihan) {
+            ->where('status_akun', 'approved')
+            ->whereHas('progresPelatihans', function ($q) use ($pelatihan) {
                 $q->where('pelatihan_id', $pelatihan->id);
             });
-        }
 
         // Filter by unit kerja
         if ($request->filled('unit_kerja_id')) {
@@ -138,8 +92,11 @@ class GradebookController extends Controller
 
         // Identify posttest
         $posttestMateri = $materis->first(function ($m) {
-            if ($m->is_posttest) return true;
+            if ($m->is_posttest) {
+                return true;
+            }
             $judul = strtolower($m->judul ?? '');
+
             return str_contains($judul, 'posttest')
                 || str_contains($judul, 'post-test')
                 || str_contains($judul, 'ujian akhir')
@@ -148,9 +105,16 @@ class GradebookController extends Controller
 
         // Regular quizzes (excluding pretest and posttest)
         $regularQuizzes = $materis->filter(function ($m) use ($posttestMateri) {
-            if ($m->jenis !== 'quiz') return false;
-            if ($m->is_pretest) return false;
-            if ($posttestMateri && $m->id === $posttestMateri->id) return false;
+            if ($m->jenis !== 'quiz') {
+                return false;
+            }
+            if ($m->is_pretest) {
+                return false;
+            }
+            if ($posttestMateri && $m->id === $posttestMateri->id) {
+                return false;
+            }
+
             return true;
         });
 
@@ -202,7 +166,7 @@ class GradebookController extends Controller
             ];
         }
 
-        $unitKerjas = \App\Models\UnitKerja::orderBy('nama_unit')->get();
+        $unitKerjas = UnitKerja::orderBy('nama_unit')->get();
 
         return view('admin.gradebook.index', compact(
             'pelatihan', 'allPelatihans', 'bobot', 'gradebookData', 'materis', 'tugasList', 'unitKerjas', 'hasQuiz'
@@ -233,7 +197,7 @@ class GradebookController extends Controller
             + $validated['bobot_akhlak'] + $validated['bobot_kompetensi'];
 
         if (abs($total - 100) > 0.01) {
-            return back()->with('error', 'Total bobot harus tepat 100%. Saat ini: ' . $total . '%.');
+            return back()->with('error', 'Total bobot harus tepat 100%. Saat ini: '.$total.'%.');
         }
 
         BobotNilai::updateOrCreate(
@@ -242,12 +206,138 @@ class GradebookController extends Controller
         );
 
         // Recalculate for all users so the new weights are instantly reflected
-        $allPeserta = User::where('role', 'peserta')->where('status_akun', 'approved')->pluck('id');
+        $allPeserta = User::where('role', 'peserta')
+            ->where('status_akun', 'approved')
+            ->whereHas('progresPelatihans', fn ($query) => $query->where('pelatihan_id', $pelatihan->id))
+            ->pluck('id');
         foreach ($allPeserta as $uId) {
             NilaiService::recalculate($uId, $pelatihan->id);
         }
 
         return back()->with('success', 'Konfigurasi bobot nilai berhasil disimpan dan seluruh nilai akhir telah diperbarui.');
+    }
+
+    /**
+     * Update the one global weighting configuration used after all course items are collected.
+     */
+    public function updateGlobalBobot(Request $request)
+    {
+        $validated = $request->validate([
+            'bobot_quiz' => 'required|numeric|min:0|max:100',
+            'bobot_tugas' => 'required|numeric|min:0|max:100',
+            'bobot_mental' => 'required|numeric|min:0|max:100',
+            'bobot_fisik' => 'required|numeric|min:0|max:100',
+            'bobot_akhlak' => 'required|numeric|min:0|max:100',
+            'bobot_kompetensi' => 'required|numeric|min:0|max:100',
+            'passing_grade' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $total = collect($validated)->except('passing_grade')->sum();
+        if (abs($total - 100) > 0.01) {
+            return back()->with('error', "Total bobot Nilai Akhir harus tepat 100%. Saat ini: {$total}%.");
+        }
+
+        $this->globalGradebookService->updateSettings($validated);
+
+        User::query()
+            ->where('role', 'peserta')
+            ->where('status_akun', 'approved')
+            ->select('id')
+            ->chunkById(100, function ($users) {
+                foreach ($users as $user) {
+                    $this->globalGradebookService->recalculateUser($user->id);
+                }
+            });
+
+        return back()->with('success', 'Bobot Nilai Akhir global disimpan dan rekap seluruh peserta diperbarui.');
+    }
+
+    /**
+     * Export every raw grade item and the one global weighted final grade.
+     */
+    public function exportAllCourses(Request $request)
+    {
+        $unitKerjaId = $request->filled('unit_kerja_id') ? (int) $request->unit_kerja_id : null;
+        $report = $this->globalReportData($unitKerjaId);
+        $gradeColumns = [];
+
+        foreach ($report['allCoursesData'] as $row) {
+            foreach ($row['courseScores'] as $courseId => $course) {
+                foreach ($course['items'] as $item) {
+                    $columnKey = $courseId.':'.$item['key'];
+                    $gradeColumns[$columnKey] ??= [
+                        'course_id' => $courseId,
+                        'item_key' => $item['key'],
+                        'label' => $course['pelatihan']->judul.' - '.$item['label'],
+                    ];
+                }
+            }
+        }
+
+        $settings = $report['gradebookSettings'];
+        $filename = 'Gradebook_Seluruh_Course_'.date('Y-m-d').'.csv';
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($report, $gradeColumns, $settings) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            $header = ['No', 'NIP', 'Nama', 'Unit Kerja'];
+            foreach ($gradeColumns as $column) {
+                $header[] = $column['label'];
+            }
+            $header = array_merge($header, [
+                "Rata-rata Kuis ({$settings->bobot_quiz}%)",
+                "Rata-rata Tugas ({$settings->bobot_tugas}%)",
+                "Mental ({$settings->bobot_mental}%)",
+                "Fisik ({$settings->bobot_fisik}%)",
+                "Akhlak ({$settings->bobot_akhlak}%)",
+                "Kompetensi ({$settings->bobot_kompetensi}%)",
+                'Nilai Akhir', 'Predikat', 'Status', 'Item Selesai', 'Total Item',
+            ]);
+            fputcsv($file, $header);
+
+            foreach ($report['allCoursesData'] as $index => $row) {
+                $user = $row['user'];
+                $summary = $row['globalSummary'];
+                $values = [
+                    $index + 1,
+                    $user->nip,
+                    $user->nama,
+                    $user->unitKerja?->nama ?? $user->unitKerja?->nama_unit ?? '-',
+                ];
+
+                foreach ($gradeColumns as $column) {
+                    $course = $row['courseScores'][$column['course_id']] ?? null;
+                    $item = $course
+                        ? collect($course['items'])->firstWhere('key', $column['item_key'])
+                        : null;
+                    $values[] = $item && $item['score'] !== null ? $item['score'] : '';
+                }
+
+                $values = array_merge($values, [
+                    $summary['scores']['quiz'] ?? '',
+                    $summary['scores']['tugas'] ?? '',
+                    $summary['scores']['mental'] ?? '',
+                    $summary['scores']['fisik'] ?? '',
+                    $summary['scores']['akhlak'] ?? '',
+                    $summary['scores']['kompetensi'] ?? '',
+                    $summary['nilai_akhir'],
+                    $summary['predikat'],
+                    strtoupper(str_replace('_', ' ', $summary['status_kelulusan'])),
+                    $summary['item_selesai'],
+                    $summary['total_item'],
+                ]);
+                fputcsv($file, $values);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
@@ -257,16 +347,17 @@ class GradebookController extends Controller
     {
         $users = User::where('role', 'peserta')
             ->where('status_akun', 'approved')
+            ->whereHas('progresPelatihans', fn ($query) => $query->where('pelatihan_id', $pelatihan->id))
             ->with(['unitKerja'])
             ->orderBy('nama')
             ->get();
 
         $posttestMateri = $pelatihan->materis()->where('is_active', true)->where(function ($q) {
             $q->where('is_posttest', true)
-              ->orWhere('judul', 'LIKE', '%posttest%')
-              ->orWhere('judul', 'LIKE', '%post-test%')
-              ->orWhere('judul', 'LIKE', '%ujian akhir%')
-              ->orWhere('judul', 'LIKE', '%evaluasi akhir%');
+                ->orWhere('judul', 'LIKE', '%posttest%')
+                ->orWhere('judul', 'LIKE', '%post-test%')
+                ->orWhere('judul', 'LIKE', '%ujian akhir%')
+                ->orWhere('judul', 'LIKE', '%evaluasi akhir%');
         })->first();
 
         $quizQuery = $pelatihan->materis()
@@ -278,7 +369,7 @@ class GradebookController extends Controller
         }
         $hasQuiz = $quizQuery->exists();
 
-        $filename = 'Rekap_Nilai_' . str_replace(' ', '_', $pelatihan->judul) . '_' . date('Y-m-d') . '.csv';
+        $filename = 'Rekap_Nilai_'.str_replace(' ', '_', $pelatihan->judul).'_'.date('Y-m-d').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -288,7 +379,7 @@ class GradebookController extends Controller
         $callback = function () use ($users, $pelatihan, $hasQuiz) {
             $file = fopen('php://output', 'w');
             // BOM for Excel UTF-8
-            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
             $headerRow = ['No', 'NIP', 'Nama', 'Unit Kerja', 'Pretest'];
             if ($hasQuiz) {
@@ -296,7 +387,7 @@ class GradebookController extends Controller
             }
             $headerRow = array_merge($headerRow, [
                 'Tugas', 'Post-Test', 'Mental', 'Fisik', 'Akhlak', 'Kompetensi',
-                'Nilai Akhir', 'Predikat', 'Status'
+                'Nilai Akhir', 'Predikat', 'Status',
             ]);
 
             fputcsv($file, $headerRow);
@@ -307,7 +398,7 @@ class GradebookController extends Controller
                     ->where('pelatihan_id', $pelatihan->id)
                     ->first();
 
-                if (!$rekap) {
+                if (! $rekap) {
                     $rekap = NilaiService::recalculate($user->id, $pelatihan->id);
                 }
 
@@ -359,7 +450,7 @@ class GradebookController extends Controller
         $data = $this->pretestData();
         $pdf = Pdf::loadView('pdf.pretest', $data)->setPaper('a4', 'portrait');
 
-        return $pdf->download('Rekap-Hasil-Pretest-' . date('Y-m-d') . '.pdf');
+        return $pdf->download('Rekap-Hasil-Pretest-'.date('Y-m-d').'.pdf');
     }
 
     /**
@@ -367,7 +458,7 @@ class GradebookController extends Controller
      */
     private function pretestData(): array
     {
-        $pretest = \App\Models\Materi::where('is_pretest', true)->first();
+        $pretest = Materi::where('is_pretest', true)->first();
 
         $pesertas = User::where('role', 'peserta')
             ->where('status_akun', 'approved')
@@ -456,7 +547,7 @@ class GradebookController extends Controller
         $data = $this->pretestDetailData($user);
         $pdf = Pdf::loadView('pdf.pretest-detail', $data)->setPaper('a4', 'portrait');
 
-        return $pdf->download('Hasil-Pretest-' . $user->nip . '.pdf');
+        return $pdf->download('Hasil-Pretest-'.$user->nip.'.pdf');
     }
 
     /**
@@ -466,56 +557,24 @@ class GradebookController extends Controller
     {
         $pelatihanId = $request->get('pelatihan_id', 'all');
         $unitKerjaId = $request->get('unit_kerja_id');
-        $setting = \App\Models\SertifikatSetting::first();
+        $setting = SertifikatSetting::first();
 
         $unitKerjaFilter = null;
         if ($unitKerjaId) {
-            $unitKerjaFilter = \App\Models\UnitKerja::find($unitKerjaId);
+            $unitKerjaFilter = UnitKerja::find($unitKerjaId);
         }
 
         $allPelatihans = Pelatihan::orderBy('judul')->get();
 
         if ($pelatihanId === 'all') {
-            $query = User::where('role', 'peserta')
-                ->where('status_akun', 'approved');
-
-            if ($unitKerjaId) {
-                $query->where('unit_kerja_id', $unitKerjaId);
-            }
-
-            $users = $query->with(['unitKerja', 'progresPelatihans.pelatihan', 'sertifikats.pelatihan'])->orderBy('nama')->get();
-
-            $reportData = [];
-            foreach ($users as $user) {
-                $rekaps = RekapNilai::where('user_id', $user->id)->with('pelatihan')->get();
-                $progresList = $user->progresPelatihans;
-
-                $enrolledIds = $progresList->pluck('pelatihan_id');
-            $enrolledRekaps = $rekaps->whereIn('pelatihan_id', $enrolledIds)->filter(fn($r) => $r->nilai_akhir !== null);
-            $avgScore = $enrolledRekaps->isNotEmpty() ? $enrolledRekaps->avg('nilai_akhir') : 0;
-                $totalEnrolled = $progresList->count();
-                // Kelulusan murni dari RekapNilai status_kelulusan == 'lulus'
-                $totalCompleted = $rekaps->where('status_kelulusan', 'lulus')->count();
-                // Sertifikat hanya dihitung untuk pelatihan yang sertif_aktif == true
-                $totalCerts = $user->sertifikats->filter(function ($cert) {
-                    return $cert->pelatihan && (bool) $cert->pelatihan->sertif_aktif;
-                })->count();
-
-                $reportData[] = [
-                    'user' => $user,
-                    'totalEnrolled' => $totalEnrolled,
-                    'totalCompleted' => $totalCompleted,
-                    'totalCerts' => $totalCerts,
-                    'avgScore' => $avgScore,
-                    'rekaps' => $rekaps,
-                ];
-            }
+            $report = $this->globalReportData($unitKerjaId ? (int) $unitKerjaId : null);
 
             return view('admin.gradebook.cetak', [
                 'isAll' => true,
                 'pelatihan' => null,
-                'allPelatihans' => $allPelatihans,
-                'reportData' => $reportData,
+                'allPelatihans' => $report['allPelatihans'],
+                'reportData' => $report['allCoursesData'],
+                'gradebookSettings' => $report['gradebookSettings'],
                 'unitKerjaFilter' => $unitKerjaFilter,
                 'setting' => $setting,
             ]);
@@ -526,7 +585,8 @@ class GradebookController extends Controller
         $bobot = BobotNilai::getOrCreateDefault($pelatihan->id);
 
         $query = User::where('role', 'peserta')
-            ->where('status_akun', 'approved');
+            ->where('status_akun', 'approved')
+            ->whereHas('progresPelatihans', fn ($query) => $query->where('pelatihan_id', $pelatihan->id));
 
         if ($unitKerjaId) {
             $query->where('unit_kerja_id', $unitKerjaId);
@@ -559,7 +619,7 @@ class GradebookController extends Controller
      */
     private function pretestDetailData(User $user): array
     {
-        $pretest = \App\Models\Materi::where('is_pretest', true)->first();
+        $pretest = Materi::where('is_pretest', true)->first();
         $sesi = null;
         $hasilLatihans = collect();
 
@@ -576,5 +636,63 @@ class GradebookController extends Controller
         }
 
         return compact('user', 'pretest', 'sesi', 'hasilLatihans');
+    }
+
+    /**
+     * One data source for the global screen, print view and CSV export.
+     */
+    private function globalReportData(?int $unitKerjaId = null): array
+    {
+        $allPelatihans = Pelatihan::query()
+            ->with([
+                'materis' => fn ($query) => $query->where('is_active', true)->orderBy('urutan'),
+                'tugas' => fn ($query) => $query->where('is_active', true)->orderBy('urutan'),
+            ])
+            ->orderBy('judul')
+            ->get();
+
+        $query = User::query()
+            ->where('role', 'peserta')
+            ->where('status_akun', 'approved');
+
+        if ($unitKerjaId) {
+            $query->where('unit_kerja_id', $unitKerjaId);
+        }
+
+        $users = $query
+            ->with(['unitKerja', 'progresPelatihans', 'sertifikats.pelatihan'])
+            ->orderBy('nama')
+            ->get();
+
+        $allCoursesData = [];
+        foreach ($users as $user) {
+            $global = $this->globalGradebookService->calculate($user, $allPelatihans);
+            $enrolledCourses = collect($global['courseScores'])->where('enrolled', true);
+            $courseFinals = $enrolledCourses
+                ->pluck('nilai_akhir')
+                ->filter(fn ($score) => $score !== null);
+
+            $totalCerts = $user->sertifikats->filter(function ($certificate) {
+                return $certificate->pelatihan && (bool) $certificate->pelatihan->sertif_aktif;
+            })->count();
+
+            $allCoursesData[] = [
+                'user' => $user,
+                'totalEnrolled' => $enrolledCourses->count(),
+                'totalCompleted' => $enrolledCourses->where('completed', true)->count(),
+                'totalCerts' => $totalCerts,
+                'avgScore' => $courseFinals->isNotEmpty() ? round($courseFinals->avg(), 2) : 0,
+                'courseScores' => $global['courseScores'],
+                'teamScores' => $global['teamScores'],
+                'globalSummary' => $global['summary'],
+            ];
+        }
+
+        return [
+            'allPelatihans' => $allPelatihans,
+            'allCoursesData' => $allCoursesData,
+            'users' => $users,
+            'gradebookSettings' => $this->globalGradebookService->settings(),
+        ];
     }
 }

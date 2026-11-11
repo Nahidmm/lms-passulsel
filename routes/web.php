@@ -1,20 +1,38 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\BerkasArsipController;
+use App\Http\Controllers\Admin\DokumenAiController;
+use App\Http\Controllers\Admin\GradebookController;
+use App\Http\Controllers\Admin\ImportSoalController;
+use App\Http\Controllers\Admin\JabatanController;
+use App\Http\Controllers\Admin\KelolAksesController;
+use App\Http\Controllers\Admin\KuisReviewController;
+use App\Http\Controllers\Admin\PenilaianController;
+use App\Http\Controllers\Admin\PretestController;
+use App\Http\Controllers\Admin\TimController;
+use App\Http\Controllers\Admin\TugasController;
+use App\Http\Controllers\Admin\TugasGradingController;
+use App\Http\Controllers\Admin\UnitKerjaController;
+use App\Http\Controllers\Admin\UserImportController;
+use App\Http\Controllers\AiAssistantController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\MateriController;
-use App\Http\Controllers\VideoController;
 use App\Http\Controllers\EvaluasiController;
-use App\Http\Controllers\StatistikController;
-use App\Http\Controllers\AiAssistantController;
 use App\Http\Controllers\KalenderController;
-use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ManajemenAkunController;
-use App\Http\Controllers\SoalController;
-use App\Http\Controllers\Admin\KelolAksesController;
-use App\Http\Controllers\Admin\JabatanController;
+use App\Http\Controllers\MateriController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PelatihanController;
+use App\Http\Controllers\Peserta\PretestPesertaController;
+use App\Http\Controllers\Peserta\TugasPesertaController;
+use App\Http\Controllers\SertifikatController;
+use App\Http\Controllers\SertifikatSettingController;
+use App\Http\Controllers\SoalController;
+use App\Http\Controllers\StatistikController;
+use App\Http\Controllers\Tim\DashboardTimController;
+use App\Http\Controllers\VideoController;
+use Illuminate\Support\Facades\Route;
 
 // Public / Guest Routes
 Route::middleware('guest')->group(function () {
@@ -24,13 +42,13 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-    
+
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 
 // Public Route untuk Verifikasi Sertifikat
-Route::get('/verify-certificate/{credential_id}', [\App\Http\Controllers\SertifikatController::class, 'verify'])->name('sertifikat.verify');
+Route::get('/verify-certificate/{credential_id}', [SertifikatController::class, 'verify'])->name('sertifikat.verify');
 
 // Authenticated Routes (Any Role)
 Route::middleware(['auth'])->group(function () {
@@ -45,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Normal access (Account approved, password changed, and pretest completed)
     Route::middleware(['account.approved', 'force.password', 'pretest.completed'])->group(function () {
-        
+
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Profil
@@ -68,14 +86,14 @@ Route::middleware(['auth'])->group(function () {
         // ==========================================
         Route::middleware(['role:peserta'])->prefix('peserta')->name('peserta.')->group(function () {
             // Sertifikat
-            Route::get('/sertifikat/{credential_id}/download', [\App\Http\Controllers\SertifikatController::class, 'download'])->name('sertifikat.download');
-            
+            Route::get('/sertifikat/{credential_id}/download', [SertifikatController::class, 'download'])->name('sertifikat.download');
+
             // Pembelajaran (Pelatihan)
-            Route::get('/pelatihan', [\App\Http\Controllers\PelatihanController::class, 'indexPeserta'])->name('pelatihan.index');
-            Route::get('/pelatihan/{pelatihan}', [\App\Http\Controllers\PelatihanController::class, 'showPeserta'])->name('pelatihan.show');
-            Route::post('/pelatihan/{pelatihan}/enroll', [\App\Http\Controllers\PelatihanController::class, 'enrollPeserta'])->name('pelatihan.enroll');
-            Route::get('/pembelajaran/materi/{materi}', [\App\Http\Controllers\MateriController::class, 'showPeserta'])->name('pembelajaran.materi.show');
-            Route::post('/pembelajaran/materi/{materi}/progress', [\App\Http\Controllers\MateriController::class, 'updateProgress'])->name('pembelajaran.materi.progress');
+            Route::get('/pelatihan', [PelatihanController::class, 'indexPeserta'])->name('pelatihan.index');
+            Route::get('/pelatihan/{pelatihan}', [PelatihanController::class, 'showPeserta'])->name('pelatihan.show');
+            Route::post('/pelatihan/{pelatihan}/enroll', [PelatihanController::class, 'enrollPeserta'])->name('pelatihan.enroll');
+            Route::get('/pembelajaran/materi/{materi}', [MateriController::class, 'showPeserta'])->name('pembelajaran.materi.show');
+            Route::post('/pembelajaran/materi/{materi}/progress', [MateriController::class, 'updateProgress'])->name('pembelajaran.materi.progress');
 
             // Evaluasi (Kuis)
             Route::post('/evaluasi/start', [EvaluasiController::class, 'start'])->name('evaluasi.start');
@@ -87,11 +105,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/evaluasi/hasil/{sesi}', [EvaluasiController::class, 'hasil'])->name('evaluasi.hasil');
 
             // Pretest
-            Route::get('/pretest/take', [\App\Http\Controllers\Peserta\PretestPesertaController::class, 'take'])->name('pretest.take');
+            Route::get('/pretest/take', [PretestPesertaController::class, 'take'])->name('pretest.take');
 
             // Penugasan & Upload Sertifikat Luar
-            Route::get('/tugas/{tugas}', [\App\Http\Controllers\Peserta\TugasPesertaController::class, 'show'])->name('tugas.show');
-            Route::post('/tugas/{tugas}/submit', [\App\Http\Controllers\Peserta\TugasPesertaController::class, 'submit'])->name('tugas.submit');
+            Route::get('/tugas/{tugas}', [TugasPesertaController::class, 'show'])->name('tugas.show');
+            Route::post('/tugas/{tugas}/submit', [TugasPesertaController::class, 'submit'])->name('tugas.submit');
 
             // Statistik / Riwayat
             Route::get('/statistik', [StatistikController::class, 'indexPeserta'])->name('statistik.index');
@@ -102,63 +120,65 @@ Route::middleware(['auth'])->group(function () {
         // ==========================================
         Route::middleware(['role:admin,superadmin'])->prefix('admin')->name('admin.')->group(function () {
             // Kelola Pelatihan, Materi, dan Soal (Nested)
-            Route::resource('pelatihan', \App\Http\Controllers\PelatihanController::class);
-            Route::post('/pelatihan/{pelatihan}/toggle-sertif', [\App\Http\Controllers\PelatihanController::class, 'toggleSertif'])->name('pelatihan.toggle-sertif');
-            Route::resource('pelatihan.materi', \App\Http\Controllers\MateriController::class)->shallow();
-            Route::resource('materi.soal', \App\Http\Controllers\SoalController::class)->shallow();
-            Route::match(['get', 'post'], 'materi/{materi}/preview-quiz', [\App\Http\Controllers\MateriController::class, 'previewQuiz'])->name('materi.preview-quiz');
-            Route::post('soal/{soal}/resync', [\App\Http\Controllers\SoalController::class, 'resync'])->name('soal.resync');
+            Route::resource('pelatihan', PelatihanController::class);
+            Route::post('/pelatihan/{pelatihan}/toggle-sertif', [PelatihanController::class, 'toggleSertif'])->name('pelatihan.toggle-sertif');
+            Route::resource('pelatihan.materi', MateriController::class)->shallow();
+            Route::resource('materi.soal', SoalController::class)->shallow();
+            Route::match(['get', 'post'], 'materi/{materi}/preview-quiz', [MateriController::class, 'previewQuiz'])->name('materi.preview-quiz');
+            Route::post('soal/{soal}/resync', [SoalController::class, 'resync'])->name('soal.resync');
 
             // Penugasan & Upload Sertifikat (STRAPSUS PAS)
-            Route::resource('pelatihan.tugas', \App\Http\Controllers\Admin\TugasController::class)->parameters(['tugas' => 'tugas'])->shallow();
-            Route::get('tugas/{tugas}/submissions', [\App\Http\Controllers\Admin\TugasGradingController::class, 'index'])->name('tugas.submissions');
-            Route::post('tugas-submission/{submission}/nilai', [\App\Http\Controllers\Admin\TugasGradingController::class, 'grade'])->name('tugas.submission.nilai');
-            Route::get('tugas-pending', [\App\Http\Controllers\Admin\TugasGradingController::class, 'pendingIndex'])->name('tugas.pending');
+            Route::resource('pelatihan.tugas', TugasController::class)->parameters(['tugas' => 'tugas'])->shallow();
+            Route::get('tugas/{tugas}/submissions', [TugasGradingController::class, 'index'])->name('tugas.submissions');
+            Route::post('tugas-submission/{submission}/nilai', [TugasGradingController::class, 'grade'])->name('tugas.submission.nilai');
+            Route::get('tugas-pending', [TugasGradingController::class, 'pendingIndex'])->name('tugas.pending');
 
             // Moodle-style Gradebook (Buku Nilai & Konfigurasi Bobot)
-            Route::get('gradebook', [\App\Http\Controllers\Admin\GradebookController::class, 'globalIndex'])->name('gradebook.index');
-            Route::get('gradebook/cetak', [\App\Http\Controllers\Admin\GradebookController::class, 'cetak'])->name('gradebook.cetak');
-            Route::get('pelatihan/{pelatihan}/gradebook', [\App\Http\Controllers\Admin\GradebookController::class, 'index'])->name('pelatihan.gradebook');
-            Route::post('pelatihan/{pelatihan}/gradebook/bobot', [\App\Http\Controllers\Admin\GradebookController::class, 'updateBobot'])->name('pelatihan.gradebook.bobot');
-            Route::get('pelatihan/{pelatihan}/gradebook/export', [\App\Http\Controllers\Admin\GradebookController::class, 'export'])->name('pelatihan.gradebook.export');
-            Route::get('gradebook/pretest', [\App\Http\Controllers\Admin\GradebookController::class, 'pretest'])->name('gradebook.pretest');
-            Route::get('gradebook/pretest/pdf', [\App\Http\Controllers\Admin\GradebookController::class, 'exportPretestPdf'])->name('gradebook.pretest.pdf');
-            Route::get('gradebook/pretest/{user}', [\App\Http\Controllers\Admin\GradebookController::class, 'pretestDetail'])->name('gradebook.pretest.detail');
-            Route::get('gradebook/pretest/{user}/pdf', [\App\Http\Controllers\Admin\GradebookController::class, 'exportPretestDetailPdf'])->name('gradebook.pretest.detail.pdf');
-            Route::get('berkas-arsip', [\App\Http\Controllers\Admin\BerkasArsipController::class, 'index'])->name('berkas.index');
-            Route::get('berkas-arsip/pdf', [\App\Http\Controllers\Admin\BerkasArsipController::class, 'exportPdf'])->name('berkas.pdf');
+            Route::get('gradebook', [GradebookController::class, 'globalIndex'])->name('gradebook.index');
+            Route::get('gradebook/cetak', [GradebookController::class, 'cetak'])->name('gradebook.cetak');
+            Route::get('gradebook/export', [GradebookController::class, 'exportAllCourses'])->name('gradebook.export');
+            Route::post('gradebook/bobot-global', [GradebookController::class, 'updateGlobalBobot'])->name('gradebook.bobot-global');
+            Route::get('pelatihan/{pelatihan}/gradebook', [GradebookController::class, 'index'])->name('pelatihan.gradebook');
+            Route::post('pelatihan/{pelatihan}/gradebook/bobot', [GradebookController::class, 'updateBobot'])->name('pelatihan.gradebook.bobot');
+            Route::get('pelatihan/{pelatihan}/gradebook/export', [GradebookController::class, 'export'])->name('pelatihan.gradebook.export');
+            Route::get('gradebook/pretest', [GradebookController::class, 'pretest'])->name('gradebook.pretest');
+            Route::get('gradebook/pretest/pdf', [GradebookController::class, 'exportPretestPdf'])->name('gradebook.pretest.pdf');
+            Route::get('gradebook/pretest/{user}', [GradebookController::class, 'pretestDetail'])->name('gradebook.pretest.detail');
+            Route::get('gradebook/pretest/{user}/pdf', [GradebookController::class, 'exportPretestDetailPdf'])->name('gradebook.pretest.detail.pdf');
+            Route::get('berkas-arsip', [BerkasArsipController::class, 'index'])->name('berkas.index');
+            Route::get('berkas-arsip/pdf', [BerkasArsipController::class, 'exportPdf'])->name('berkas.pdf');
 
             // Kuis: Nilai & Review Peserta
-            Route::get('kuis/{materi}/peserta', [\App\Http\Controllers\Admin\KuisReviewController::class, 'indexPeserta'])->name('kuis.peserta');
-            Route::get('kuis/{materi}/peserta/{sesi}', [\App\Http\Controllers\Admin\KuisReviewController::class, 'showJawaban'])->name('kuis.jawaban');
-            Route::post('kuis/{materi}/peserta/{sesi}/nilai', [\App\Http\Controllers\Admin\KuisReviewController::class, 'nilaiManual'])->name('kuis.nilai-manual');
-            Route::post('kuis/{materi}/peserta/{sesi}/reset', [\App\Http\Controllers\Admin\KuisReviewController::class, 'resetPeserta'])->name('kuis.peserta.reset');
-            Route::get('kuis/{materi}/export', [\App\Http\Controllers\Admin\KuisReviewController::class, 'exportNilai'])->name('kuis.export');
+            Route::get('kuis/{materi}/peserta', [KuisReviewController::class, 'indexPeserta'])->name('kuis.peserta');
+            Route::get('kuis/{materi}/peserta/{sesi}', [KuisReviewController::class, 'showJawaban'])->name('kuis.jawaban');
+            Route::post('kuis/{materi}/peserta/{sesi}/nilai', [KuisReviewController::class, 'nilaiManual'])->name('kuis.nilai-manual');
+            Route::post('kuis/{materi}/peserta/{sesi}/reset', [KuisReviewController::class, 'resetPeserta'])->name('kuis.peserta.reset');
+            Route::get('kuis/{materi}/export', [KuisReviewController::class, 'exportNilai'])->name('kuis.export');
 
             // Import Soal dari CSV
-            Route::get('materi/{materi}/import-soal', [\App\Http\Controllers\Admin\ImportSoalController::class, 'create'])->name('soal.import');
-            Route::post('materi/{materi}/import-soal', [\App\Http\Controllers\Admin\ImportSoalController::class, 'store'])->name('soal.import.store');
-            Route::get('materi/{materi}/template-soal', [\App\Http\Controllers\Admin\ImportSoalController::class, 'template'])->name('soal.template');
+            Route::get('materi/{materi}/import-soal', [ImportSoalController::class, 'create'])->name('soal.import');
+            Route::post('materi/{materi}/import-soal', [ImportSoalController::class, 'store'])->name('soal.import.store');
+            Route::get('materi/{materi}/template-soal', [ImportSoalController::class, 'template'])->name('soal.template');
 
             // API endpoints for Drag-and-Drop builder
-            Route::post('pelatihan/{pelatihan}/reorder', [\App\Http\Controllers\PelatihanController::class, 'reorder'])->name('pelatihan.reorder');
-            
+            Route::post('pelatihan/{pelatihan}/reorder', [PelatihanController::class, 'reorder'])->name('pelatihan.reorder');
+
             // Note: VideoController is deprecated since video is now a type of Materi
 
             // Redirect legacy statistik & penilaian to unified Gradebook (Buku Nilai)
-            Route::get('/statistik', fn() => redirect()->route('admin.gradebook.index'))->name('statistik.index');
+            Route::get('/statistik', fn () => redirect()->route('admin.gradebook.index'))->name('statistik.index');
             Route::get('/statistik/export', [StatistikController::class, 'exportCsv'])->name('statistik.export');
-            Route::get('/penilaian', fn() => redirect()->route('admin.gradebook.index'))->name('penilaian.index');
-            Route::get('/penilaian/{user}', [\App\Http\Controllers\Admin\PenilaianController::class, 'show'])->name('penilaian.show');
+            Route::get('/penilaian', fn () => redirect()->route('admin.gradebook.index'))->name('penilaian.index');
+            Route::get('/penilaian/{user}', [PenilaianController::class, 'show'])->name('penilaian.show');
 
             // Pretest Management
-            Route::get('/pretest', [App\Http\Controllers\Admin\PretestController::class, 'index'])->name('pretest.index');
-            Route::post('/pretest/setting', [App\Http\Controllers\Admin\PretestController::class, 'updateSetting'])->name('pretest.setting');
-            Route::post('/pretest/topik', [App\Http\Controllers\Admin\PretestController::class, 'storeTopik'])->name('pretest.topik.store');
-            Route::put('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'updateTopik'])->name('pretest.topik.update');
-            Route::delete('/pretest/topik/{topik}', [App\Http\Controllers\Admin\PretestController::class, 'destroyTopik'])->name('pretest.topik.destroy');
-            Route::post('/pretest/reset/{user}', [App\Http\Controllers\Admin\PretestController::class, 'resetPeserta'])->name('pretest.reset');
-            Route::post('/pretest/exempt/{user}', [App\Http\Controllers\Admin\PretestController::class, 'exemptPeserta'])->name('pretest.exempt');
+            Route::get('/pretest', [PretestController::class, 'index'])->name('pretest.index');
+            Route::post('/pretest/setting', [PretestController::class, 'updateSetting'])->name('pretest.setting');
+            Route::post('/pretest/topik', [PretestController::class, 'storeTopik'])->name('pretest.topik.store');
+            Route::put('/pretest/topik/{topik}', [PretestController::class, 'updateTopik'])->name('pretest.topik.update');
+            Route::delete('/pretest/topik/{topik}', [PretestController::class, 'destroyTopik'])->name('pretest.topik.destroy');
+            Route::post('/pretest/reset/{user}', [PretestController::class, 'resetPeserta'])->name('pretest.reset');
+            Route::post('/pretest/exempt/{user}', [PretestController::class, 'exemptPeserta'])->name('pretest.exempt');
 
             // Kelola Jabatan
             Route::get('/jabatan', [JabatanController::class, 'index'])->name('jabatan.index');
@@ -177,18 +197,18 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/akun/delete/{id}', [ManajemenAkunController::class, 'destroy'])->name('akun.destroy');
 
             // Import Users
-            Route::get('/users/import', [\App\Http\Controllers\Admin\UserImportController::class, 'index'])->name('users.import');
-            Route::post('/users/import', [\App\Http\Controllers\Admin\UserImportController::class, 'store'])->name('users.import.store');
-            Route::get('/users/import/template', [\App\Http\Controllers\Admin\UserImportController::class, 'downloadTemplate'])->name('users.import.template');
+            Route::get('/users/import', [UserImportController::class, 'index'])->name('users.import');
+            Route::post('/users/import', [UserImportController::class, 'store'])->name('users.import.store');
+            Route::get('/users/import/template', [UserImportController::class, 'downloadTemplate'])->name('users.import.template');
 
             // Unit Kerja
-            Route::resource('unit-kerja', \App\Http\Controllers\Admin\UnitKerjaController::class)->except(['create', 'show', 'edit']);
+            Route::resource('unit-kerja', UnitKerjaController::class)->except(['create', 'show', 'edit']);
 
             // Kelola Tim Pembinaan (4 Tim)
-            Route::get('/tim', [\App\Http\Controllers\Admin\TimController::class, 'index'])->name('tim.index');
-            Route::post('/tim', [\App\Http\Controllers\Admin\TimController::class, 'store'])->name('tim.store');
-            Route::get('/tim/penilaian', [\App\Http\Controllers\Admin\TimController::class, 'rekapPenilaian'])->name('tim.penilaian');
-            Route::delete('/tim/{user}', [\App\Http\Controllers\Admin\TimController::class, 'destroy'])->name('tim.destroy');
+            Route::get('/tim', [TimController::class, 'index'])->name('tim.index');
+            Route::post('/tim', [TimController::class, 'store'])->name('tim.store');
+            Route::get('/tim/penilaian', [TimController::class, 'rekapPenilaian'])->name('tim.penilaian');
+            Route::delete('/tim/{user}', [TimController::class, 'destroy'])->name('tim.destroy');
 
             // Kalender Akademik
             Route::resource('kalender', KalenderController::class);
@@ -196,16 +216,16 @@ Route::middleware(['auth'])->group(function () {
             // ==========================================
             // AKSI SERTIFIKAT (Admin / Superadmin)
             // ==========================================
-            Route::post('/sertifikat/generate', [\App\Http\Controllers\SertifikatController::class, 'generate'])->name('sertifikat.generate');
-            Route::delete('/sertifikat/{sertifikat}', [\App\Http\Controllers\SertifikatController::class, 'destroy'])->name('sertifikat.destroy');
+            Route::post('/sertifikat/generate', [SertifikatController::class, 'generate'])->name('sertifikat.generate');
+            Route::delete('/sertifikat/{sertifikat}', [SertifikatController::class, 'destroy'])->name('sertifikat.destroy');
 
             // ==========================================
             // SERTIFIKAT (Superadmin Only)
             // ==========================================
             Route::middleware(['role:superadmin'])->group(function () {
-                                Route::get('/sertifikat-setting/preview', [\App\Http\Controllers\SertifikatSettingController::class, 'preview'])->name('sertifikat-setting.preview');
-Route::get('/sertifikat-setting', [\App\Http\Controllers\SertifikatSettingController::class, 'edit'])->name('sertifikat-setting.edit');
-                Route::put('/sertifikat-setting', [\App\Http\Controllers\SertifikatSettingController::class, 'update'])->name('sertifikat-setting.update');
+                Route::get('/sertifikat-setting/preview', [SertifikatSettingController::class, 'preview'])->name('sertifikat-setting.preview');
+                Route::get('/sertifikat-setting', [SertifikatSettingController::class, 'edit'])->name('sertifikat-setting.edit');
+                Route::put('/sertifikat-setting', [SertifikatSettingController::class, 'update'])->name('sertifikat-setting.update');
             });
 
             // ==========================================
@@ -225,11 +245,11 @@ Route::get('/sertifikat-setting', [\App\Http\Controllers\SertifikatSettingContro
                 // Assign Role ke User
                 Route::get('/users', [KelolAksesController::class, 'users'])->name('users');
                 Route::post('/users/{id}/assign', [KelolAksesController::class, 'assignRole'])->name('users.assign');
-                
+
                 // Knowledge Base AI (RAG)
-                Route::get('/dokumen-ai', [\App\Http\Controllers\Admin\DokumenAiController::class, 'index'])->name('dokumen-ai.index');
-                Route::post('/dokumen-ai', [\App\Http\Controllers\Admin\DokumenAiController::class, 'store'])->name('dokumen-ai.store');
-                Route::delete('/dokumen-ai/{dokumen_ai}', [\App\Http\Controllers\Admin\DokumenAiController::class, 'destroy'])->name('dokumen-ai.destroy');
+                Route::get('/dokumen-ai', [DokumenAiController::class, 'index'])->name('dokumen-ai.index');
+                Route::post('/dokumen-ai', [DokumenAiController::class, 'store'])->name('dokumen-ai.store');
+                Route::delete('/dokumen-ai/{dokumen_ai}', [DokumenAiController::class, 'destroy'])->name('dokumen-ai.destroy');
             });
         });
 
@@ -237,18 +257,8 @@ Route::get('/sertifikat-setting', [\App\Http\Controllers\SertifikatSettingContro
         // ROLE: TIM PEMBINAAN (mental, fisik, akhlak, kompetensi)
         // ==========================================
         Route::middleware(['role:tim'])->prefix('tim')->name('tim.')->group(function () {
-            Route::get('/dashboard', [\App\Http\Controllers\Tim\DashboardTimController::class, 'dashboard'])->name('dashboard');
-            Route::post('/penilaian', [\App\Http\Controllers\Tim\DashboardTimController::class, 'storePenilaian'])->name('penilaian.store');
+            Route::get('/dashboard', [DashboardTimController::class, 'dashboard'])->name('dashboard');
+            Route::post('/penilaian', [DashboardTimController::class, 'storePenilaian'])->name('penilaian.store');
         });
     });
 });
-
-
-
-
-
-
-
-
-
-
